@@ -38,7 +38,7 @@ export default function GameSetup({ onStart }) {
                   <button
                     key={num}
                     onClick={() => updatePlayerCount(num)}
-                    className={'flex-1 py-3 rounded-lg font-semibold transition ' + (
+                    className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (
                       playerCount === num
                         ? 'bg-amber-600 text-white'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -71,7 +71,7 @@ export default function GameSetup({ onStart }) {
 
           <button
             onClick={() => onStart(playerNames.slice(0, playerCount))}
-            className="w-full bg-amber-600 text-white py-4 rounded-lg font-bold text-xl hover:bg-amber-700 transition"
+            className="w-full bg-amber-600 text-white py-4 rounded-lg font-bold text-xl hover:bg-amber-700 transition cursor-pointer"
           >
             Commencer la partie
           </button>

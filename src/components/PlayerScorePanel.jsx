@@ -90,17 +90,8 @@ function DevelopmentsList({ playerDevelopments, onBuyDevelopment, canBuy, player
               </div>
               <div className="flex-1 font-medium">{dev.name}</div>
               <div className="w-12 text-center font-semibold text-amber-700">{dev.points}🏆</div>
-              <div className="w-32 text-xs text-gray-600 italic">
-                {dev.id === 'agriculture' && 'Nourriture +1'}
-                {dev.id === 'quarrying' && 'Pierre x2'}
-                {dev.id === 'masonry' && 'Ouvriers +1'}
-                {dev.id === 'coinage' && 'Pièces +5'}
-                {dev.id === 'irrigation' && 'Pas sécheresse'}
-                {dev.id === 'medicine' && 'Pas peste'}
-                {dev.id === 'caravans' && 'Pas limite'}
-                {dev.id === 'religion' && 'Protection'}
-                {dev.id === 'architecture' && '+2pts/monument'}
-                {dev.id === 'empire' && '+1pt/cité'}
+              <div className="w-40 text-xs text-gray-600 italic">
+                {dev.effect}
               </div>
             </div>
           );
@@ -186,18 +177,43 @@ function DisastersDisplay({ disasters }) {
   );
 }
 
-function ResourcesDisplay({ goodsPositions, food }) {
+function FoodDisplay({ food }) {
+  const maxFood = 15;
+
+  return (
+    <div className="mb-6">
+      <h3 className="text-lg font-bold mb-3 text-gray-800">🌾 Nourriture</h3>
+      <div className="bg-amber-50 rounded-lg p-3">
+        <div className="flex gap-1 flex-wrap">
+          {Array(maxFood).fill(0).map(function(_, idx) {
+            const value = idx + 1;
+            return (
+              <div key={idx} className="flex flex-col items-center">
+                <div
+                  className={'w-6 h-8 border-2 border-gray-400 rounded ' + (
+                    value <= food ? 'bg-amber-600' : 'bg-white'
+                  )}
+                />
+                <div className="text-xs text-gray-600 mt-0.5">{value}</div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="text-center mt-2 font-bold text-amber-700">
+          Nourriture actuelle: {food}/15
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ResourcesDisplay({ goodsPositions }) {
   const totalGoods = getTotalGoodsCount(goodsPositions);
   const goodsValue = getGoodsValue(goodsPositions);
 
   return (
     <div className="mb-6">
-      <h3 className="text-lg font-bold mb-3 text-gray-800">Ressources</h3>
-
-      <div className="bg-amber-50 rounded-lg p-3 mb-3">
-        <div className="text-sm text-gray-600 mb-1">Nourriture</div>
-        <div className="text-2xl font-bold text-amber-700">🌾 {food}</div>
-      </div>
+      <h3 className="text-lg font-bold mb-3 text-gray-800">Biens</h3>
 
       <div className="bg-gray-50 rounded-lg p-3">
         <div className="text-sm font-semibold text-gray-700 mb-2">
@@ -259,6 +275,7 @@ export default function PlayerScorePanel({
         </div>
       </div>
 
+      <FoodDisplay food={player.food} />
       <CityDisplay
         cities={player.cities}
         onBuildCity={onBuildCity}
@@ -278,7 +295,7 @@ export default function PlayerScorePanel({
         playerGoodsValue={goodsValue}
         pendingCoins={pendingCoins}
       />
-      <ResourcesDisplay goodsPositions={player.goodsPositions} food={player.food} />
+      <ResourcesDisplay goodsPositions={player.goodsPositions} />
       <DisastersDisplay disasters={player.disasters} />
     </div>
   );

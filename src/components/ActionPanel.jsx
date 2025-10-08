@@ -1,18 +1,101 @@
 import { useState } from 'react';
-import { getGoodsValue } from '../utils/gameUtils';
+import { getGoodsValue, getTotalGoodsCount } from '../utils/gameUtils';
+import { GOODS_TYPES, GOODS_NAMES, GOODS_COLORS, GOODS_VALUES } from '../constants/gameData';
 
 function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onToggleLock, onReroll, onKeep, currentPlayer }) {
   const canReroll = rollCount < 2 && lockedDice.length < diceResults.length;
   const hasAgriculture = currentPlayer.developments.indexOf('agriculture') !== -1;
 
+  // Compter les crânes
+  let totalSkulls = 0;
+  for (let i = 0; i < diceResults.length; i++) {
+    if (diceResults[i] && diceResults[i].skulls) {
+      totalSkulls += diceResults[i].skulls;
+    }
+  }
+
+  // Déterminer le type de catastrophe
+  let disasterType = null;
+  let disasterMessage = '';
+  let disasterAffected = '';
+
+  if (totalSkulls === 2) {
+    disasterType = 'drought';
+    const hasIrrigation = currentPlayer.developments.indexOf('irrigation') !== -1;
+    if (hasIrrigation) {
+      disasterMessage = 'Sécheresse évitée grâce à l\'Irrigation';
+      disasterAffected = 'protected';
+    } else {
+      disasterMessage = 'Sécheresse !';
+      disasterAffected = 'Vous perdez 2 points';
+    }
+  } else if (totalSkulls === 3) {
+    disasterType = 'plague';
+    const hasMedicine = currentPlayer.developments.indexOf('medicine') !== -1;
+    if (hasMedicine) {
+      disasterMessage = 'Peste évitée grâce à la Médecine';
+      disasterAffected = 'Les autres joueurs perdent 3 points';
+    } else {
+      disasterMessage = 'Peste !';
+      disasterAffected = 'Les autres joueurs non protégés perdent 3 points';
+    }
+  } else if (totalSkulls === 4) {
+    disasterType = 'invasion';
+    let hasGreatWall = false;
+    for (let i = 0; i < currentPlayer.monuments.length; i++) {
+      if (currentPlayer.monuments[i].id === 'great_wall' && currentPlayer.monuments[i].completed) {
+        hasGreatWall = true;
+        break;
+      }
+    }
+    if (hasGreatWall) {
+      disasterMessage = 'Invasion repoussée par la Grande Muraille';
+      disasterAffected = 'protected';
+    } else {
+      disasterMessage = 'Invasion !';
+      disasterAffected = 'Vous perdez 4 points';
+    }
+  } else if (totalSkulls >= 5) {
+    disasterType = 'revolt';
+    const hasReligion = currentPlayer.developments.indexOf('religion') !== -1;
+    if (hasReligion) {
+      disasterMessage = 'Révolte évitée grâce à la Religion';
+      disasterAffected = 'Les autres joueurs perdent toutes leurs ressources';
+    } else {
+      disasterMessage = 'Révolte !';
+      disasterAffected = 'Vous perdez toutes vos ressources';
+    }
+  }
+
   function getDiceIcon(result) {
     if (!result) return '?';
-    if (result.type === 'food') return '🌾';
-    if (result.type === 'goods') return '📦';
-    if (result.type === 'workers') return '👷';
-    if (result.type === 'food_or_workers') return '🌾/👷';
-    if (result.type === 'coins') return '💰';
-    return '?';
+
+    let mainIcon = '';
+
+    if (result.type === 'food') {
+      mainIcon = '🌾'.repeat(result.value);
+    } else if (result.type === 'goods') {
+      if (result.skulls > 0 && result.value === 2) {
+        // Pour le dé goods + crâne : amphore, crâne, amphore
+        return '🏺☠️🏺';
+      }
+      mainIcon = '🏺'.repeat(result.value);
+    } else if (result.type === 'workers') {
+      mainIcon = '⚒️'.repeat(result.value);
+    } else if (result.type === 'food_or_workers') {
+      mainIcon = '🌾🌾/⚒️⚒️';
+    } else if (result.type === 'coins') {
+      mainIcon = '💰';
+    } else {
+      mainIcon = '?';
+    }
+
+    if (result.skulls > 0 && result.type !== 'goods') {
+      const skullIcon = '☠️'.repeat(result.skulls);
+      return mainIcon + ' ' + skullIcon;
+    }
+
+    return mainIcon;
   }
 
   function getDiceText(result) {
@@ -27,7 +110,6 @@ function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onTogg
     if (result.type === 'workers') text = result.value + ' ouvrier' + (result.value > 1 ? 's' : '');
     if (result.type === 'food_or_workers') text = result.value + ' nourriture OU ouvriers';
     if (result.type === 'coins') text = result.value + ' pièces';
-    if (result.skulls > 0) text += ' ☠️';
     return text;
   }
 
@@ -42,6 +124,28 @@ function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onTogg
         </p>
       </div>
 
+      {disasterType && (
+        <div className={`mb-4 p-4 rounded-lg border-2 ${
+          disasterAffected === 'protected'
+            ? 'bg-green-50 border-green-400'
+            : 'bg-red-50 border-red-400'
+        }`}>
+          <div className="text-center">
+            <div className="text-3xl mb-2">
+              {disasterAffected === 'protected' ? '🛡️' : '☠️'}
+            </div>
+            <div className={`text-lg font-bold mb-1 ${
+              disasterAffected === 'protected' ? 'text-green-700' : 'text-red-700'
+            }`}>
+              {disasterMessage}
+            </div>
+            <div className="text-sm text-gray-600">
+              {disasterAffected !== 'protected' && disasterAffected}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-3 gap-3 mb-6">
         {diceResults.map(function(result, i) {
           const isLocked = lockedDice.indexOf(i) !== -1;
@@ -52,10 +156,10 @@ function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onTogg
             if (hasSkulls) {
               buttonClass += 'bg-red-200 border-4 border-red-400 cursor-not-allowed';
             } else {
-              buttonClass += 'bg-amber-200 border-4 border-amber-500';
+              buttonClass += 'bg-amber-200 border-4 border-amber-500 cursor-pointer';
             }
           } else {
-            buttonClass += 'bg-gray-100 border-4 border-gray-300 hover:border-amber-300';
+            buttonClass += 'bg-gray-100 border-4 border-gray-300 hover:border-amber-300 cursor-pointer';
           }
 
           return (
@@ -88,7 +192,7 @@ function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onTogg
           <button
             onClick={onReroll}
             disabled={isRolling}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-400 transition"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-400 transition cursor-pointer disabled:cursor-not-allowed"
           >
             Relancer les dés non verrouillés
           </button>
@@ -96,7 +200,7 @@ function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onTogg
         <button
           onClick={onKeep}
           disabled={isRolling}
-          className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 transition"
+          className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 transition cursor-pointer disabled:cursor-not-allowed"
         >
           Conserver et continuer
         </button>
@@ -120,7 +224,7 @@ function ChooseFoodOrWorkers({ pendingFoodOrWorkers, currentPlayer, onChoose, fo
   }
 
   const currentFood = currentPlayer.food;
-  const futureFood = Math.min(currentFood + totalFood, 12);
+  const futureFood = Math.min(currentFood + totalFood, 15);
   const foodAfterFeeding = Math.max(0, futureFood - citiesToFeed);
   const foodShortage = Math.max(0, citiesToFeed - futureFood);
 
@@ -157,7 +261,7 @@ function ChooseFoodOrWorkers({ pendingFoodOrWorkers, currentPlayer, onChoose, fo
         </div>
 
         <div className="bg-purple-50 rounded-lg p-3">
-          <div className="text-xs text-gray-600 mb-2 font-semibold">👷 Ouvriers</div>
+          <div className="text-xs text-gray-600 mb-2 font-semibold">⚒️ Ouvriers</div>
           <div className="text-sm space-y-1">
             <div className="flex justify-between">
               <span>Dés ouvriers:</span>
@@ -184,7 +288,7 @@ function ChooseFoodOrWorkers({ pendingFoodOrWorkers, currentPlayer, onChoose, fo
         <div className="text-center mb-6">
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-center">
-              <div className="text-4xl mb-1">👷</div>
+              <div className="text-4xl mb-1">⚒️</div>
               <div className="text-2xl font-bold text-purple-700">{totalWorkers}</div>
               {hasMasonry && (pendingFoodOrWorkers - foodSelected) > 0 && (
                 <span className="text-xs text-gray-600">(+Maçonnerie)</span>
@@ -211,7 +315,7 @@ function ChooseFoodOrWorkers({ pendingFoodOrWorkers, currentPlayer, onChoose, fo
 
       <button
         onClick={() => onChoose(foodSelected)}
-        className="w-full bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700 text-lg"
+        className="w-full bg-green-600 text-white py-4 rounded-lg font-bold hover:bg-green-700 text-lg cursor-pointer"
       >
         Valider
       </button>
@@ -273,7 +377,7 @@ function FeedPhase({ currentPlayer, citiesToFeed, onContinue }) {
 
       <button
         onClick={onContinue}
-        className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700"
+        className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 cursor-pointer"
       >
         Continuer
       </button>
@@ -304,7 +408,7 @@ function BuildPhaseDisplay({ pendingWorkers, onReset, onSkip }) {
       <div className="flex flex-col gap-3">
         <button
           onClick={onReset}
-          className="w-full bg-orange-500 text-white py-3 rounded-lg font-bold hover:bg-orange-600"
+          className="w-full bg-orange-500 text-white py-3 rounded-lg font-bold hover:bg-orange-600 cursor-pointer"
         >
           Annuler toutes les sélections
         </button>
@@ -315,7 +419,7 @@ function BuildPhaseDisplay({ pendingWorkers, onReset, onSkip }) {
           className={`w-full py-3 rounded-lg font-bold ${
             hasWorkersRemaining
               ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-              : 'bg-gray-600 text-white hover:bg-gray-700'
+              : 'bg-gray-600 text-white hover:bg-gray-700 cursor-pointer'
           }`}
         >
           Terminer la construction
@@ -325,31 +429,186 @@ function BuildPhaseDisplay({ pendingWorkers, onReset, onSkip }) {
   );
 }
 
-function BuyPhaseDisplay({ player, pendingCoins, onReset, onSkip, hasPurchased }) {
+function BuyPhaseDisplay({ player, pendingCoins, onReset, onSkip, hasPurchased, selectedDevelopment, selectedGoods, selectedCoins, onToggleGood, onConfirmPurchase, onCancelSelection, calculateSelectedValue, lastPurchasedDevelopment }) {
+  const totalGoods = getTotalGoodsCount(player.goodsPositions);
+  const goodsValue = getGoodsValue(player.goodsPositions);
+  const totalValue = goodsValue + pendingCoins;
+
+  if (selectedDevelopment) {
+    const selectedValue = calculateSelectedValue();
+    const canPurchase = selectedValue >= selectedDevelopment.cost;
+
+    return (
+      <div>
+        <h3 className="text-xl font-bold mb-4 text-amber-800">Acheter: {selectedDevelopment.name}</h3>
+
+        <div className="bg-blue-50 rounded-lg p-4 mb-4 border-2 border-blue-400">
+          <div className="text-center mb-2">
+            <div className="text-sm text-gray-600">Coût</div>
+            <div className="text-2xl font-bold text-blue-700">{selectedDevelopment.cost} 💰</div>
+          </div>
+          <div className="text-center">
+            <div className="text-sm text-gray-600">Valeur sélectionnée</div>
+            <div className={`text-2xl font-bold ${canPurchase ? 'text-green-600' : 'text-red-600'}`}>
+              {selectedValue} 💰
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gray-50 rounded-lg p-4 mb-4">
+          <div className="text-sm font-semibold text-gray-700 mb-3">
+            Cliquez sur les ressources à utiliser
+          </div>
+
+          {pendingCoins > 0 && (
+            <div className="flex items-center justify-between p-3 mb-2 rounded border-2 bg-amber-100 border-amber-500">
+              <span className="font-semibold">💰 Pièces (auto)</span>
+              <span className="text-lg font-bold">{pendingCoins}</span>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            {[...GOODS_TYPES].reverse().map(function(type) {
+              const position = player.goodsPositions[type];
+              const selectedPosition = selectedGoods[type];
+
+              if (position === 0) return null;
+
+              const isUsed = selectedPosition > 0;
+
+              return (
+                <div
+                  key={type}
+                  className={'flex items-center gap-2 p-2 rounded cursor-pointer transition ' + (
+                    isUsed ? 'bg-green-100 border-2 border-green-500' : 'bg-white border-2 border-gray-300 hover:border-blue-400'
+                  )}
+                  onClick={() => onToggleGood(type)}
+                >
+                  <div className="text-xs w-20 text-gray-600 font-semibold">{GOODS_NAMES[type]}</div>
+                  <div className="flex-1 flex gap-1">
+                    {GOODS_VALUES[type].map(function(val, idx) {
+                      if (idx === 0 || idx > position) return null;
+
+                      return (
+                        <div
+                          key={idx}
+                          className="flex flex-col items-center"
+                        >
+                          <div
+                            className={'w-5 h-6 border-2 rounded transition ' + (
+                              isUsed ? 'bg-white border-gray-400' : GOODS_COLORS[type] + ' border-gray-700'
+                            )}
+                          />
+                          <div className="text-xs text-gray-500 mt-0.5">{val}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="text-xs font-bold w-8 text-right">
+                    {selectedPosition > 0 ? GOODS_VALUES[type][selectedPosition] : 0}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={onCancelSelection}
+            className="w-full bg-gray-500 text-white py-3 rounded-lg font-bold hover:bg-gray-600 cursor-pointer"
+          >
+            Annuler
+          </button>
+          <button
+            onClick={onConfirmPurchase}
+            disabled={!canPurchase}
+            className={`w-full py-3 rounded-lg font-bold ${
+              canPurchase
+                ? 'bg-green-600 text-white hover:bg-green-700 cursor-pointer'
+                : 'bg-gray-400 text-gray-200 cursor-not-allowed'
+            }`}
+          >
+            Confirmer l'achat
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h3 className="text-xl font-bold mb-4 text-amber-800">Acheter un développement</h3>
 
-      <p className="text-center mb-6">
-        Valeur disponible: <span className="font-bold text-2xl">
-          {getGoodsValue(player.goodsPositions) + pendingCoins}
-        </span> pièces
-        {pendingCoins > 0 && (
-          <span className="text-sm text-gray-600 block mt-1">
-            (Ressources: {getGoodsValue(player.goodsPositions)} + Pièces: {pendingCoins})
-          </span>
-        )}
-      </p>
+      <div className="bg-gray-50 rounded-lg p-4 mb-4">
+        <div className="text-center mb-3">
+          <div className="text-sm text-gray-600 mb-1">Valeur disponible</div>
+          <div className="text-3xl font-bold text-amber-700">{totalValue} 💰</div>
+          {pendingCoins > 0 && (
+            <div className="text-xs text-gray-500 mt-1">
+              Ressources: {goodsValue} + Pièces: {pendingCoins}
+            </div>
+          )}
+        </div>
 
-      <p className="text-center mb-6 text-gray-600">
-        Cliquez sur un développement dans le panneau de gauche pour l'acheter
-      </p>
+        <div className="border-t border-gray-200 pt-3">
+          <div className="text-sm font-semibold text-gray-700 mb-2">
+            Biens ({totalGoods}/6)
+          </div>
+          <div className="space-y-2">
+            {[...GOODS_TYPES].reverse().map(function(type) {
+              const position = player.goodsPositions[type];
+              const value = GOODS_VALUES[type][position];
+
+              return (
+                <div key={type} className="flex items-center gap-2">
+                  <div className="text-xs w-20 text-gray-600">{GOODS_NAMES[type]}</div>
+                  <div className="flex-1 flex gap-1">
+                    {GOODS_VALUES[type].map(function(val, idx) {
+                      if (idx === 0) return null;
+                      return (
+                        <div key={idx} className="flex flex-col items-center">
+                          <div
+                            className={'w-5 h-6 border-2 border-gray-400 rounded ' + (
+                              idx <= position ? GOODS_COLORS[type] : 'bg-white'
+                            )}
+                            title={val.toString()}
+                          />
+                          <div className="text-xs text-gray-500 mt-0.5">{val}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="text-xs font-bold w-8 text-right">{value}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {hasPurchased && lastPurchasedDevelopment ? (
+        <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4 mb-4">
+          <div className="text-center">
+            <div className="text-lg font-bold text-green-700 mb-2">✓ Achat effectué</div>
+            <div className="text-md font-semibold text-gray-800">{lastPurchasedDevelopment.name}</div>
+            <div className="text-sm text-gray-600 mt-1">{lastPurchasedDevelopment.effect}</div>
+            <div className="text-xs text-gray-500 mt-2">
+              Coût: {lastPurchasedDevelopment.cost} 💰 | Points: {lastPurchasedDevelopment.points} 🏆
+            </div>
+          </div>
+        </div>
+      ) : (
+        <p className="text-center mb-4 text-sm text-gray-600">
+          Cliquez sur un développement dans le panneau de gauche pour l'acheter
+        </p>
+      )}
 
       <div className="flex flex-col gap-3">
         {hasPurchased && (
           <button
             onClick={onReset}
-            className="w-full bg-orange-500 text-white py-3 rounded-lg font-bold hover:bg-orange-600"
+            className="w-full bg-orange-500 text-white py-3 rounded-lg font-bold hover:bg-orange-600 cursor-pointer"
           >
             Annuler la sélection
           </button>
@@ -358,14 +617,14 @@ function BuyPhaseDisplay({ player, pendingCoins, onReset, onSkip, hasPurchased }
         {hasPurchased ? (
           <button
             onClick={onSkip}
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700"
+            className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 cursor-pointer"
           >
             Valider et continuer
           </button>
         ) : (
           <button
             onClick={onSkip}
-            className="w-full bg-gray-600 text-white py-3 rounded-lg font-bold hover:bg-gray-700"
+            className="w-full bg-gray-600 text-white py-3 rounded-lg font-bold hover:bg-gray-700 cursor-pointer"
           >
             Ne rien acheter
           </button>
@@ -377,38 +636,80 @@ function BuyPhaseDisplay({ player, pendingCoins, onReset, onSkip, hasPurchased }
 
 function DiscardPhaseDisplay({ player, onContinue }) {
   const hasCaravans = player.developments.indexOf('caravans') !== -1;
-  const totalGoods = player.goodsPositions.wood + player.goodsPositions.stone +
-                     player.goodsPositions.pottery + player.goodsPositions.cloth +
-                     player.goodsPositions.spearheads;
+  const totalGoods = getTotalGoodsCount(player.goodsPositions);
+  const goodsValue = getGoodsValue(player.goodsPositions);
   const needsToDiscard = !hasCaravans && totalGoods > 6;
 
   return (
     <div>
       <h3 className="text-xl font-bold mb-4 text-amber-800">Fin du tour</h3>
 
+      <div className="bg-gray-50 rounded-lg p-4 mb-4">
+        <div className="text-sm font-semibold text-gray-700 mb-2">
+          Biens ({totalGoods}/6)
+        </div>
+        <div className="space-y-2">
+          {[...GOODS_TYPES].reverse().map(function(type) {
+            const position = player.goodsPositions[type];
+            const value = GOODS_VALUES[type][position];
+
+            return (
+              <div key={type} className="flex items-center gap-2">
+                <div className="text-xs w-20 text-gray-600">{GOODS_NAMES[type]}</div>
+                <div className="flex-1 flex gap-1">
+                  {GOODS_VALUES[type].map(function(val, idx) {
+                    if (idx === 0) return null;
+                    return (
+                      <div key={idx} className="flex flex-col items-center">
+                        <div
+                          className={'w-5 h-6 border-2 border-gray-400 rounded ' + (
+                            idx <= position ? GOODS_COLORS[type] : 'bg-white'
+                          )}
+                          title={val.toString()}
+                        />
+                        <div className="text-xs text-gray-500 mt-0.5">{val}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="text-xs font-bold w-8 text-right">{value}</div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="text-xs text-gray-500 mt-2 font-semibold">Valeur totale: {goodsValue} pièces</div>
+      </div>
+
       {hasCaravans ? (
-        <p className="text-center mb-6 text-green-700 font-semibold">
-          ✓ Caravanes: vous pouvez garder toutes vos ressources !
-        </p>
+        <div className="bg-green-50 rounded-lg p-4 mb-4 border-2 border-green-400">
+          <p className="text-center text-green-700 font-semibold">
+            ✓ Caravanes: vous pouvez garder toutes vos ressources !
+          </p>
+        </div>
       ) : (
         <div>
-          <p className="text-center mb-4">
-            Vous ne pouvez garder que 6 ressources maximum.
-          </p>
-          <p className="text-center mb-6 font-semibold">
-            Ressources actuelles: {totalGoods}
-          </p>
-          {needsToDiscard && (
-            <p className="text-red-600 text-center mb-4">
-              ⚠️ Vous devez défausser {totalGoods - 6} ressource(s)
-            </p>
+          {needsToDiscard ? (
+            <div className="bg-red-50 rounded-lg p-4 mb-4 border-2 border-red-400">
+              <p className="text-center text-red-700 font-semibold mb-2">
+                ⚠️ Limite de 6 ressources dépassée
+              </p>
+              <p className="text-center text-red-600">
+                Vous devez défausser {totalGoods - 6} ressource(s)
+              </p>
+            </div>
+          ) : (
+            <div className="bg-green-50 rounded-lg p-4 mb-4 border-2 border-green-400">
+              <p className="text-center text-green-700 font-semibold">
+                ✓ Vous respectez la limite de 6 ressources
+              </p>
+            </div>
           )}
         </div>
       )}
 
       <button
         onClick={onContinue}
-        className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700"
+        className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 cursor-pointer"
       >
         Terminer le tour
       </button>
@@ -437,6 +738,14 @@ export default function ActionPanel({
   onResetBuy,
   onSkipBuy,
   hasPurchased,
+  selectedDevelopment,
+  selectedGoods,
+  selectedCoins,
+  onToggleGood,
+  onConfirmPurchase,
+  onCancelSelection,
+  calculateSelectedValue,
+  lastPurchasedDevelopment,
   onDiscard
 }) {
   const [foodSelected, setFoodSelected] = useState(0);
@@ -497,6 +806,14 @@ export default function ActionPanel({
           onReset={onResetBuy}
           onSkip={onSkipBuy}
           hasPurchased={hasPurchased}
+          selectedDevelopment={selectedDevelopment}
+          selectedGoods={selectedGoods}
+          selectedCoins={selectedCoins}
+          onToggleGood={onToggleGood}
+          onConfirmPurchase={onConfirmPurchase}
+          onCancelSelection={onCancelSelection}
+          calculateSelectedValue={calculateSelectedValue}
+          lastPurchasedDevelopment={lastPurchasedDevelopment}
         />
       )}
 

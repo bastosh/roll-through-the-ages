@@ -136,7 +136,7 @@ export default function Game({ playerNames }) {
         }
       }
     }
-    player.food = Math.min(player.food + foodToAdd, 12);
+    player.food = Math.min(player.food + foodToAdd, 15);
 
     let goodsToAdd = 0;
     for (let i = 0; i < results.length; i++) {
@@ -194,7 +194,7 @@ export default function Game({ playerNames }) {
     if (player.developments.indexOf('agriculture') !== -1) {
       foodToAdd += foodDiceCount; // Agriculture ajoute +1 par dé
     }
-    player.food = Math.min(player.food + foodToAdd, 12);
+    player.food = Math.min(player.food + foodToAdd, 15);
 
     // Add workers - chaque dé donne 2 ouvriers de base
     let workersToAdd = workerDiceCount * 2;
@@ -335,6 +335,152 @@ export default function Game({ playerNames }) {
   const [originalGoodsPositions, setOriginalGoodsPositions] = useState(null);
   const [originalCoins, setOriginalCoins] = useState(0);
   const [originalDevelopments, setOriginalDevelopments] = useState(null);
+  const [selectedDevelopmentToBuy, setSelectedDevelopmentToBuy] = useState(null);
+  const [selectedGoodsForPurchase, setSelectedGoodsForPurchase] = useState({ wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 });
+  const [coinsForPurchase, setCoinsForPurchase] = useState(0);
+  const [lastPurchasedDevelopment, setLastPurchasedDevelopment] = useState(null);
+
+  function handleSelectDevelopment(devId) {
+    const dev = DEVELOPMENTS.find(d => d.id === devId);
+    if (!dev) return;
+
+    const player = players[currentPlayerIndex];
+    const totalValue = getGoodsValue(player.goodsPositions) + pendingCoins;
+
+    if (totalValue >= dev.cost && player.developments.indexOf(devId) === -1) {
+      if (originalGoodsPositions) {
+        return; // Already purchased something this turn
+      }
+
+      // Si le montant total est exactement égal au coût, acheter automatiquement
+      if (totalValue === dev.cost) {
+        handleAutoBuyDevelopment(dev);
+      } else {
+        // Sinon, demander au joueur de choisir les ressources
+        // Par défaut, aucune ressource n'est utilisée (valeur 0), seules les pièces comptent
+        setSelectedDevelopmentToBuy(dev);
+        setSelectedGoodsForPurchase({
+          wood: 0,
+          stone: 0,
+          pottery: 0,
+          cloth: 0,
+          spearheads: 0
+        });
+        setCoinsForPurchase(pendingCoins); // Automatically include coins
+      }
+    }
+  }
+
+  function handleAutoBuyDevelopment(dev) {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+
+    // Save original state
+    setOriginalGoodsPositions({ ...player.goodsPositions });
+    setOriginalCoins(pendingCoins);
+    setOriginalDevelopments([...player.developments]);
+
+    // Use all coins first
+    let remaining = dev.cost - pendingCoins;
+    setPendingCoins(0);
+
+    // Use goods from most expensive to least expensive
+    if (remaining > 0) {
+      const goodsOrder = ['spearheads', 'cloth', 'pottery', 'stone', 'wood'];
+      for (let i = 0; i < goodsOrder.length; i++) {
+        const type = goodsOrder[i];
+        while (player.goodsPositions[type] > 0 && remaining > 0) {
+          const currentValue = GOODS_VALUES[type][player.goodsPositions[type]];
+          const previousValue = GOODS_VALUES[type][player.goodsPositions[type] - 1];
+          const valueToDeduct = currentValue - previousValue;
+          player.goodsPositions[type]--;
+          remaining -= valueToDeduct;
+        }
+      }
+    }
+
+    player.developments.push(dev.id);
+    setPlayers(newPlayers);
+
+    // Store last purchased development
+    setLastPurchasedDevelopment(dev);
+
+    if (player.developments.length >= 5) {
+      endGame();
+      return;
+    }
+  }
+
+  function handleToggleGoodForPurchase(type) {
+    if (!selectedDevelopmentToBuy) return;
+
+    const player = players[currentPlayerIndex];
+    const newSelected = { ...selectedGoodsForPurchase };
+
+    if (newSelected[type] === 0) {
+      // Click: use this resource (set to max position to add its value)
+      newSelected[type] = player.goodsPositions[type];
+    } else {
+      // Click again: don't use this resource (set to 0 to remove its value)
+      newSelected[type] = 0;
+    }
+
+    setSelectedGoodsForPurchase(newSelected);
+  }
+
+  function calculateSelectedValue() {
+    let total = coinsForPurchase;
+    for (const type of GOODS_TYPES) {
+      const position = selectedGoodsForPurchase[type];
+      if (position > 0) {
+        total += GOODS_VALUES[type][position];
+      }
+    }
+    return total;
+  }
+
+  function handleConfirmPurchase() {
+    if (!selectedDevelopmentToBuy) return;
+
+    const selectedValue = calculateSelectedValue();
+    if (selectedValue < selectedDevelopmentToBuy.cost) return;
+
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+
+    // Save original state
+    setOriginalGoodsPositions({ ...player.goodsPositions });
+    setOriginalCoins(pendingCoins);
+    setOriginalDevelopments([...player.developments]);
+
+    // Apply the purchase
+    for (const type of GOODS_TYPES) {
+      player.goodsPositions[type] -= selectedGoodsForPurchase[type];
+    }
+    setPendingCoins(pendingCoins - coinsForPurchase);
+
+    player.developments.push(selectedDevelopmentToBuy.id);
+    setPlayers(newPlayers);
+
+    // Store last purchased development
+    setLastPurchasedDevelopment(selectedDevelopmentToBuy);
+
+    // Reset selection
+    setSelectedDevelopmentToBuy(null);
+    setSelectedGoodsForPurchase({ wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 });
+    setCoinsForPurchase(0);
+
+    if (player.developments.length >= 5) {
+      endGame();
+      return;
+    }
+  }
+
+  function handleCancelPurchaseSelection() {
+    setSelectedDevelopmentToBuy(null);
+    setSelectedGoodsForPurchase({ wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 });
+    setCoinsForPurchase(0);
+  }
 
   function handleBuyDevelopment(devId) {
     let dev = null;
@@ -407,6 +553,7 @@ export default function Game({ playerNames }) {
       setOriginalGoodsPositions(null);
       setOriginalCoins(0);
       setOriginalDevelopments(null);
+      setLastPurchasedDevelopment(null);
     }
   }
 
@@ -415,6 +562,7 @@ export default function Game({ playerNames }) {
     setOriginalGoodsPositions(null);
     setOriginalCoins(0);
     setOriginalDevelopments(null);
+    setLastPurchasedDevelopment(null);
     setPhase('discard');
   }
 
@@ -456,55 +604,76 @@ export default function Game({ playerNames }) {
     setPendingCoins(0);
   }
 
-  function endGame() {
-    const newPlayers = [...players];
+  function calculatePlayerScore(player) {
+    let score = 0;
 
-    for (let i = 0; i < newPlayers.length; i++) {
-      const player = newPlayers[i];
-      let score = 0;
+    for (let j = 0; j < player.developments.length; j++) {
+      const devId = player.developments[j];
+      for (let k = 0; k < DEVELOPMENTS.length; k++) {
+        if (DEVELOPMENTS[k].id === devId) {
+          score += DEVELOPMENTS[k].points;
+          break;
+        }
+      }
+    }
 
-      for (let j = 0; j < player.developments.length; j++) {
-        const devId = player.developments[j];
-        for (let k = 0; k < DEVELOPMENTS.length; k++) {
-          if (DEVELOPMENTS[k].id === devId) {
-            score += DEVELOPMENTS[k].points;
+    for (let j = 0; j < player.monuments.length; j++) {
+      const m = player.monuments[j];
+      if (m.completed) {
+        for (let k = 0; k < MONUMENTS.length; k++) {
+          if (MONUMENTS[k].id === m.id) {
+            const monument = MONUMENTS[k];
+            score += m.firstToComplete ? monument.points[0] : monument.points[1];
             break;
           }
         }
       }
+    }
 
+    if (player.developments.indexOf('architecture') !== -1) {
+      let completedCount = 0;
       for (let j = 0; j < player.monuments.length; j++) {
-        const m = player.monuments[j];
-        if (m.completed) {
-          for (let k = 0; k < MONUMENTS.length; k++) {
-            if (MONUMENTS[k].id === m.id) {
-              const monument = MONUMENTS[k];
-              score += m.firstToComplete ? monument.points[0] : monument.points[1];
-              break;
-            }
-          }
-        }
+        if (player.monuments[j].completed) completedCount++;
       }
+      score += completedCount * 2;
+    }
 
-      if (player.developments.indexOf('architecture') !== -1) {
-        let completedCount = 0;
-        for (let j = 0; j < player.monuments.length; j++) {
-          if (player.monuments[j].completed) completedCount++;
-        }
-        score += completedCount * 2;
+    if (player.developments.indexOf('empire') !== -1) {
+      let cityCount = 3;
+      for (let j = 0; j < player.cities.length; j++) {
+        if (player.cities[j].built) cityCount++;
       }
+      score += cityCount;
+    }
 
-      if (player.developments.indexOf('empire') !== -1) {
-        let cityCount = 3;
-        for (let j = 0; j < player.cities.length; j++) {
-          if (player.cities[j].built) cityCount++;
-        }
-        score += cityCount;
+    score -= player.disasters;
+
+    return score;
+  }
+
+  // Update scores in real-time
+  useEffect(function() {
+    const newPlayers = [...players];
+    let hasChanged = false;
+
+    for (let i = 0; i < newPlayers.length; i++) {
+      const newScore = calculatePlayerScore(newPlayers[i]);
+      if (newPlayers[i].score !== newScore) {
+        newPlayers[i].score = newScore;
+        hasChanged = true;
       }
+    }
 
-      score -= player.disasters;
+    if (hasChanged) {
+      setPlayers(newPlayers);
+    }
+  }, [players]);
 
-      player.score = score;
+  function endGame() {
+    const newPlayers = [...players];
+
+    for (let i = 0; i < newPlayers.length; i++) {
+      newPlayers[i].score = calculatePlayerScore(newPlayers[i]);
     }
 
     setPlayers(newPlayers);
@@ -585,8 +754,8 @@ export default function Game({ playerNames }) {
         <div className="grid grid-cols-2 gap-4" style={{ height: 'calc(100vh - 180px)' }}>
           <PlayerScorePanel
             player={currentPlayer}
-            onBuyDevelopment={handleBuyDevelopment}
-            canBuy={phase === 'buy'}
+            onBuyDevelopment={handleSelectDevelopment}
+            canBuy={phase === 'buy' && !selectedDevelopmentToBuy}
             pendingCoins={pendingCoins}
             onBuildCity={handleBuildCity}
             onBuildMonument={handleBuildMonument}
@@ -614,6 +783,14 @@ export default function Game({ playerNames }) {
             onResetBuy={handleResetBuy}
             onSkipBuy={handleSkipBuy}
             hasPurchased={originalGoodsPositions !== null}
+            selectedDevelopment={selectedDevelopmentToBuy}
+            selectedGoods={selectedGoodsForPurchase}
+            selectedCoins={coinsForPurchase}
+            onToggleGood={handleToggleGoodForPurchase}
+            onConfirmPurchase={handleConfirmPurchase}
+            onCancelSelection={handleCancelPurchaseSelection}
+            calculateSelectedValue={calculateSelectedValue}
+            lastPurchasedDevelopment={lastPurchasedDevelopment}
             onDiscard={handleDiscard}
           />
         </div>
