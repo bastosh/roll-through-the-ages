@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { getGoodsValue, getTotalGoodsCount } from '../utils/gameUtils';
 import { GOODS_TYPES, GOODS_NAMES, GOODS_COLORS, GOODS_VALUES } from '../constants/gameData';
 
-function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onToggleLock, onReroll, onKeep, currentPlayer }) {
+function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onToggleLock, onReroll, onKeep, currentPlayer, leadershipUsed, leadershipMode, onUseLeadership, onLeadershipReroll, onCancelLeadership, skullsCanBeToggled }) {
   const canReroll = rollCount < 2 && lockedDice.length < diceResults.length;
   const hasAgriculture = currentPlayer.developments.indexOf('agriculture') !== -1;
   const hasMasonry = currentPlayer.developments.indexOf('masonry') !== -1;
+  const hasLeadership = currentPlayer.developments.indexOf('leadership') !== -1;
+  const canUseLeadership = hasLeadership && !leadershipUsed && rollCount >= 2;
 
   // Compter les crânes
   let totalSkulls = 0;
@@ -171,7 +173,12 @@ function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onTogg
           let buttonClass = 'aspect-square rounded-lg flex flex-col items-center justify-center text-4xl font-bold transition-all ';
           if (isLocked) {
             if (hasSkulls) {
-              buttonClass += 'bg-red-200 border-4 border-red-400 cursor-not-allowed';
+              // Si les crânes peuvent être basculés, montrer comme cliquable
+              if (skullsCanBeToggled) {
+                buttonClass += 'bg-red-200 border-4 border-red-400 cursor-pointer hover:border-red-600';
+              } else {
+                buttonClass += 'bg-red-200 border-4 border-red-400 cursor-not-allowed';
+              }
             } else {
               buttonClass += 'bg-amber-200 border-4 border-amber-500 cursor-pointer';
             }
@@ -183,7 +190,7 @@ function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onTogg
             <button
               key={i}
               onClick={() => onToggleLock(i)}
-              disabled={hasSkulls}
+              disabled={hasSkulls && !skullsCanBeToggled}
               className={buttonClass}
             >
               {isRolling && !isLocked ? (
@@ -205,22 +212,59 @@ function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onTogg
       </div>
 
       <div className="flex flex-col gap-3">
-        {canReroll && (
-          <button
-            onClick={onReroll}
-            disabled={isRolling}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-400 transition cursor-pointer disabled:cursor-not-allowed"
-          >
-            Relancer les dés non verrouillés
-          </button>
+        {leadershipMode ? (
+          <>
+            <div className="bg-purple-50 border-2 border-purple-400 rounded-lg p-3 mb-2">
+              <div className="text-center text-purple-700 font-bold mb-2">
+                👑 Mode Leadership
+              </div>
+              <p className="text-sm text-gray-600 text-center">
+                Déverrouillez exactement 1 dé (sans crâne) pour le relancer
+              </p>
+            </div>
+            <button
+              onClick={onLeadershipReroll}
+              disabled={isRolling}
+              className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 disabled:bg-gray-400 transition cursor-pointer disabled:cursor-not-allowed"
+            >
+              Relancer le dé sélectionné
+            </button>
+            <button
+              onClick={onCancelLeadership}
+              className="w-full bg-gray-500 text-white py-3 rounded-lg font-bold hover:bg-gray-600 cursor-pointer"
+            >
+              Annuler
+            </button>
+          </>
+        ) : (
+          <>
+            {canReroll && (
+              <button
+                onClick={onReroll}
+                disabled={isRolling}
+                className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-400 transition cursor-pointer disabled:cursor-not-allowed"
+              >
+                Relancer les dés non verrouillés
+              </button>
+            )}
+            {canUseLeadership && (
+              <button
+                onClick={onUseLeadership}
+                disabled={isRolling}
+                className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 disabled:bg-gray-400 transition cursor-pointer disabled:cursor-not-allowed"
+              >
+                👑 Utiliser Leadership (relancer 1 dé)
+              </button>
+            )}
+            <button
+              onClick={onKeep}
+              disabled={isRolling}
+              className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 transition cursor-pointer disabled:cursor-not-allowed"
+            >
+              Conserver et continuer
+            </button>
+          </>
         )}
-        <button
-          onClick={onKeep}
-          disabled={isRolling}
-          className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 transition cursor-pointer disabled:cursor-not-allowed"
-        >
-          Conserver et continuer
-        </button>
       </div>
     </div>
   );
@@ -402,12 +446,48 @@ function FeedPhase({ currentPlayer, citiesToFeed, onContinue }) {
   );
 }
 
-function BuildPhaseDisplay({ pendingWorkers, onReset, onSkip }) {
+function BuildPhaseDisplay({ currentPlayer, pendingWorkers, onReset, onSkip, stoneToTradeForWorkers, onTradeStone, onResetStone }) {
   const hasWorkersRemaining = pendingWorkers > 0;
+  const hasEngineering = currentPlayer.developments.indexOf('engineering') !== -1;
 
   return (
     <div>
       <h3 className="text-xl font-bold mb-4 text-amber-800">Construire</h3>
+
+      {hasEngineering && (
+        <div className="bg-blue-50 border-2 border-blue-400 rounded-lg p-4 mb-4">
+          <div className="text-center mb-3">
+            <div className="text-sm font-bold text-blue-700 mb-2">🏗️ Ingénierie</div>
+            <div className="text-xs text-gray-600 mb-2">
+              Échangez de la pierre contre 3 ouvriers/unité
+            </div>
+            <div className="flex items-center justify-center gap-3">
+              <div className="text-sm">
+                Pierre: <span className="font-bold">{currentPlayer.goodsPositions.stone}</span>
+              </div>
+              <input
+                type="number"
+                min="0"
+                max={currentPlayer.goodsPositions.stone}
+                value={stoneToTradeForWorkers}
+                onChange={(e) => onTradeStone(parseInt(e.target.value) || 0)}
+                className="w-20 px-2 py-1 border-2 border-blue-400 rounded text-center font-bold"
+              />
+              <div className="text-sm">
+                → <span className="font-bold text-purple-600">{stoneToTradeForWorkers * 3} ⚒️</span>
+              </div>
+            </div>
+            {stoneToTradeForWorkers > 0 && (
+              <button
+                onClick={onResetStone}
+                className="mt-2 px-3 py-1 bg-orange-500 text-white text-xs rounded hover:bg-orange-600 cursor-pointer"
+              >
+                Annuler l'échange
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       <p className="text-center mb-6">
         Ouvriers disponibles: <span className="font-bold text-2xl">{pendingWorkers}</span>
@@ -446,10 +526,11 @@ function BuildPhaseDisplay({ pendingWorkers, onReset, onSkip }) {
   );
 }
 
-function BuyPhaseDisplay({ player, pendingCoins, onReset, onSkip, hasPurchased, selectedDevelopment, selectedGoods, selectedCoins, onToggleGood, onConfirmPurchase, onCancelSelection, calculateSelectedValue, lastPurchasedDevelopment }) {
+function BuyPhaseDisplay({ player, pendingCoins, onReset, onSkip, hasPurchased, selectedDevelopment, selectedGoods, selectedCoins, onToggleGood, onConfirmPurchase, onCancelSelection, calculateSelectedValue, lastPurchasedDevelopment, granariesRate, foodToTradeForCoins, onTradeFood, onResetTrade }) {
   const totalGoods = getTotalGoodsCount(player.goodsPositions);
   const goodsValue = getGoodsValue(player.goodsPositions);
   const totalValue = goodsValue + pendingCoins;
+  const hasGranaries = player.developments.indexOf('granaries') !== -1;
 
   if (selectedDevelopment) {
     const selectedValue = calculateSelectedValue();
@@ -564,6 +645,41 @@ function BuyPhaseDisplay({ player, pendingCoins, onReset, onSkip, hasPurchased, 
   return (
     <div>
       <h3 className="text-xl font-bold mb-4 text-amber-800">Acheter un développement</h3>
+
+      {hasGranaries && (
+        <div className="bg-green-50 border-2 border-green-400 rounded-lg p-4 mb-4">
+          <div className="text-center mb-3">
+            <div className="text-sm font-bold text-green-700 mb-2">🌾 Greniers</div>
+            <div className="text-xs text-gray-600 mb-2">
+              Échangez de la nourriture contre {granariesRate} pièces/unité
+            </div>
+            <div className="flex items-center justify-center gap-3">
+              <div className="text-sm">
+                Nourriture: <span className="font-bold">{player.food}</span>
+              </div>
+              <input
+                type="number"
+                min="0"
+                max={player.food}
+                value={foodToTradeForCoins}
+                onChange={(e) => onTradeFood(parseInt(e.target.value) || 0)}
+                className="w-20 px-2 py-1 border-2 border-green-400 rounded text-center font-bold"
+              />
+              <div className="text-sm">
+                → <span className="font-bold text-amber-600">{foodToTradeForCoins * granariesRate} 💰</span>
+              </div>
+            </div>
+            {foodToTradeForCoins > 0 && (
+              <button
+                onClick={onResetTrade}
+                className="mt-2 px-3 py-1 bg-orange-500 text-white text-xs rounded hover:bg-orange-600 cursor-pointer"
+              >
+                Annuler l'échange
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="bg-gray-50 rounded-lg p-4 mb-4">
         <div className="text-center mb-3">
@@ -759,6 +875,9 @@ export default function ActionPanel({
   pendingWorkers,
   onResetBuild,
   onSkipBuild,
+  stoneToTradeForWorkers,
+  onTradeStone,
+  onResetStone,
   pendingCoins,
   onResetBuy,
   onSkipBuy,
@@ -771,7 +890,17 @@ export default function ActionPanel({
   onCancelSelection,
   calculateSelectedValue,
   lastPurchasedDevelopment,
-  onDiscard
+  onDiscard,
+  leadershipUsed,
+  leadershipMode,
+  onUseLeadership,
+  onLeadershipReroll,
+  onCancelLeadership,
+  skullsCanBeToggled,
+  granariesRate,
+  foodToTradeForCoins,
+  onTradeFood,
+  onResetTrade
 }) {
   const [foodSelected, setFoodSelected] = useState(0);
 
@@ -794,6 +923,12 @@ export default function ActionPanel({
           onReroll={onReroll}
           onKeep={onKeep}
           currentPlayer={currentPlayer}
+          leadershipUsed={leadershipUsed}
+          leadershipMode={leadershipMode}
+          onUseLeadership={onUseLeadership}
+          onLeadershipReroll={onLeadershipReroll}
+          onCancelLeadership={onCancelLeadership}
+          skullsCanBeToggled={skullsCanBeToggled}
         />
       )}
 
@@ -818,9 +953,13 @@ export default function ActionPanel({
 
       {phase === 'build' && (
         <BuildPhaseDisplay
+          currentPlayer={currentPlayer}
           pendingWorkers={pendingWorkers}
           onReset={onResetBuild}
           onSkip={onSkipBuild}
+          stoneToTradeForWorkers={stoneToTradeForWorkers}
+          onTradeStone={onTradeStone}
+          onResetStone={onResetStone}
         />
       )}
 
@@ -839,6 +978,10 @@ export default function ActionPanel({
           onCancelSelection={onCancelSelection}
           calculateSelectedValue={calculateSelectedValue}
           lastPurchasedDevelopment={lastPurchasedDevelopment}
+          granariesRate={granariesRate}
+          foodToTradeForCoins={foodToTradeForCoins}
+          onTradeFood={onTradeFood}
+          onResetTrade={onResetTrade}
         />
       )}
 

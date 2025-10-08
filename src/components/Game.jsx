@@ -59,11 +59,24 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   const [pendingFoodOrWorkers, setPendingFoodOrWorkers] = useState(0);
   const [pendingCoins, setPendingCoins] = useState(0);
   const [gameEnded, setGameEnded] = useState(false);
+  const [leadershipUsed, setLeadershipUsed] = useState(false);
+  const [leadershipMode, setLeadershipMode] = useState(false);
+  const [foodToTradeForCoins, setFoodToTradeForCoins] = useState(0);
+  const [stoneToTradeForWorkers, setStoneToTradeForWorkers] = useState(0);
 
   const currentPlayer = players[currentPlayerIndex];
   let numDice = 3;
   for (let i = 0; i < currentPlayer.cities.length; i++) {
     if (currentPlayer.cities[i].built) numDice++;
+  }
+
+  // Get Granaries exchange rate from development effect
+  function getGranariesRate() {
+    const granariesDev = DEVELOPMENTS.find(d => d.id === 'granaries');
+    if (!granariesDev) return 4; // Default fallback
+    // Extract number from effect like "Échangez 1 nourriture contre 4 pièces"
+    const match = granariesDev.effect.match(/(\d+)\s+pièces/);
+    return match ? parseInt(match[1]) : 4;
   }
 
   // Auto-roll dice when entering roll phase
@@ -137,6 +150,49 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
 
   function handleKeep() {
     processResults(diceResults);
+  }
+
+  function handleUseLeadership() {
+    // When entering leadership mode, lock all dice (user will unlock the one they want to reroll)
+    const allLocked = [];
+    for (let i = 0; i < diceResults.length; i++) {
+      allLocked.push(i);
+    }
+    setLockedDice(allLocked);
+    setLeadershipMode(true);
+    setLeadershipUsed(true);
+  }
+
+  function handleLeadershipReroll() {
+    // Count how many non-skull dice are unlocked in leadership mode
+    let unlockedNonSkullCount = 0;
+    for (let i = 0; i < diceResults.length; i++) {
+      const isLocked = lockedDice.indexOf(i) !== -1;
+      const hasSkulls = diceResults[i] && diceResults[i].skulls > 0;
+      if (!isLocked && !hasSkulls) {
+        unlockedNonSkullCount++;
+      }
+    }
+
+    // Only allow if exactly 1 non-skull die is unlocked
+    if (unlockedNonSkullCount === 1) {
+      rollDice(false);
+      setLeadershipMode(false);
+    }
+  }
+
+  function handleCancelLeadership() {
+    // Reset locks to only skull dice (or all dice if in multiplayer/variant that locks skulls)
+    setLeadershipMode(false);
+    const skullsAreLocked = !isSoloMode || variantConfig.soloSkullsLocked;
+    const newLocked = [];
+    for (let i = 0; i < diceResults.length; i++) {
+      const result = diceResults[i];
+      if (skullsAreLocked && result && result.skulls > 0) {
+        newLocked.push(i);
+      }
+    }
+    setLockedDice(newLocked);
   }
 
   function processResults(results) {
@@ -377,7 +433,36 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     }
     setPendingWorkers(0);
     setPendingFoodOrWorkers(0);
+    setStoneToTradeForWorkers(0);
     setPhase('buy');
+  }
+
+  function handleTradeStone(amount) {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+
+    if (player.goodsPositions.stone >= amount && amount >= 0) {
+      const previousTrade = stoneToTradeForWorkers;
+      setStoneToTradeForWorkers(amount);
+
+      // Remove stone and add workers (3 workers per stone)
+      player.goodsPositions.stone -= amount;
+      player.goodsPositions.stone += previousTrade; // Restore previous trade
+      setPendingWorkers(pendingWorkers + (amount * 3) - (previousTrade * 3));
+      setPlayers(newPlayers);
+    }
+  }
+
+  function handleResetStone() {
+    if (stoneToTradeForWorkers > 0) {
+      const newPlayers = [...players];
+      const player = newPlayers[currentPlayerIndex];
+
+      player.goodsPositions.stone += stoneToTradeForWorkers;
+      setPendingWorkers(pendingWorkers - (stoneToTradeForWorkers * 3));
+      setStoneToTradeForWorkers(0);
+      setPlayers(newPlayers);
+    }
   }
 
   const [originalGoodsPositions, setOriginalGoodsPositions] = useState(null);
@@ -614,7 +699,34 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     setOriginalCoins(0);
     setOriginalDevelopments(null);
     setLastPurchasedDevelopment(null);
+    setFoodToTradeForCoins(0);
     setPhase('discard');
+  }
+
+  function handleTradeFood(amount) {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+    const granariesRate = getGranariesRate();
+
+    if (player.food >= amount && amount >= 0) {
+      setFoodToTradeForCoins(amount);
+      player.food -= amount;
+      setPendingCoins(pendingCoins + (amount * granariesRate));
+      setPlayers(newPlayers);
+    }
+  }
+
+  function handleResetTrade() {
+    if (foodToTradeForCoins > 0) {
+      const newPlayers = [...players];
+      const player = newPlayers[currentPlayerIndex];
+      const granariesRate = getGranariesRate();
+
+      player.food += foodToTradeForCoins;
+      setPendingCoins(pendingCoins - (foodToTradeForCoins * granariesRate));
+      setFoodToTradeForCoins(0);
+      setPlayers(newPlayers);
+    }
   }
 
   function handleDiscard() {
@@ -664,6 +776,10 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     setRollCount(0);
     setLockedDice([]);
     setPendingCoins(0);
+    setLeadershipUsed(false);
+    setLeadershipMode(false);
+    setFoodToTradeForCoins(0);
+    setStoneToTradeForWorkers(0);
   }
 
   function calculatePlayerScore(player) {
@@ -697,7 +813,17 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
       for (let j = 0; j < player.monuments.length; j++) {
         if (player.monuments[j].completed) completedCount++;
       }
-      score += completedCount * 2;
+      // Find the architecture development to get the correct multiplier for this variant
+      let architectureDev = null;
+      for (let k = 0; k < DEVELOPMENTS.length; k++) {
+        if (DEVELOPMENTS[k].id === 'architecture') {
+          architectureDev = DEVELOPMENTS[k];
+          break;
+        }
+      }
+      // Late Bronze Age: 2 points per monument, Bronze Age: 1 point per monument
+      const multiplier = architectureDev && architectureDev.cost >= 60 ? 2 : 1;
+      score += completedCount * multiplier;
     }
 
     if (player.developments.indexOf('empire') !== -1) {
@@ -706,6 +832,12 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
         if (player.cities[j].built) cityCount++;
       }
       score += cityCount;
+    }
+
+    // Commerce development (Late Bronze Age only)
+    if (player.developments.indexOf('commerce') !== -1) {
+      const totalGoodsCount = getTotalGoodsCount(player.goodsPositions);
+      score += totalGoodsCount;
     }
 
     score -= player.disasters;
@@ -851,6 +983,9 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
             pendingWorkers={pendingWorkers}
             onResetBuild={handleResetBuild}
             onSkipBuild={handleSkipBuild}
+            stoneToTradeForWorkers={stoneToTradeForWorkers}
+            onTradeStone={handleTradeStone}
+            onResetStone={handleResetStone}
             pendingCoins={pendingCoins}
             onResetBuy={handleResetBuy}
             onSkipBuy={handleSkipBuy}
@@ -864,6 +999,16 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
             calculateSelectedValue={calculateSelectedValue}
             lastPurchasedDevelopment={lastPurchasedDevelopment}
             onDiscard={handleDiscard}
+            leadershipUsed={leadershipUsed}
+            leadershipMode={leadershipMode}
+            onUseLeadership={handleUseLeadership}
+            onLeadershipReroll={handleLeadershipReroll}
+            onCancelLeadership={handleCancelLeadership}
+            skullsCanBeToggled={isSoloMode && !variantConfig.soloSkullsLocked}
+            granariesRate={getGranariesRate()}
+            foodToTradeForCoins={foodToTradeForCoins}
+            onTradeFood={handleTradeFood}
+            onResetTrade={handleResetTrade}
           />
         </div>
       </div>
