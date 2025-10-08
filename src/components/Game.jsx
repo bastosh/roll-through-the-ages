@@ -1,11 +1,8 @@
-import { useState } from 'react';
-import { MONUMENTS, DEVELOPMENTS, GOODS_TYPES, GOODS_VALUES } from '../constants/gameData';
+import { useState, useEffect } from 'react';
+import { MONUMENTS, DEVELOPMENTS, GOODS_TYPES, GOODS_VALUES, DICE_FACES } from '../constants/gameData';
 import { addGoods, handleDisasters, getGoodsValue, getTotalGoodsCount } from '../utils/gameUtils';
-import DiceRoll from './DiceRoll';
-import PlayerBoard from './PlayerBoard';
-import BuildPhase from './BuildPhase';
-import BuyPhase from './BuyPhase';
-import DiscardPhase from './DiscardPhase';
+import PlayerScorePanel from './PlayerScorePanel';
+import ActionPanel from './ActionPanel';
 
 export default function Game({ playerNames }) {
   const [players, setPlayers] = useState(function() {
@@ -39,13 +36,13 @@ export default function Game({ playerNames }) {
   const [round, setRound] = useState(1);
   const [phase, setPhase] = useState('roll');
   const [diceResults, setDiceResults] = useState(null);
-  const [showDiceRoll, setShowDiceRoll] = useState(true);
+  const [rollCount, setRollCount] = useState(0);
+  const [lockedDice, setLockedDice] = useState([]);
+  const [isRolling, setIsRolling] = useState(false);
   const [pendingWorkers, setPendingWorkers] = useState(0);
   const [pendingFoodOrWorkers, setPendingFoodOrWorkers] = useState(0);
   const [pendingCoins, setPendingCoins] = useState(0);
   const [gameEnded, setGameEnded] = useState(false);
-  const [showBuildModal, setShowBuildModal] = useState(true);
-  const [showBuyModal, setShowBuyModal] = useState(true);
 
   const currentPlayer = players[currentPlayerIndex];
   let numDice = 3;
@@ -53,10 +50,71 @@ export default function Game({ playerNames }) {
     if (currentPlayer.cities[i].built) numDice++;
   }
 
-  function handleDiceRollComplete(results) {
-    setDiceResults(results);
-    setShowDiceRoll(false);
-    processResults(results);
+  // Auto-roll dice when entering roll phase
+  useEffect(function() {
+    if (phase === 'roll' && !diceResults) {
+      rollDice(true);
+    }
+  }, [phase]);
+
+  function rollDice(initial) {
+    setIsRolling(true);
+    let diceToRoll = [];
+
+    if (initial) {
+      for (let i = 0; i < numDice; i++) {
+        diceToRoll.push(i);
+      }
+    } else {
+      for (let i = 0; i < diceResults.length; i++) {
+        if (lockedDice.indexOf(i) === -1) {
+          diceToRoll.push(i);
+        }
+      }
+    }
+
+    setTimeout(function() {
+      const newResults = [...diceResults || []];
+      for (let i = 0; i < diceToRoll.length; i++) {
+        const idx = diceToRoll[i];
+        newResults[idx] = DICE_FACES[Math.floor(Math.random() * 6)];
+      }
+      setDiceResults(newResults);
+      setIsRolling(false);
+
+      const newLocked = [...lockedDice];
+      for (let i = 0; i < newResults.length; i++) {
+        const result = newResults[i];
+        if (result && result.skulls > 0 && newLocked.indexOf(i) === -1) {
+          newLocked.push(i);
+        }
+      }
+      setLockedDice(newLocked);
+    }, 600);
+  }
+
+  function toggleLock(index) {
+    if (diceResults[index] && diceResults[index].skulls > 0) return;
+
+    const currentIndex = lockedDice.indexOf(index);
+    if (currentIndex === -1) {
+      setLockedDice([...lockedDice, index]);
+    } else {
+      const newLocked = [...lockedDice];
+      newLocked.splice(currentIndex, 1);
+      setLockedDice(newLocked);
+    }
+  }
+
+  function handleReroll() {
+    if (rollCount < 2 && lockedDice.length < diceResults.length) {
+      setRollCount(rollCount + 1);
+      rollDice(false);
+    }
+  }
+
+  function handleKeep() {
+    processResults(diceResults);
   }
 
   function processResults(results) {
@@ -89,7 +147,7 @@ export default function Game({ playerNames }) {
     addGoods(player, goodsToAdd);
 
     let workers = 0;
-    let foodOrWorkers = 0;
+    let foodOrWorkersDice = 0;
     let coins = 0;
     for (let i = 0; i < results.length; i++) {
       const r = results[i];
@@ -100,7 +158,7 @@ export default function Game({ playerNames }) {
         }
       }
       if (r.type === 'food_or_workers') {
-        foodOrWorkers += r.value;
+        foodOrWorkersDice += 1; // Compte le nombre de dés, pas la valeur
       }
       if (r.type === 'coins') {
         coins += r.value;
@@ -111,37 +169,39 @@ export default function Game({ playerNames }) {
     }
 
     setPendingWorkers(workers);
-    setPendingFoodOrWorkers(foodOrWorkers);
+    setPendingFoodOrWorkers(foodOrWorkersDice);
     setPendingCoins(coins);
 
     handleDisasters(newPlayers, currentPlayerIndex, skulls);
 
     setPlayers(newPlayers);
 
-    if (foodOrWorkers > 0) {
+    if (foodOrWorkersDice > 0) {
       setPhase('choose_food_or_workers');
     } else {
       setPhase('feed');
     }
   }
 
-  function handleUseFoodOrWorkers(asFood) {
+  function handleUseFoodOrWorkers(foodDiceCount) {
     const newPlayers = [...players];
     const player = newPlayers[currentPlayerIndex];
 
-    if (asFood) {
-      let foodToAdd = pendingFoodOrWorkers;
-      if (player.developments.indexOf('agriculture') !== -1) {
-        foodToAdd += pendingFoodOrWorkers;
-      }
-      player.food = Math.min(player.food + foodToAdd, 12);
-    } else {
-      let workersToAdd = pendingFoodOrWorkers;
-      if (player.developments.indexOf('masonry') !== -1) {
-        workersToAdd += pendingFoodOrWorkers;
-      }
-      setPendingWorkers(pendingWorkers + workersToAdd);
+    const workerDiceCount = pendingFoodOrWorkers - foodDiceCount;
+
+    // Add food - chaque dé donne 2 nourriture de base
+    let foodToAdd = foodDiceCount * 2;
+    if (player.developments.indexOf('agriculture') !== -1) {
+      foodToAdd += foodDiceCount; // Agriculture ajoute +1 par dé
     }
+    player.food = Math.min(player.food + foodToAdd, 12);
+
+    // Add workers - chaque dé donne 2 ouvriers de base
+    let workersToAdd = workerDiceCount * 2;
+    if (player.developments.indexOf('masonry') !== -1) {
+      workersToAdd += workerDiceCount; // Maçonnerie ajoute +1 par dé
+    }
+    setPendingWorkers(pendingWorkers + workersToAdd);
 
     setPendingFoodOrWorkers(0);
     setPlayers(newPlayers);
@@ -239,12 +299,42 @@ export default function Game({ playerNames }) {
     }
   }
 
+  function handleResetBuild() {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+
+    // Reset city progress and return workers
+    let workersToReturn = 0;
+    for (let i = 0; i < player.cities.length; i++) {
+      workersToReturn += player.cities[i].progress;
+      player.cities[i].progress = 0;
+      player.cities[i].built = false; // Reset built status
+    }
+
+    // Reset monument progress and return workers
+    for (let i = 0; i < player.monuments.length; i++) {
+      workersToReturn += player.monuments[i].progress;
+      player.monuments[i].progress = 0;
+      player.monuments[i].completed = false; // Reset completed status
+      player.monuments[i].firstToComplete = false; // Reset first to complete
+    }
+
+    setPendingWorkers(pendingWorkers + workersToReturn);
+    setPlayers(newPlayers);
+  }
+
   function handleSkipBuild() {
+    if (pendingWorkers > 0) {
+      return; // Ne pas permettre de passer si des ouvriers restent
+    }
     setPendingWorkers(0);
     setPendingFoodOrWorkers(0);
-    setShowBuildModal(true);
     setPhase('buy');
   }
+
+  const [originalGoodsPositions, setOriginalGoodsPositions] = useState(null);
+  const [originalCoins, setOriginalCoins] = useState(0);
+  const [originalDevelopments, setOriginalDevelopments] = useState(null);
 
   function handleBuyDevelopment(devId) {
     let dev = null;
@@ -261,6 +351,16 @@ export default function Game({ playerNames }) {
     const totalValue = getGoodsValue(player.goodsPositions) + pendingCoins;
 
     if (totalValue >= dev.cost && player.developments.indexOf(devId) === -1) {
+      // Only allow one purchase per turn
+      if (originalGoodsPositions) {
+        return; // Already purchased something this turn
+      }
+
+      // Save original state before purchase
+      setOriginalGoodsPositions({ ...player.goodsPositions });
+      setOriginalCoins(pendingCoins);
+      setOriginalDevelopments([...player.developments]);
+
       let remaining = dev.cost;
 
       if (pendingCoins > 0) {
@@ -291,15 +391,30 @@ export default function Game({ playerNames }) {
         return;
       }
     }
+  }
 
-    setPendingCoins(0);
-    setShowBuyModal(true);
-    setPhase('discard');
+  function handleResetBuy() {
+    if (originalGoodsPositions) {
+      const newPlayers = [...players];
+      const player = newPlayers[currentPlayerIndex];
+
+      // Restore original goods, coins, and developments
+      player.goodsPositions = { ...originalGoodsPositions };
+      player.developments = [...originalDevelopments];
+      setPendingCoins(originalCoins);
+
+      setPlayers(newPlayers);
+      setOriginalGoodsPositions(null);
+      setOriginalCoins(0);
+      setOriginalDevelopments(null);
+    }
   }
 
   function handleSkipBuy() {
     setPendingCoins(0);
-    setShowBuyModal(true);
+    setOriginalGoodsPositions(null);
+    setOriginalCoins(0);
+    setOriginalDevelopments(null);
     setPhase('discard');
   }
 
@@ -335,11 +450,10 @@ export default function Game({ playerNames }) {
     }
 
     setPhase('roll');
-    setShowDiceRoll(true);
-    setShowBuildModal(true);
-    setShowBuyModal(true);
-    setPendingCoins(0);
     setDiceResults(null);
+    setRollCount(0);
+    setLockedDice([]);
+    setPendingCoins(0);
   }
 
   function endGame() {
@@ -468,112 +582,40 @@ export default function Game({ playerNames }) {
           </div>
         </div>
 
-        {showDiceRoll && phase === 'roll' && (
-          <DiceRoll
-            dice={numDice}
-            onRollComplete={handleDiceRollComplete}
-            currentPlayer={currentPlayerIndex}
-            players={players}
-          />
-        )}
-
-        {phase === 'choose_food_or_workers' && (
-          <div className="fixed inset-0 bg-black/25 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl p-8 max-w-md w-full">
-              <h2 className="text-2xl font-bold mb-4 text-center">Choisir nourriture ou ouvriers</h2>
-              <p className="text-center mb-6 font-semibold">
-                Vous avez obtenu {pendingFoodOrWorkers} dé(s) nourriture/ouvriers.
-                <br />
-                Que souhaitez-vous en faire ?
-              </p>
-              <div className="flex flex-col gap-4">
-                <button
-                  onClick={() => handleUseFoodOrWorkers(true)}
-                  className="w-full bg-amber-600 text-white py-4 rounded-lg font-bold hover:bg-amber-700 text-lg"
-                >
-                  🌾 Convertir en {pendingFoodOrWorkers * (currentPlayer.developments.indexOf('agriculture') !== -1 ? 2 : 1)} nourriture
-                  {currentPlayer.developments.indexOf('agriculture') !== -1 && (
-                    <div className="text-sm mt-1 opacity-90">(+Agriculture)</div>
-                  )}
-                </button>
-                <button
-                  onClick={() => handleUseFoodOrWorkers(false)}
-                  className="w-full bg-purple-600 text-white py-4 rounded-lg font-bold hover:bg-purple-700 text-lg"
-                >
-                  👷 Convertir en {pendingFoodOrWorkers * (currentPlayer.developments.indexOf('masonry') !== -1 ? 2 : 1)} ouvriers
-                  {currentPlayer.developments.indexOf('masonry') !== -1 && (
-                    <div className="text-sm mt-1 opacity-90">(+Maçonnerie)</div>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {phase === 'feed' && (
-          <div className="fixed inset-0 bg-black/25 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl p-8 max-w-md w-full">
-              <h2 className="text-2xl font-bold mb-4 text-center">Nourrir les cités</h2>
-              <p className="text-center mb-6">
-                Vous devez nourrir {citiesToFeed} cités.
-                <br />
-                Nourriture disponible: {currentPlayer.food}
-              </p>
-              {currentPlayer.food < citiesToFeed && (
-                <p className="text-red-600 text-center mb-4 font-semibold">
-                  ⚠️ Famine ! Vous perdrez {citiesToFeed - currentPlayer.food} point(s)
-                </p>
-              )}
-              <button
-                onClick={handleFeed}
-                className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700"
-              >
-                Continuer
-              </button>
-            </div>
-          </div>
-        )}
-
-        {phase === 'build' && (
-          <BuildPhase
+        <div className="grid grid-cols-2 gap-4" style={{ height: 'calc(100vh - 180px)' }}>
+          <PlayerScorePanel
             player={currentPlayer}
-            pendingWorkers={pendingWorkers}
-            showBuildModal={showBuildModal}
-            setShowBuildModal={setShowBuildModal}
-            handleBuildCity={handleBuildCity}
-            handleBuildMonument={handleBuildMonument}
-            handleSkipBuild={handleSkipBuild}
-          />
-        )}
-
-        {phase === 'buy' && (
-          <BuyPhase
-            player={currentPlayer}
+            onBuyDevelopment={handleBuyDevelopment}
+            canBuy={phase === 'buy'}
             pendingCoins={pendingCoins}
-            showBuyModal={showBuyModal}
-            setShowBuyModal={setShowBuyModal}
-            handleBuyDevelopment={handleBuyDevelopment}
-            handleSkipBuy={handleSkipBuy}
+            onBuildCity={handleBuildCity}
+            onBuildMonument={handleBuildMonument}
+            canBuild={phase === 'build'}
+            pendingWorkers={pendingWorkers}
           />
-        )}
-
-        {phase === 'discard' && (
-          <DiscardPhase
-            player={currentPlayer}
-            handleDiscard={handleDiscard}
+          <ActionPanel
+            phase={phase}
+            diceResults={diceResults}
+            rollCount={rollCount}
+            lockedDice={lockedDice}
+            isRolling={isRolling}
+            onToggleLock={toggleLock}
+            onReroll={handleReroll}
+            onKeep={handleKeep}
+            pendingFoodOrWorkers={pendingFoodOrWorkers}
+            currentPlayer={currentPlayer}
+            onChooseFoodOrWorkers={handleUseFoodOrWorkers}
+            citiesToFeed={citiesToFeed}
+            onFeed={handleFeed}
+            pendingWorkers={pendingWorkers}
+            onResetBuild={handleResetBuild}
+            onSkipBuild={handleSkipBuild}
+            pendingCoins={pendingCoins}
+            onResetBuy={handleResetBuy}
+            onSkipBuy={handleSkipBuy}
+            hasPurchased={originalGoodsPositions !== null}
+            onDiscard={handleDiscard}
           />
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {players.map(function(player, i) {
-            return (
-              <PlayerBoard
-                key={i}
-                player={player}
-                isActive={i === currentPlayerIndex}
-              />
-            );
-          })}
         </div>
       </div>
     </div>
