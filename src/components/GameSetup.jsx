@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 export default function GameSetup({ onStart }) {
-  const [playerCount, setPlayerCount] = useState(2);
-  const [playerNames, setPlayerNames] = useState(['Joueur 1', 'Joueur 2']);
+  const [playerCount, setPlayerCount] = useState(1);
+  const [playerNames, setPlayerNames] = useState(['Joueur 1']);
 
   function updatePlayerCount(count) {
     setPlayerCount(count);
@@ -33,7 +33,7 @@ export default function GameSetup({ onStart }) {
               Nombre de joueurs
             </label>
             <div className="flex gap-4">
-              {[2, 3, 4].map(function(num) {
+              {[1, 2, 3, 4].map(function(num) {
                 return (
                   <button
                     key={num}
@@ -44,7 +44,7 @@ export default function GameSetup({ onStart }) {
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     )}
                   >
-                    {num} joueurs
+                    {num} {num === 1 ? 'joueur' : 'joueurs'}
                   </button>
                 );
               })}
@@ -53,7 +53,7 @@ export default function GameSetup({ onStart }) {
 
           <div>
             <label className="block text-lg font-semibold mb-3 text-gray-700">
-              Noms des joueurs
+              {playerCount === 1 ? 'Nom du joueur' : 'Noms des joueurs'}
             </label>
             {playerNames.map(function(name, i) {
               return (

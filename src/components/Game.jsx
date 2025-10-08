@@ -7,9 +7,24 @@ import ActionPanel from './ActionPanel';
 export default function Game({ playerNames }) {
   const [players, setPlayers] = useState(function() {
     return playerNames.map(function(name, i) {
+      // Déterminer quels monuments sont disponibles selon le nombre de joueurs
+      const numPlayers = playerNames.length;
+      const excludedMonuments = [];
+
+      if (numPlayers <= 2) {
+        // 1-2 joueurs : Temple et Grande Pyramide non accessibles
+        excludedMonuments.push('temple', 'great_pyramid');
+      } else if (numPlayers === 3) {
+        // 3 joueurs : Jardins suspendus non accessibles
+        excludedMonuments.push('hanging_gardens');
+      }
+      // 4 joueurs : tous les monuments disponibles
+
       const monuments = [];
       for (let j = 0; j < MONUMENTS.length; j++) {
-        monuments.push({ id: MONUMENTS[j].id, progress: 0, completed: false, firstToComplete: false });
+        if (excludedMonuments.indexOf(MONUMENTS[j].id) === -1) {
+          monuments.push({ id: MONUMENTS[j].id, progress: 0, completed: false, firstToComplete: false });
+        }
       }
 
       const cities = [];
@@ -723,7 +738,7 @@ export default function Game({ playerNames }) {
 
           <button
             onClick={() => window.location.reload()}
-            className="w-full bg-amber-600 text-white py-4 rounded-lg font-bold text-xl hover:bg-amber-700 transition mt-8"
+            className="w-full bg-amber-600 text-white py-4 rounded-lg font-bold text-xl hover:bg-amber-700 transition mt-8 cursor-pointer"
           >
             Nouvelle partie
           </button>
@@ -743,10 +758,10 @@ export default function Game({ playerNames }) {
         <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-amber-800">
-              Roll Through the Ages - Manche {round}
+              Roll Through the Ages{players.length > 1 ? ' - Manche ' + round : ''}
             </h1>
             <div className="text-lg font-semibold text-gray-700">
-              Tour de {currentPlayer.name}
+              {players.length > 1 ? 'Tour de ' + currentPlayer.name : currentPlayer.name}
             </div>
           </div>
         </div>
@@ -761,6 +776,9 @@ export default function Game({ playerNames }) {
             onBuildMonument={handleBuildMonument}
             canBuild={phase === 'build'}
             pendingWorkers={pendingWorkers}
+            selectedDevelopmentId={selectedDevelopmentToBuy ? selectedDevelopmentToBuy.id : null}
+            allPlayers={players}
+            currentPlayerIndex={currentPlayerIndex}
           />
           <ActionPanel
             phase={phase}

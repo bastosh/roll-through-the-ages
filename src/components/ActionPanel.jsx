@@ -5,6 +5,7 @@ import { GOODS_TYPES, GOODS_NAMES, GOODS_COLORS, GOODS_VALUES } from '../constan
 function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onToggleLock, onReroll, onKeep, currentPlayer }) {
   const canReroll = rollCount < 2 && lockedDice.length < diceResults.length;
   const hasAgriculture = currentPlayer.developments.indexOf('agriculture') !== -1;
+  const hasMasonry = currentPlayer.developments.indexOf('masonry') !== -1;
 
   // Compter les crânes
   let totalSkulls = 0;
@@ -73,7 +74,8 @@ function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onTogg
     let mainIcon = '';
 
     if (result.type === 'food') {
-      mainIcon = '🌾'.repeat(result.value);
+      const foodValue = result.value + (hasAgriculture ? 1 : 0);
+      mainIcon = '🌾'.repeat(foodValue);
     } else if (result.type === 'goods') {
       if (result.skulls > 0 && result.value === 2) {
         // Pour le dé goods + crâne : amphore, crâne, amphore
@@ -81,9 +83,12 @@ function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onTogg
       }
       mainIcon = '🏺'.repeat(result.value);
     } else if (result.type === 'workers') {
-      mainIcon = '⚒️'.repeat(result.value);
+      const workersValue = result.value + (hasMasonry ? 1 : 0);
+      mainIcon = '⚒️'.repeat(workersValue);
     } else if (result.type === 'food_or_workers') {
-      mainIcon = '🌾🌾/⚒️⚒️';
+      const foodValue = result.value + (hasAgriculture ? 1 : 0);
+      const workersValue = result.value + (hasMasonry ? 1 : 0);
+      mainIcon = '🌾'.repeat(foodValue) + '/' + '⚒️'.repeat(workersValue);
     } else if (result.type === 'coins') {
       mainIcon = '💰';
     } else {
@@ -104,11 +109,23 @@ function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onTogg
     if (result.type === 'food') {
       const foodValue = result.value + (hasAgriculture ? 1 : 0);
       text = foodValue + ' nourriture';
-      if (hasAgriculture) text += ' (+Agriculture)';
+      if (hasAgriculture) text += ' (agriculture)';
     }
     if (result.type === 'goods') text = result.value + ' bien' + (result.value > 1 ? 's' : '');
-    if (result.type === 'workers') text = result.value + ' ouvrier' + (result.value > 1 ? 's' : '');
-    if (result.type === 'food_or_workers') text = result.value + ' nourriture OU ouvriers';
+    if (result.type === 'workers') {
+      const workersValue = result.value + (hasMasonry ? 1 : 0);
+      text = workersValue + ' ouvrier' + (workersValue > 1 ? 's' : '');
+      if (hasMasonry) text += ' (maçonnerie)';
+    }
+    if (result.type === 'food_or_workers') {
+      const foodValue = result.value + (hasAgriculture ? 1 : 0);
+      const workersValue = result.value + (hasMasonry ? 1 : 0);
+      text = foodValue + ' nourriture OU ' + workersValue + ' ouvriers';
+      const bonuses = [];
+      if (hasAgriculture) bonuses.push('agriculture');
+      if (hasMasonry) bonuses.push('maçonnerie');
+      if (bonuses.length > 0) text += ' (' + bonuses.join(', ') + ')';
+    }
     if (result.type === 'coins') text = result.value + ' pièces';
     return text;
   }
@@ -471,6 +488,7 @@ function BuyPhaseDisplay({ player, pendingCoins, onReset, onSkip, hasPurchased, 
             {[...GOODS_TYPES].reverse().map(function(type) {
               const position = player.goodsPositions[type];
               const selectedPosition = selectedGoods[type];
+              const maxForType = GOODS_VALUES[type].length - 1;
 
               if (position === 0) return null;
 
@@ -487,7 +505,10 @@ function BuyPhaseDisplay({ player, pendingCoins, onReset, onSkip, hasPurchased, 
                   <div className="text-xs w-20 text-gray-600 font-semibold">{GOODS_NAMES[type]}</div>
                   <div className="flex-1 flex gap-1">
                     {GOODS_VALUES[type].map(function(val, idx) {
-                      if (idx === 0 || idx > position) return null;
+                      if (idx === 0) return null;
+
+                      const isFilled = idx <= position;
+                      const showEmptyBox = idx > position;
 
                       return (
                         <div
@@ -496,10 +517,14 @@ function BuyPhaseDisplay({ player, pendingCoins, onReset, onSkip, hasPurchased, 
                         >
                           <div
                             className={'w-5 h-6 border-2 rounded transition ' + (
-                              isUsed ? 'bg-white border-gray-400' : GOODS_COLORS[type] + ' border-gray-700'
+                              showEmptyBox ? 'bg-white border-gray-300' :
+                              isUsed ? 'bg-white border-gray-400' :
+                              GOODS_COLORS[type] + ' border-gray-700'
                             )}
                           />
-                          <div className="text-xs text-gray-500 mt-0.5">{val}</div>
+                          <div className={'text-xs mt-0.5 ' + (showEmptyBox ? 'text-gray-400' : 'text-gray-500')}>
+                            {val}
+                          </div>
                         </div>
                       );
                     })}

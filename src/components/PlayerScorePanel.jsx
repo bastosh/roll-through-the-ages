@@ -59,7 +59,7 @@ function CityDisplay({ cities, onBuildCity, canBuild, pendingWorkers }) {
   );
 }
 
-function DevelopmentsList({ playerDevelopments, onBuyDevelopment, canBuy, playerGoodsValue, pendingCoins }) {
+function DevelopmentsList({ playerDevelopments, onBuyDevelopment, canBuy, playerGoodsValue, pendingCoins, selectedDevelopmentId }) {
   return (
     <div className="mb-6">
       <h3 className="text-lg font-bold mb-3 text-gray-800">Développements</h3>
@@ -69,8 +69,9 @@ function DevelopmentsList({ playerDevelopments, onBuyDevelopment, canBuy, player
           const totalValue = playerGoodsValue + (pendingCoins || 0);
           const canAfford = totalValue >= dev.cost;
           const isClickable = canBuy && !isOwned && canAfford;
+          const isSelected = selectedDevelopmentId === dev.id;
 
-          let bgClass = isOwned ? 'bg-green-50' : 'bg-gray-50';
+          let bgClass = isOwned ? 'bg-green-50' : isSelected ? 'bg-blue-200 border-2 border-blue-600' : 'bg-gray-50';
           let className = 'flex items-center gap-2 p-2 rounded text-sm ' + bgClass;
           if (isClickable) {
             className += ' hover:bg-blue-100 cursor-pointer';
@@ -103,7 +104,7 @@ function DevelopmentsList({ playerDevelopments, onBuyDevelopment, canBuy, player
   );
 }
 
-function MonumentsGrid({ playerMonuments, onBuildMonument, canBuild, pendingWorkers }) {
+function MonumentsGrid({ playerMonuments, onBuildMonument, canBuild, pendingWorkers, allPlayers, currentPlayerIndex }) {
   return (
     <div className="mb-6">
       <h3 className="text-lg font-bold mb-3 text-gray-800">Monuments</h3>
@@ -111,6 +112,23 @@ function MonumentsGrid({ playerMonuments, onBuildMonument, canBuild, pendingWork
         {playerMonuments.map(function(m) {
           const monument = MONUMENTS.find(mon => mon.id === m.id);
           const isClickable = canBuild && !m.completed && (pendingWorkers >= 1 || m.progress > 0);
+
+          // Vérifier si quelqu'un d'autre a terminé ce monument en premier
+          let someoneElseCompletedFirst = false;
+          if (allPlayers) {
+            for (let i = 0; i < allPlayers.length; i++) {
+              if (i !== currentPlayerIndex) {
+                for (let j = 0; j < allPlayers[i].monuments.length; j++) {
+                  const otherMonument = allPlayers[i].monuments[j];
+                  if (otherMonument.id === m.id && otherMonument.completed && otherMonument.firstToComplete) {
+                    someoneElseCompletedFirst = true;
+                    break;
+                  }
+                }
+              }
+              if (someoneElseCompletedFirst) break;
+            }
+          }
 
           return (
             <div
@@ -133,16 +151,42 @@ function MonumentsGrid({ playerMonuments, onBuildMonument, canBuild, pendingWork
                   );
                 })}
               </div>
-              <div className="text-center text-sm font-semibold">
-                {m.completed ? (
-                  <span className="text-purple-700">
-                    {m.firstToComplete ? monument.points[0] : monument.points[1]} pts ✓
-                  </span>
-                ) : (
-                  <span className="text-gray-600">
-                    {monument.points[0]}/{monument.points[1]} pts
-                  </span>
-                )}
+              {monument.effect && (
+                <div className="text-xs text-gray-600 italic mb-2 text-center">
+                  {monument.effect}
+                </div>
+              )}
+              <div className="flex items-center justify-center gap-2 text-sm font-semibold">
+                {/* Points maximum (première case à cocher) */}
+                <div className="flex items-center gap-1">
+                  <div className={'w-6 h-6 border-2 rounded flex items-center justify-center ' + (
+                    m.completed && m.firstToComplete ? 'bg-green-600 border-green-700' :
+                    someoneElseCompletedFirst ? 'bg-gray-300 border-gray-400' :
+                    'bg-white border-gray-400'
+                  )}>
+                    {m.completed && m.firstToComplete ? (
+                      <span className="text-white text-xs font-bold">{monument.points[0]}</span>
+                    ) : someoneElseCompletedFirst ? (
+                      <span className="text-gray-600 text-xs font-bold">✗</span>
+                    ) : (
+                      <span className="text-gray-600 text-xs font-bold">{monument.points[0]}</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Points secondaires */}
+                <div className="flex items-center gap-1">
+                  <div className={'w-6 h-6 border-2 rounded flex items-center justify-center ' + (
+                    m.completed && !m.firstToComplete ? 'bg-purple-600 border-purple-700' :
+                    'bg-white border-gray-400'
+                  )}>
+                    {m.completed && !m.firstToComplete ? (
+                      <span className="text-white text-xs font-bold">{monument.points[1]}</span>
+                    ) : (
+                      <span className="text-gray-600 text-xs font-bold">{monument.points[1]}</span>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           );
@@ -211,6 +255,9 @@ function ResourcesDisplay({ goodsPositions }) {
   const totalGoods = getTotalGoodsCount(goodsPositions);
   const goodsValue = getGoodsValue(goodsPositions);
 
+  // Calculer le nombre maximum de cases pour aligner toutes les lignes
+  const maxSlots = Math.max(...GOODS_TYPES.map(type => GOODS_VALUES[type].length - 1));
+
   return (
     <div className="mb-6">
       <h3 className="text-lg font-bold mb-3 text-gray-800">Biens</h3>
@@ -223,11 +270,13 @@ function ResourcesDisplay({ goodsPositions }) {
           {[...GOODS_TYPES].reverse().map(function(type) {
             const position = goodsPositions[type];
             const value = GOODS_VALUES[type][position];
+            const maxForType = GOODS_VALUES[type].length - 1;
 
             return (
               <div key={type} className="flex items-center gap-2">
                 <div className="text-xs w-20 text-gray-600">{GOODS_NAMES[type]}</div>
                 <div className="flex-1 flex gap-1">
+                  {/* Afficher toutes les cases existantes pour ce type */}
                   {GOODS_VALUES[type].map(function(val, idx) {
                     if (idx === 0) return null;
                     return (
@@ -239,6 +288,15 @@ function ResourcesDisplay({ goodsPositions }) {
                           title={val.toString()}
                         />
                         <div className="text-xs text-gray-500 mt-0.5">{val}</div>
+                      </div>
+                    );
+                  })}
+                  {/* Ajouter des cases vides pour aligner avec les autres lignes */}
+                  {Array(maxSlots - maxForType).fill(0).map(function(_, idx) {
+                    return (
+                      <div key={'empty-' + idx} className="flex flex-col items-center">
+                        <div className="w-6 h-8 border-2 border-transparent rounded bg-transparent" />
+                        <div className="text-xs text-transparent mt-0.5">-</div>
                       </div>
                     );
                   })}
@@ -262,7 +320,10 @@ export default function PlayerScorePanel({
   onBuildCity,
   onBuildMonument,
   canBuild,
-  pendingWorkers
+  pendingWorkers,
+  selectedDevelopmentId,
+  allPlayers,
+  currentPlayerIndex
 }) {
   const goodsValue = getGoodsValue(player.goodsPositions);
 
@@ -287,6 +348,8 @@ export default function PlayerScorePanel({
         onBuildMonument={onBuildMonument}
         canBuild={canBuild}
         pendingWorkers={pendingWorkers}
+        allPlayers={allPlayers}
+        currentPlayerIndex={currentPlayerIndex}
       />
       <DevelopmentsList
         playerDevelopments={player.developments}
@@ -294,6 +357,7 @@ export default function PlayerScorePanel({
         canBuy={canBuy}
         playerGoodsValue={goodsValue}
         pendingCoins={pendingCoins}
+        selectedDevelopmentId={selectedDevelopmentId}
       />
       <ResourcesDisplay goodsPositions={player.goodsPositions} />
       <DisastersDisplay disasters={player.disasters} />

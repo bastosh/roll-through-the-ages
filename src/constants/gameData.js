@@ -25,13 +25,13 @@ export const GOODS_VALUES = {
 };
 
 export const MONUMENTS = [
-  { id: 'step_pyramid', name: 'Petite Pyramide', workers: 3, points: [1, 0] },
-  { id: 'stone_circle', name: 'Stonehenge', workers: 5, points: [2, 1] },
-  { id: 'temple', name: 'Temple', workers: 7, points: [4, 2] },
-  { id: 'obelisk', name: 'Obélisque', workers: 9, points: [6, 3] },
-  { id: 'hanging_gardens', name: 'Jardins suspendus', workers: 11, points: [8, 4] },
-  { id: 'great_wall', name: 'Grande Muraille', workers: 13, points: [10, 5] },
-  { id: 'great_pyramid', name: 'Grande Pyramide', workers: 15, points: [12, 6] }
+  { id: 'step_pyramid', name: 'Petite Pyramide', workers: 3, points: [1, 0], effect: null },
+  { id: 'stone_circle', name: 'Stonehenge', workers: 5, points: [2, 1], effect: null },
+  { id: 'temple', name: 'Temple', workers: 7, points: [4, 2], effect: null },
+  { id: 'obelisk', name: 'Obélisque', workers: 9, points: [6, 3], effect: null },
+  { id: 'hanging_gardens', name: 'Jardins suspendus', workers: 11, points: [8, 4], effect: null },
+  { id: 'great_wall', name: 'Grande Muraille', workers: 13, points: [10, 5], effect: 'Les invasions ne vous affectent plus' },
+  { id: 'great_pyramid', name: 'Grande Pyramide', workers: 15, points: [12, 6], effect: null }
 ];
 
 export const DEVELOPMENTS = [
