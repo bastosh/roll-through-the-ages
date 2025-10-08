@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { VARIANTS } from '../constants/variants';
 
 export default function GameSetup({ onStart }) {
   const [playerCount, setPlayerCount] = useState(1);
   const [playerNames, setPlayerNames] = useState(['Joueur 1']);
+  const [selectedVariant, setSelectedVariant] = useState(VARIANTS[0].id);
+  const [isSoloMode, setIsSoloMode] = useState(true);
 
   function updatePlayerCount(count) {
     setPlayerCount(count);
@@ -11,6 +14,11 @@ export default function GameSetup({ onStart }) {
       names.push(playerNames[i] || 'Joueur ' + (i + 1));
     }
     setPlayerNames(names);
+
+    // Solo mode only available for 1 player
+    if (count > 1) {
+      setIsSoloMode(false);
+    }
   }
 
   function updatePlayerName(index, name) {
@@ -22,12 +30,34 @@ export default function GameSetup({ onStart }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-200 p-8">
       <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-2xl p-8">
-        <h1 className="text-4xl font-bold text-center mb-2 text-amber-800">
+        <h1 className="text-4xl font-bold text-center mb-8 text-amber-800">
           Roll Through the Ages
         </h1>
-        <p className="text-center text-amber-600 mb-8">L'Âge du Bronze</p>
 
         <div className="space-y-6">
+          <div>
+            <label className="block text-lg font-semibold mb-3 text-gray-700">
+              Variante du jeu
+            </label>
+            <div className="flex gap-4 flex-wrap">
+              {VARIANTS.map(function(variant) {
+                return (
+                  <button
+                    key={variant.id}
+                    onClick={() => setSelectedVariant(variant.id)}
+                    className={'flex-1 min-w-[200px] py-3 rounded-lg font-semibold transition cursor-pointer ' + (
+                      selectedVariant === variant.id
+                        ? 'bg-amber-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    )}
+                  >
+                    {variant.displayName}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div>
             <label className="block text-lg font-semibold mb-3 text-gray-700">
               Nombre de joueurs
@@ -51,6 +81,36 @@ export default function GameSetup({ onStart }) {
             </div>
           </div>
 
+          {playerCount === 1 && (
+            <div>
+              <label className="block text-lg font-semibold mb-3 text-gray-700">
+                Mode de jeu
+              </label>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setIsSoloMode(true)}
+                  className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (
+                    isSoloMode
+                      ? 'bg-amber-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  )}
+                >
+                  Mode solo (10 tours)
+                </button>
+                <button
+                  onClick={() => setIsSoloMode(false)}
+                  className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (
+                    !isSoloMode
+                      ? 'bg-amber-600 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  )}
+                >
+                  Partie libre
+                </button>
+              </div>
+            </div>
+          )}
+
           <div>
             <label className="block text-lg font-semibold mb-3 text-gray-700">
               {playerCount === 1 ? 'Nom du joueur' : 'Noms des joueurs'}
@@ -70,7 +130,7 @@ export default function GameSetup({ onStart }) {
           </div>
 
           <button
-            onClick={() => onStart(playerNames.slice(0, playerCount))}
+            onClick={() => onStart(playerNames.slice(0, playerCount), selectedVariant, isSoloMode)}
             className="w-full bg-amber-600 text-white py-4 rounded-lg font-bold text-xl hover:bg-amber-700 transition cursor-pointer"
           >
             Commencer la partie

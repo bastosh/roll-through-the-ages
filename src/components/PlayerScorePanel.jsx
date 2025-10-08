@@ -1,4 +1,4 @@
-import { GOODS_TYPES, GOODS_NAMES, GOODS_COLORS, GOODS_VALUES, MONUMENTS, DEVELOPMENTS } from '../constants/gameData';
+import { GOODS_TYPES, GOODS_NAMES, GOODS_COLORS, GOODS_VALUES } from '../constants/gameData';
 import { getGoodsValue, getTotalGoodsCount } from '../utils/gameUtils';
 
 function CityDisplay({ cities, onBuildCity, canBuild, pendingWorkers }) {
@@ -59,12 +59,12 @@ function CityDisplay({ cities, onBuildCity, canBuild, pendingWorkers }) {
   );
 }
 
-function DevelopmentsList({ playerDevelopments, onBuyDevelopment, canBuy, playerGoodsValue, pendingCoins, selectedDevelopmentId }) {
+function DevelopmentsList({ playerDevelopments, onBuyDevelopment, canBuy, playerGoodsValue, pendingCoins, selectedDevelopmentId, developments }) {
   return (
     <div className="mb-6">
       <h3 className="text-lg font-bold mb-3 text-gray-800">Développements</h3>
       <div className="space-y-1">
-        {DEVELOPMENTS.map(function(dev) {
+        {developments.map(function(dev) {
           const isOwned = playerDevelopments.indexOf(dev.id) !== -1;
           const totalValue = playerGoodsValue + (pendingCoins || 0);
           const canAfford = totalValue >= dev.cost;
@@ -104,13 +104,13 @@ function DevelopmentsList({ playerDevelopments, onBuyDevelopment, canBuy, player
   );
 }
 
-function MonumentsGrid({ playerMonuments, onBuildMonument, canBuild, pendingWorkers, allPlayers, currentPlayerIndex }) {
+function MonumentsGrid({ playerMonuments, onBuildMonument, canBuild, pendingWorkers, allPlayers, currentPlayerIndex, monuments }) {
   return (
     <div className="mb-6">
       <h3 className="text-lg font-bold mb-3 text-gray-800">Monuments</h3>
       <div className="grid grid-cols-2 gap-3">
         {playerMonuments.map(function(m) {
-          const monument = MONUMENTS.find(mon => mon.id === m.id);
+          const monument = monuments.find(mon => mon.id === m.id);
           const isClickable = canBuild && !m.completed && (pendingWorkers >= 1 || m.progress > 0);
 
           // Vérifier si quelqu'un d'autre a terminé ce monument en premier
@@ -323,7 +323,9 @@ export default function PlayerScorePanel({
   pendingWorkers,
   selectedDevelopmentId,
   allPlayers,
-  currentPlayerIndex
+  currentPlayerIndex,
+  monuments,
+  developments
 }) {
   const goodsValue = getGoodsValue(player.goodsPositions);
 
@@ -350,6 +352,7 @@ export default function PlayerScorePanel({
         pendingWorkers={pendingWorkers}
         allPlayers={allPlayers}
         currentPlayerIndex={currentPlayerIndex}
+        monuments={monuments}
       />
       <DevelopmentsList
         playerDevelopments={player.developments}
@@ -358,6 +361,7 @@ export default function PlayerScorePanel({
         playerGoodsValue={goodsValue}
         pendingCoins={pendingCoins}
         selectedDevelopmentId={selectedDevelopmentId}
+        developments={developments}
       />
       <ResourcesDisplay goodsPositions={player.goodsPositions} />
       <DisastersDisplay disasters={player.disasters} />

@@ -5,9 +5,13 @@ import Game from './components/Game';
 export default function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [playerNames, setPlayerNames] = useState([]);
+  const [variantId, setVariantId] = useState('bronze_age');
+  const [isSoloMode, setIsSoloMode] = useState(false);
 
-  function handleStart(names) {
+  function handleStart(names, selectedVariantId, soloMode) {
     setPlayerNames(names);
+    setVariantId(selectedVariantId);
+    setIsSoloMode(soloMode);
     setGameStarted(true);
   }
 
@@ -15,5 +19,5 @@ export default function App() {
     return <GameSetup onStart={handleStart} />;
   }
 
-  return <Game playerNames={playerNames} />;
+  return <Game playerNames={playerNames} variantId={variantId} isSoloMode={isSoloMode} />;
 }

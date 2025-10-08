@@ -1,24 +1,24 @@
-import { useState, useEffect } from 'react';
-import { MONUMENTS, DEVELOPMENTS, GOODS_TYPES, GOODS_VALUES, DICE_FACES } from '../constants/gameData';
+import { useState, useEffect, useMemo } from 'react';
+import { GOODS_TYPES, GOODS_VALUES, DICE_FACES } from '../constants/gameData';
+import { getVariantById } from '../constants/variants';
 import { addGoods, handleDisasters, getGoodsValue, getTotalGoodsCount } from '../utils/gameUtils';
 import PlayerScorePanel from './PlayerScorePanel';
 import ActionPanel from './ActionPanel';
 
-export default function Game({ playerNames }) {
+export default function Game({ playerNames, variantId, isSoloMode }) {
+  // Load variant configuration
+  const variantConfig = useMemo(function() {
+    return getVariantById(variantId);
+  }, [variantId]);
+
+  const MONUMENTS = variantConfig.monuments;
+  const DEVELOPMENTS = variantConfig.developments;
+
   const [players, setPlayers] = useState(function() {
     return playerNames.map(function(name, i) {
       // Déterminer quels monuments sont disponibles selon le nombre de joueurs
       const numPlayers = playerNames.length;
-      const excludedMonuments = [];
-
-      if (numPlayers <= 2) {
-        // 1-2 joueurs : Temple et Grande Pyramide non accessibles
-        excludedMonuments.push('temple', 'great_pyramid');
-      } else if (numPlayers === 3) {
-        // 3 joueurs : Jardins suspendus non accessibles
-        excludedMonuments.push('hanging_gardens');
-      }
-      // 4 joueurs : tous les monuments disponibles
+      const excludedMonuments = variantConfig.monumentRestrictions[numPlayers] || [];
 
       const monuments = [];
       for (let j = 0; j < MONUMENTS.length; j++) {
@@ -49,6 +49,7 @@ export default function Game({ playerNames }) {
 
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [round, setRound] = useState(1);
+  const [soloTurn, setSoloTurn] = useState(isSoloMode ? 1 : 0);
   const [phase, setPhase] = useState('roll');
   const [diceResults, setDiceResults] = useState(null);
   const [rollCount, setRollCount] = useState(0);
@@ -97,19 +98,25 @@ export default function Game({ playerNames }) {
       setDiceResults(newResults);
       setIsRolling(false);
 
-      const newLocked = [...lockedDice];
-      for (let i = 0; i < newResults.length; i++) {
-        const result = newResults[i];
-        if (result && result.skulls > 0 && newLocked.indexOf(i) === -1) {
-          newLocked.push(i);
+      // Skulls auto-locked unless in solo mode AND variant allows rerolling skulls
+      const shouldLockSkulls = !isSoloMode || variantConfig.soloSkullsLocked;
+      if (shouldLockSkulls) {
+        const newLocked = [...lockedDice];
+        for (let i = 0; i < newResults.length; i++) {
+          const result = newResults[i];
+          if (result && result.skulls > 0 && newLocked.indexOf(i) === -1) {
+            newLocked.push(i);
+          }
         }
+        setLockedDice(newLocked);
       }
-      setLockedDice(newLocked);
     }, 600);
   }
 
   function toggleLock(index) {
-    if (diceResults[index] && diceResults[index].skulls > 0) return;
+    // Skulls cannot be unlocked unless in solo mode AND variant allows rerolling skulls
+    const skullsAreLocked = !isSoloMode || variantConfig.soloSkullsLocked;
+    if (skullsAreLocked && diceResults[index] && diceResults[index].skulls > 0) return;
 
     const currentIndex = lockedDice.indexOf(index);
     if (currentIndex === -1) {
@@ -311,6 +318,32 @@ export default function Game({ playerNames }) {
         setPendingWorkers(pendingWorkers - 1);
       }
       setPlayers(newPlayers);
+
+      // Check if all monuments have been collectively built (for variants that require it)
+      if (variantConfig.endGameConditions.allMonumentsBuilt) {
+        let allMonumentsBuilt = true;
+        for (let i = 0; i < MONUMENTS.length; i++) {
+          const monumentId = MONUMENTS[i].id;
+          let builtByAnyone = false;
+          for (let j = 0; j < newPlayers.length; j++) {
+            for (let k = 0; k < newPlayers[j].monuments.length; k++) {
+              if (newPlayers[j].monuments[k].id === monumentId && newPlayers[j].monuments[k].completed) {
+                builtByAnyone = true;
+                break;
+              }
+            }
+            if (builtByAnyone) break;
+          }
+          if (!builtByAnyone) {
+            allMonumentsBuilt = false;
+            break;
+          }
+        }
+        if (allMonumentsBuilt) {
+          endGame();
+          return;
+        }
+      }
     }
   }
 
@@ -420,7 +453,8 @@ export default function Game({ playerNames }) {
     // Store last purchased development
     setLastPurchasedDevelopment(dev);
 
-    if (player.developments.length >= 5) {
+    // Check end game condition based on variant
+    if (player.developments.length >= variantConfig.endGameConditions.developmentCount) {
       endGame();
       return;
     }
@@ -485,7 +519,8 @@ export default function Game({ playerNames }) {
     setSelectedGoodsForPurchase({ wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 });
     setCoinsForPurchase(0);
 
-    if (player.developments.length >= 5) {
+    // Check end game condition based on variant
+    if (player.developments.length >= variantConfig.endGameConditions.developmentCount) {
       endGame();
       return;
     }
@@ -547,7 +582,8 @@ export default function Game({ playerNames }) {
       player.developments.push(devId);
       setPlayers(newPlayers);
 
-      if (player.developments.length >= 5) {
+      // Check end game condition based on variant
+      if (player.developments.length >= variantConfig.endGameConditions.developmentCount) {
         endGame();
         return;
       }
@@ -608,6 +644,17 @@ export default function Game({ playerNames }) {
     if (currentPlayerIndex === players.length - 1) {
       setRound(round + 1);
       setCurrentPlayerIndex(0);
+
+      // In solo mode, increment turn counter and check if game should end
+      if (isSoloMode) {
+        const nextTurn = soloTurn + 1;
+        setSoloTurn(nextTurn);
+
+        if (nextTurn > 10) {
+          endGame();
+          return;
+        }
+      }
     } else {
       setCurrentPlayerIndex(currentPlayerIndex + 1);
     }
@@ -760,6 +807,11 @@ export default function Game({ playerNames }) {
             <h1 className="text-2xl font-bold text-amber-800">
               Roll Through the Ages{players.length > 1 ? ' - Manche ' + round : ''}
             </h1>
+            {isSoloMode && (
+              <div className="text-xl font-bold text-amber-700 bg-amber-100 px-4 py-2 rounded-lg">
+                Tour {soloTurn}/10 · Reste {11 - soloTurn} tour{11 - soloTurn > 1 ? 's' : ''}
+              </div>
+            )}
             <div className="text-lg font-semibold text-gray-700">
               {players.length > 1 ? 'Tour de ' + currentPlayer.name : currentPlayer.name}
             </div>
@@ -779,6 +831,8 @@ export default function Game({ playerNames }) {
             selectedDevelopmentId={selectedDevelopmentToBuy ? selectedDevelopmentToBuy.id : null}
             allPlayers={players}
             currentPlayerIndex={currentPlayerIndex}
+            monuments={MONUMENTS}
+            developments={DEVELOPMENTS}
           />
           <ActionPanel
             phase={phase}
