@@ -63,6 +63,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   const [leadershipMode, setLeadershipMode] = useState(false);
   const [foodToTradeForCoins, setFoodToTradeForCoins] = useState(0);
   const [stoneToTradeForWorkers, setStoneToTradeForWorkers] = useState(0);
+  const [testMode, setTestMode] = useState(false);
 
   const currentPlayer = players[currentPlayerIndex];
   let numDice = 3;
@@ -77,6 +78,25 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     // Extract number from effect like "Échangez 1 nourriture contre 4 pièces"
     const match = granariesDev.effect.match(/(\d+)\s+pièces/);
     return match ? parseInt(match[1]) : 4;
+  }
+
+  function handleToggleTestMode() {
+    const newTestMode = !testMode;
+    setTestMode(newTestMode);
+
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+
+    if (newTestMode) {
+      // Add all developments
+      const allDevIds = DEVELOPMENTS.map(d => d.id);
+      player.developments = allDevIds;
+    } else {
+      // Remove all developments
+      player.developments = [];
+    }
+
+    setPlayers(newPlayers);
   }
 
   // Auto-roll dice when entering roll phase
@@ -438,17 +458,22 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   }
 
   function handleTradeStone(amount) {
+    if (amount < 0) return;
+
     const newPlayers = [...players];
     const player = newPlayers[currentPlayerIndex];
 
-    if (player.goodsPositions.stone >= amount && amount >= 0) {
-      const previousTrade = stoneToTradeForWorkers;
-      setStoneToTradeForWorkers(amount);
+    // Calculate the difference to know how much stone to add/remove
+    const difference = amount - stoneToTradeForWorkers;
 
-      // Remove stone and add workers (3 workers per stone)
-      player.goodsPositions.stone -= amount;
-      player.goodsPositions.stone += previousTrade; // Restore previous trade
-      setPendingWorkers(pendingWorkers + (amount * 3) - (previousTrade * 3));
+    // Check if we have enough stone (current stone + already traded stone >= new amount)
+    const totalStoneAvailable = player.goodsPositions.stone + stoneToTradeForWorkers;
+
+    if (amount <= totalStoneAvailable) {
+      // Update stone and workers based on the difference
+      player.goodsPositions.stone -= difference;
+      setPendingWorkers(pendingWorkers + (difference * 3));
+      setStoneToTradeForWorkers(amount);
       setPlayers(newPlayers);
     }
   }
@@ -538,8 +563,8 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     // Store last purchased development
     setLastPurchasedDevelopment(dev);
 
-    // Check end game condition based on variant
-    if (player.developments.length >= variantConfig.endGameConditions.developmentCount) {
+    // Check end game condition based on variant (but not in test mode)
+    if (!testMode && player.developments.length >= variantConfig.endGameConditions.developmentCount) {
       endGame();
       return;
     }
@@ -604,8 +629,8 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     setSelectedGoodsForPurchase({ wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 });
     setCoinsForPurchase(0);
 
-    // Check end game condition based on variant
-    if (player.developments.length >= variantConfig.endGameConditions.developmentCount) {
+    // Check end game condition based on variant (but not in test mode)
+    if (!testMode && player.developments.length >= variantConfig.endGameConditions.developmentCount) {
       endGame();
       return;
     }
@@ -704,14 +729,23 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   }
 
   function handleTradeFood(amount) {
+    if (amount < 0) return;
+
     const newPlayers = [...players];
     const player = newPlayers[currentPlayerIndex];
     const granariesRate = getGranariesRate();
 
-    if (player.food >= amount && amount >= 0) {
+    // Calculate the difference to know how much food to add/remove
+    const difference = amount - foodToTradeForCoins;
+
+    // Check if we have enough food (current food + already traded food >= new amount)
+    const totalFoodAvailable = player.food + foodToTradeForCoins;
+
+    if (amount <= totalFoodAvailable) {
+      // Update food and coins based on the difference
+      player.food -= difference;
+      setPendingCoins(pendingCoins + (difference * granariesRate));
       setFoodToTradeForCoins(amount);
-      player.food -= amount;
-      setPendingCoins(pendingCoins + (amount * granariesRate));
       setPlayers(newPlayers);
     }
   }
@@ -939,13 +973,27 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
             <h1 className="text-2xl font-bold text-amber-800">
               Roll Through the Ages{players.length > 1 ? ' - Manche ' + round : ''}
             </h1>
-            {isSoloMode && (
-              <div className="text-xl font-bold text-amber-700 bg-amber-100 px-4 py-2 rounded-lg">
-                Tour {soloTurn}/10 · Reste {11 - soloTurn} tour{11 - soloTurn > 1 ? 's' : ''}
+            <div className="flex items-center gap-4">
+              {import.meta.env.VITE_ENABLE_TEST_MODE === 'true' && (
+                <button
+                  onClick={handleToggleTestMode}
+                  className={'px-4 py-2 rounded-lg font-bold text-sm transition cursor-pointer ' + (
+                    testMode
+                      ? 'bg-red-600 text-white hover:bg-red-700'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  )}
+                >
+                  {testMode ? '🧪 Mode Test ON' : '🧪 Mode Test'}
+                </button>
+              )}
+              {isSoloMode && (
+                <div className="text-xl font-bold text-amber-700 bg-amber-100 px-4 py-2 rounded-lg">
+                  Tour {soloTurn}/10 · Reste {11 - soloTurn} tour{11 - soloTurn > 1 ? 's' : ''}
+                </div>
+              )}
+              <div className="text-lg font-semibold text-gray-700">
+                {players.length > 1 ? 'Tour de ' + currentPlayer.name : currentPlayer.name}
               </div>
-            )}
-            <div className="text-lg font-semibold text-gray-700">
-              {players.length > 1 ? 'Tour de ' + currentPlayer.name : currentPlayer.name}
             </div>
           </div>
         </div>

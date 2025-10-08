@@ -7,6 +7,7 @@ function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onTogg
   const hasAgriculture = currentPlayer.developments.indexOf('agriculture') !== -1;
   const hasMasonry = currentPlayer.developments.indexOf('masonry') !== -1;
   const hasLeadership = currentPlayer.developments.indexOf('leadership') !== -1;
+  const hasCoinage = currentPlayer.developments.indexOf('coinage') !== -1;
   const canUseLeadership = hasLeadership && !leadershipUsed && rollCount >= 2;
 
   // Compter les crânes
@@ -128,7 +129,11 @@ function DiceRollDisplay({ diceResults, rollCount, lockedDice, isRolling, onTogg
       if (hasMasonry) bonuses.push('maçonnerie');
       if (bonuses.length > 0) text += ' (' + bonuses.join(', ') + ')';
     }
-    if (result.type === 'coins') text = result.value + ' pièces';
+    if (result.type === 'coins') {
+      const coinValue = result.value + (hasCoinage ? 5 : 0);
+      text = coinValue + ' pièces';
+      if (hasCoinage) text += ' (monnaie)';
+    }
     return text;
   }
 
@@ -449,6 +454,7 @@ function FeedPhase({ currentPlayer, citiesToFeed, onContinue }) {
 function BuildPhaseDisplay({ currentPlayer, pendingWorkers, onReset, onSkip, stoneToTradeForWorkers, onTradeStone, onResetStone }) {
   const hasWorkersRemaining = pendingWorkers > 0;
   const hasEngineering = currentPlayer.developments.indexOf('engineering') !== -1;
+  const totalStoneAvailable = currentPlayer.goodsPositions.stone + stoneToTradeForWorkers;
 
   return (
     <div>
@@ -463,12 +469,12 @@ function BuildPhaseDisplay({ currentPlayer, pendingWorkers, onReset, onSkip, sto
             </div>
             <div className="flex items-center justify-center gap-3">
               <div className="text-sm">
-                Pierre: <span className="font-bold">{currentPlayer.goodsPositions.stone}</span>
+                Pierre: <span className="font-bold">{totalStoneAvailable}</span>
               </div>
               <input
                 type="number"
                 min="0"
-                max={currentPlayer.goodsPositions.stone}
+                max={totalStoneAvailable}
                 value={stoneToTradeForWorkers}
                 onChange={(e) => onTradeStone(parseInt(e.target.value) || 0)}
                 className="w-20 px-2 py-1 border-2 border-blue-400 rounded text-center font-bold"
@@ -531,6 +537,7 @@ function BuyPhaseDisplay({ player, pendingCoins, onReset, onSkip, hasPurchased, 
   const goodsValue = getGoodsValue(player.goodsPositions);
   const totalValue = goodsValue + pendingCoins;
   const hasGranaries = player.developments.indexOf('granaries') !== -1;
+  const totalFoodAvailable = player.food + foodToTradeForCoins;
 
   if (selectedDevelopment) {
     const selectedValue = calculateSelectedValue();
@@ -655,12 +662,12 @@ function BuyPhaseDisplay({ player, pendingCoins, onReset, onSkip, hasPurchased, 
             </div>
             <div className="flex items-center justify-center gap-3">
               <div className="text-sm">
-                Nourriture: <span className="font-bold">{player.food}</span>
+                Nourriture: <span className="font-bold">{totalFoodAvailable}</span>
               </div>
               <input
                 type="number"
                 min="0"
-                max={player.food}
+                max={totalFoodAvailable}
                 value={foodToTradeForCoins}
                 onChange={(e) => onTradeFood(parseInt(e.target.value) || 0)}
                 className="w-20 px-2 py-1 border-2 border-green-400 rounded text-center font-bold"
