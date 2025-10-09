@@ -224,13 +224,37 @@ function DisastersDisplay({ disasters }) {
   );
 }
 
-function ResourcesDisplay({ goodsPositions, food }) {
+function ResourcesDisplay({ goodsPositions, food, previewFood, previewGoodsCount }) {
   const totalGoods = getTotalGoodsCount(goodsPositions);
   const goodsValue = getGoodsValue(goodsPositions);
 
   // Calculer le nombre maximum de cases pour aligner toutes les lignes
   const maxSlots = Math.max(...GOODS_TYPES.map(type => GOODS_VALUES[type].length - 1));
   const maxFood = 15;
+
+  // Calculate preview goods positions (simulate adding goods)
+  let previewGoodsPositions = { ...goodsPositions };
+  if (previewGoodsCount > 0) {
+    let resourceIndex = 0;
+    for (let i = 0; i < previewGoodsCount; i++) {
+      let attempts = 0;
+      while (attempts < GOODS_TYPES.length) {
+        const type = GOODS_TYPES[resourceIndex];
+        const maxPos = GOODS_VALUES[type].length - 1;
+
+        if (previewGoodsPositions[type] < maxPos) {
+          previewGoodsPositions[type]++;
+          resourceIndex = (resourceIndex + 1) % GOODS_TYPES.length;
+          break;
+        }
+
+        resourceIndex = (resourceIndex + 1) % GOODS_TYPES.length;
+        attempts++;
+      }
+    }
+  }
+
+  const futureFood = Math.min(food + (previewFood || 0), 15);
 
   return (
     <div className="flex-shrink-0">
@@ -248,6 +272,7 @@ function ResourcesDisplay({ goodsPositions, food }) {
         <div className="space-y-1">
           {[...GOODS_TYPES].reverse().map(function (type) {
             const position = goodsPositions[type];
+            const previewPosition = previewGoodsPositions[type];
             const value = GOODS_VALUES[type][position];
             const maxForType = GOODS_VALUES[type].length - 1;
 
@@ -258,12 +283,25 @@ function ResourcesDisplay({ goodsPositions, food }) {
                   {/* Afficher toutes les cases existantes pour ce type */}
                   {GOODS_VALUES[type].map(function (val, idx) {
                     if (idx === 0) return null;
+                    const isCurrent = idx <= position;
+                    const isPreview = idx > position && idx <= previewPosition;
+
+                    let bgClass = 'bg-white';
+                    if (isCurrent) {
+                      bgClass = GOODS_COLORS[type];
+                    } else if (isPreview) {
+                      // Lighter version of the color for preview
+                      if (type === 'wood') bgClass = 'bg-yellow-200';
+                      else if (type === 'stone') bgClass = 'bg-gray-200';
+                      else if (type === 'pottery') bgClass = 'bg-orange-200';
+                      else if (type === 'cloth') bgClass = 'bg-purple-200';
+                      else if (type === 'spearheads') bgClass = 'bg-red-200';
+                    }
+
                     return (
                       <div key={idx} className="flex flex-col items-center">
                         <div
-                          className={'w-6 h-7 border-2 border-gray-400 rounded ' + (
-                            idx <= position ? GOODS_COLORS[type] : 'bg-white'
-                          )}
+                          className={'w-6 h-7 border-2 border-gray-400 rounded ' + bgClass}
                           title={val.toString()}
                         />
                         <div className="text-xs text-gray-500 mt-0.5">{val}</div>
@@ -292,13 +330,19 @@ function ResourcesDisplay({ goodsPositions, food }) {
           <div className="flex-1 flex gap-1">
             {Array(maxFood).fill(0).map(function (_, idx) {
               const value = idx + 1;
+              const isCurrent = value <= food;
+              const isPreview = value > food && value <= futureFood;
+
+              let bgClass = 'bg-white';
+              if (isCurrent) {
+                bgClass = 'bg-amber-600';
+              } else if (isPreview) {
+                bgClass = 'bg-amber-200'; // Lighter amber for preview
+              }
+
               return (
                 <div key={idx} className="flex flex-col items-center">
-                  <div
-                    className={'w-6 h-7 border-2 border-gray-400 rounded ' + (
-                      value <= food ? 'bg-amber-600' : 'bg-white'
-                    )}
-                  />
+                  <div className={'w-6 h-7 border-2 border-gray-400 rounded ' + bgClass} />
                   <div className="text-xs text-gray-500 mt-0.5">{value}</div>
                 </div>
               );
@@ -324,7 +368,9 @@ export default function PlayerScorePanel({
   allPlayers,
   currentPlayerIndex,
   monuments,
-  developments
+  developments,
+  previewFood,
+  previewGoodsCount
 }) {
   const goodsValue = getGoodsValue(player.goodsPositions);
 
@@ -349,7 +395,12 @@ export default function PlayerScorePanel({
             currentPlayerIndex={currentPlayerIndex}
             monuments={monuments}
           />
-          <ResourcesDisplay goodsPositions={player.goodsPositions} food={player.food} />
+          <ResourcesDisplay
+            goodsPositions={player.goodsPositions}
+            food={player.food}
+            previewFood={previewFood}
+            previewGoodsCount={previewGoodsCount}
+          />
         </div>
 
         {/* Colonne de droite */}

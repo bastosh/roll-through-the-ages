@@ -1297,6 +1297,38 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     if (currentPlayer.cities[i].built) citiesToFeed++;
   }
 
+  // Calculate preview values for food and goods based on dice results
+  let previewFood = 0;
+  let previewGoodsCount = 0;
+
+  if (diceResults && (phase === 'roll' || phase === 'choose_food_or_workers')) {
+    const hasAgriculture = currentPlayer.developments.indexOf('agriculture') !== -1;
+
+    for (let i = 0; i < diceResults.length; i++) {
+      const r = diceResults[i];
+      if (r.type === 'food') {
+        previewFood += r.value;
+        if (hasAgriculture) {
+          previewFood += 1;
+        }
+      } else if (r.type === 'goods') {
+        previewGoodsCount += r.value;
+      }
+    }
+
+    // Handle food_or_workers in choose phase
+    if (phase === 'choose_food_or_workers') {
+      for (let i = 0; i < foodOrWorkerChoices.length; i++) {
+        if (foodOrWorkerChoices[i] === 'food') {
+          previewFood += 2;
+          if (hasAgriculture) {
+            previewFood += 1;
+          }
+        }
+      }
+    }
+  }
+
   return (
     <div className="h-screen overflow-hidden bg-gradient-to-br from-amber-100 to-orange-200 p-4">
       {/* Player Turn Modal */}
@@ -1512,6 +1544,8 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
               currentPlayerIndex={currentPlayerIndex}
               monuments={MONUMENTS}
               developments={DEVELOPMENTS}
+              previewFood={previewFood}
+              previewGoodsCount={previewGoodsCount}
             />
           </div>
           <div className="col-span-1">
