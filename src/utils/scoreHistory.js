@@ -4,33 +4,59 @@ export function getScoreHistory() {
   try {
     const history = window.localStorage.getItem(SCORE_HISTORY_KEY);
     if (history) {
-      return JSON.parse(history);
+      const parsed = JSON.parse(history);
+      // Migration: si l'ancien format existe, le convertir
+      if (parsed.solo && !Array.isArray(parsed.solo[Object.keys(parsed.solo)[0] || ''])) {
+        return migrateOldFormat(parsed);
+      }
+      return parsed;
     }
   } catch (error) {
     console.error('Error loading score history:', error);
   }
-  return { solo: [], multi: [] };
+  return {};
 }
 
-export function addScore(playerName, score, isSolo) {
+function migrateOldFormat(oldHistory) {
+  // Ancien format: { solo: [], multi: [] }
+  // Nouveau format: { bronze_age: { solo: [], multi: [] }, ... }
+  const newHistory = {};
+
+  if (oldHistory.solo && Array.isArray(oldHistory.solo)) {
+    // Supposer que c'était pour bronze_age
+    newHistory.bronze_age = {
+      solo: oldHistory.solo,
+      multi: oldHistory.multi || []
+    };
+  }
+
+  return newHistory;
+}
+
+export function addScore(playerName, score, isSolo, variantId) {
   const history = getScoreHistory();
+
+  // Initialiser la variante si elle n'existe pas
+  if (!history[variantId]) {
+    history[variantId] = { solo: [], multi: [] };
+  }
+
   const newEntry = {
     playerName: playerName,
     score: score,
-    date: new Date().toISOString(),
-    isSolo: isSolo
+    date: new Date().toISOString()
   };
 
   const category = isSolo ? 'solo' : 'multi';
-  history[category].push(newEntry);
+  history[variantId][category].push(newEntry);
 
   // Trier par score décroissant
-  history[category].sort(function(a, b) {
+  history[variantId][category].sort(function(a, b) {
     return b.score - a.score;
   });
 
   // Garder seulement les 10 meilleurs
-  history[category] = history[category].slice(0, 10);
+  history[variantId][category] = history[variantId][category].slice(0, 10);
 
   try {
     window.localStorage.setItem(SCORE_HISTORY_KEY, JSON.stringify(history));

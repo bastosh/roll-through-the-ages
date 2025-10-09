@@ -28,7 +28,7 @@ export default function ActionButtons({
         <button
           onClick={onCancel}
           disabled={cancelDisabled}
-          className={`h-24 rounded-lg font-bold text-xl text-white transition cursor-pointer flex items-center justify-center ${
+          className={`h-16 rounded-lg font-bold text-xl text-white transition cursor-pointer flex items-center justify-center ${
             cancelDisabled
               ? 'bg-gray-400 cursor-not-allowed'
               : cancelColorClasses[cancelColor]
@@ -40,7 +40,7 @@ export default function ActionButtons({
       <button
         onClick={onConfirm}
         disabled={confirmDisabled}
-        className={`h-24 rounded-lg font-bold text-xl text-white transition flex items-center justify-center ${
+        className={`h-16 rounded-lg font-bold text-xl text-white transition flex items-center justify-center ${
           confirmDisabled
             ? 'bg-gray-400 cursor-not-allowed'
             : confirmColorClasses[confirmColor] + ' cursor-pointer'

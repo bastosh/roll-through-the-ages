@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import DiceRollPhase from './phases/DiceRollPhase';
 import ChooseFoodOrWorkersPhase from './phases/ChooseFoodOrWorkersPhase';
 import FeedPhase from './phases/FeedPhase';
 import BuildPhase from './phases/BuildPhase';
@@ -52,32 +51,77 @@ export default function ActionPanel({
 }) {
   const [foodSelected, setFoodSelected] = useState(0);
 
+  const hasLeadership = currentPlayer.developments.indexOf('leadership') !== -1;
+  const canReroll = rollCount < 2 && lockedDice && diceResults && lockedDice.length < diceResults.length;
+  const canUseLeadership = hasLeadership && !leadershipUsed && rollCount >= 2;
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 h-full overflow-y-auto">
-      {phase === 'roll' && !diceResults && (
-        <div className="flex flex-col items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-amber-600 mb-4"></div>
-          <p className="text-lg text-gray-600">Lancement des dés...</p>
-        </div>
-      )}
+      {phase === 'roll' && (
+        <div className="flex flex-col h-full">
+          <h3 className="text-xl font-bold mb-4 text-amber-800">Lancer de dés</h3>
 
-      {phase === 'roll' && diceResults && (
-        <DiceRollPhase
-          diceResults={diceResults}
-          rollCount={rollCount}
-          lockedDice={lockedDice}
-          isRolling={isRolling}
-          onToggleLock={onToggleLock}
-          onReroll={onReroll}
-          onKeep={onKeep}
-          currentPlayer={currentPlayer}
-          leadershipUsed={leadershipUsed}
-          leadershipMode={leadershipMode}
-          onUseLeadership={onUseLeadership}
-          onLeadershipReroll={onLeadershipReroll}
-          onCancelLeadership={onCancelLeadership}
-          skullsCanBeToggled={skullsCanBeToggled}
-        />
+          <div className="flex-1 flex flex-col justify-center">
+            <div className="text-center mb-6">
+              <p className="text-sm text-gray-600 mb-2">
+                Cliquez sur les dés en haut pour les verrouiller/déverrouiller
+              </p>
+              <p className="text-lg font-bold text-amber-700">
+                Lancer {rollCount + 1}/3
+              </p>
+            </div>
+
+            {leadershipMode ? (
+              <div className="space-y-3">
+                <div className="bg-purple-50 border-2 border-purple-400 rounded-lg p-3">
+                  <div className="text-center text-purple-700 font-bold mb-2">
+                    👑 Mode Leadership
+                  </div>
+                  <p className="text-sm text-gray-600 text-center">
+                    Déverrouillez exactement 1 dé pour le relancer
+                  </p>
+                </div>
+                <button
+                  onClick={onLeadershipReroll}
+                  disabled={isRolling}
+                  className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 disabled:bg-gray-400 transition cursor-pointer disabled:cursor-not-allowed"
+                >
+                  Relancer le dé sélectionné
+                </button>
+                <button
+                  onClick={onCancelLeadership}
+                  className="w-full bg-gray-500 text-white py-3 rounded-lg font-bold hover:bg-gray-600 cursor-pointer"
+                >
+                  Annuler
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {canUseLeadership && (
+                  <button
+                    onClick={onUseLeadership}
+                    disabled={isRolling}
+                    className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 disabled:bg-gray-400 transition cursor-pointer disabled:cursor-not-allowed"
+                  >
+                    👑 Utiliser Leadership (relancer 1 dé)
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {!leadershipMode && (
+            <div className="mt-auto">
+              <button
+                onClick={onKeep}
+                disabled={isRolling}
+                className="w-full h-16 rounded-lg font-bold text-xl text-white transition bg-green-600 hover:bg-green-700 disabled:bg-gray-400 cursor-pointer disabled:cursor-not-allowed"
+              >
+                Valider
+              </button>
+            </div>
+          )}
+        </div>
       )}
 
       {phase === 'choose_food_or_workers' && (

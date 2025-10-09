@@ -13,11 +13,11 @@ function CityDisplay({ cities, onBuildCity, canBuild, pendingWorkers }) {
     <div className="flex-shrink-0">
       <h3 className="text-sm font-bold mb-2 text-gray-800">Cités</h3>
       <div className="flex gap-1.5">
-        {allCities.map(function(city, i) {
+        {allCities.map(function (city, i) {
           const height = city.requiredWorkers === 0 ? 'h-20' :
-                        city.requiredWorkers === 3 ? 'h-20' :
-                        city.requiredWorkers === 4 ? 'h-20' :
-                        city.requiredWorkers === 5 ? 'h-24' : 'h-24';
+            city.requiredWorkers === 3 ? 'h-20' :
+              city.requiredWorkers === 4 ? 'h-20' :
+                city.requiredWorkers === 5 ? 'h-24' : 'h-24';
 
           const isClickable = canBuild && !city.built && (pendingWorkers >= 1 || city.progress > 0);
           let containerClass = 'flex-1';
@@ -37,7 +37,7 @@ function CityDisplay({ cities, onBuildCity, canBuild, pendingWorkers }) {
                 <div className="text-xs font-bold mb-0.5">Cité {city.number}</div>
                 {city.requiredWorkers > 0 && (
                   <div className="grid grid-cols-2 gap-1">
-                    {Array(city.requiredWorkers).fill(0).map(function(_, j) {
+                    {Array(city.requiredWorkers).fill(0).map(function (_, j) {
                       const isLastOdd = city.requiredWorkers % 2 === 1 && j === city.requiredWorkers - 1;
                       return (
                         <div
@@ -64,7 +64,7 @@ function DevelopmentsList({ playerDevelopments, onBuyDevelopment, canBuy, player
     <div className="flex-shrink-0">
       <h3 className="text-sm font-bold mb-2 text-gray-800">Développements</h3>
       <div className="space-y-0.5">
-        {developments.map(function(dev) {
+        {developments.map(function (dev) {
           const isOwned = playerDevelopments.indexOf(dev.id) !== -1;
           const totalValue = playerGoodsValue + (pendingCoins || 0);
           const canAfford = totalValue >= dev.cost;
@@ -109,7 +109,7 @@ function MonumentsGrid({ playerMonuments, onBuildMonument, canBuild, pendingWork
     <div className="flex-shrink-0">
       <h3 className="text-sm font-bold mb-2 text-gray-800">Monuments</h3>
       <div className="grid grid-cols-2 gap-2">
-        {playerMonuments.map(function(m) {
+        {playerMonuments.map(function (m) {
           const monument = monuments.find(mon => mon.id === m.id);
           const isClickable = canBuild && !m.completed && (pendingWorkers >= 1 || m.progress > 0);
 
@@ -138,53 +138,57 @@ function MonumentsGrid({ playerMonuments, onBuildMonument, canBuild, pendingWork
               ) + (isClickable ? ' hover:bg-purple-100 hover:border-purple-500 cursor-pointer' : '')}
               onClick={isClickable ? () => onBuildMonument(m.id) : undefined}
             >
-              <div className="text-xs font-bold mb-1">{monument.name}</div>
-              <div className="flex gap-0.5 flex-wrap mb-1">
-                {Array(monument.workers).fill(0).map(function(_, j) {
-                  return (
-                    <div
-                      key={j}
-                      className={'w-2.5 h-2.5 border border-gray-400 rounded ' + (
-                        j < m.progress ? 'bg-purple-600' : 'bg-white'
-                      )}
-                    />
-                  );
-                })}
-              </div>
-              {monument.effect && (
-                <div className="text-xs text-gray-600 italic mb-1 text-center">
-                  {monument.effect}
-                </div>
-              )}
-              <div className="flex items-center justify-center gap-1.5 text-xs font-semibold">
-                {/* Points maximum (première case à cocher) */}
-                <div className="flex items-center gap-0.5">
-                  <div className={'w-5 h-5 border-2 rounded flex items-center justify-center ' + (
-                    m.completed && m.firstToComplete ? 'bg-green-600 border-green-700' :
-                    someoneElseCompletedFirst ? 'bg-gray-300 border-gray-400' :
-                    'bg-white border-gray-400'
-                  )}>
-                    {m.completed && m.firstToComplete ? (
-                      <span className="text-white text-xs font-bold">{monument.points[0]}</span>
-                    ) : someoneElseCompletedFirst ? (
-                      <span className="text-gray-600 text-xs font-bold">✗</span>
-                    ) : (
-                      <span className="text-gray-600 text-xs font-bold">{monument.points[0]}</span>
-                    )}
+              <div className='flex justify-between'>
+                <div>
+                  <div className="text-xs font-bold mb-1">{monument.name}</div>
+                  <div className="flex gap-0.5 flex-wrap mb-1">
+                    {Array(monument.workers).fill(0).map(function (_, j) {
+                      return (
+                        <div
+                          key={j}
+                          className={'w-3.5 h-3.5 border border-gray-400 rounded ' + (
+                            j < m.progress ? 'bg-purple-600' : 'bg-white'
+                          )}
+                        />
+                      );
+                    })}
                   </div>
+                  {monument.effect && (
+                    <div className="text-xs text-gray-600 italic mb-1">
+                      {monument.effect}
+                    </div>
+                  )}
                 </div>
+                <div className="flex flex-col items-center justify-center gap-1.5 text-xs font-semibold">
+                  {/* Points maximum (première case à cocher) */}
+                  <div className="flex items-center gap-0.5">
+                    <div className={'w-5 h-5 border-2 rounded flex items-center justify-center ' + (
+                      m.completed && m.firstToComplete ? 'bg-green-600 border-green-700' :
+                        someoneElseCompletedFirst ? 'bg-gray-300 border-gray-400' :
+                          'bg-white border-gray-400'
+                    )}>
+                      {m.completed && m.firstToComplete ? (
+                        <span className="text-white text-xs font-bold">{monument.points[0]}</span>
+                      ) : someoneElseCompletedFirst ? (
+                        <span className="text-gray-600 text-xs font-bold">✗</span>
+                      ) : (
+                        <span className="text-gray-600 text-xs font-bold">{monument.points[0]}</span>
+                      )}
+                    </div>
+                  </div>
 
-                {/* Points secondaires */}
-                <div className="flex items-center gap-0.5">
-                  <div className={'w-5 h-5 border-2 rounded flex items-center justify-center ' + (
-                    m.completed && !m.firstToComplete ? 'bg-purple-600 border-purple-700' :
-                    'bg-white border-gray-400'
-                  )}>
-                    {m.completed && !m.firstToComplete ? (
-                      <span className="text-white text-xs font-bold">{monument.points[1]}</span>
-                    ) : (
-                      <span className="text-gray-600 text-xs font-bold">{monument.points[1]}</span>
-                    )}
+                  {/* Points secondaires */}
+                  <div className="flex items-center gap-0.5">
+                    <div className={'w-5 h-5 border-2 rounded flex items-center justify-center ' + (
+                      m.completed && !m.firstToComplete ? 'bg-purple-600 border-purple-700' :
+                        'bg-white border-gray-400'
+                    )}>
+                      {m.completed && !m.firstToComplete ? (
+                        <span className="text-white text-xs font-bold">{monument.points[1]}</span>
+                      ) : (
+                        <span className="text-gray-600 text-xs font-bold">{monument.points[1]}</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -204,7 +208,7 @@ function DisastersDisplay({ disasters }) {
       <h3 className="text-sm font-bold mb-2 text-gray-800">Catastrophes</h3>
       <div className="bg-red-50 border-2 border-red-400 rounded-lg p-2">
         <div className="flex gap-0.5 flex-wrap mb-1">
-          {Array(disasters).fill(0).map(function(_, i) {
+          {Array(disasters).fill(0).map(function (_, i) {
             return (
               <div
                 key={i}
@@ -238,7 +242,7 @@ function ResourcesDisplay({ goodsPositions, food }) {
           Biens ({totalGoods}/6)
         </div>
         <div className="space-y-1">
-          {[...GOODS_TYPES].reverse().map(function(type) {
+          {[...GOODS_TYPES].reverse().map(function (type) {
             const position = goodsPositions[type];
             const value = GOODS_VALUES[type][position];
             const maxForType = GOODS_VALUES[type].length - 1;
@@ -248,7 +252,7 @@ function ResourcesDisplay({ goodsPositions, food }) {
                 <div className="text-xs w-16 text-gray-600 pt-0.5">{GOODS_NAMES[type]}</div>
                 <div className="flex-1 flex gap-1">
                   {/* Afficher toutes les cases existantes pour ce type */}
-                  {GOODS_VALUES[type].map(function(val, idx) {
+                  {GOODS_VALUES[type].map(function (val, idx) {
                     if (idx === 0) return null;
                     return (
                       <div key={idx} className="flex flex-col items-center">
@@ -263,7 +267,7 @@ function ResourcesDisplay({ goodsPositions, food }) {
                     );
                   })}
                   {/* Ajouter des cases vides pour aligner avec les autres lignes */}
-                  {Array(maxSlots - maxForType).fill(0).map(function(_, idx) {
+                  {Array(maxSlots - maxForType).fill(0).map(function (_, idx) {
                     return (
                       <div key={'empty-' + idx} className="flex flex-col items-center">
                         <div className="w-6 h-7 border-2 border-transparent rounded bg-transparent" />
@@ -287,7 +291,7 @@ function ResourcesDisplay({ goodsPositions, food }) {
         <div className="flex items-start gap-1.5 pt-2 border-t border-gray-300 mt-1">
           <div className="text-xs w-16 text-gray-600 pt-0.5">Nourriture</div>
           <div className="flex-1 flex gap-1">
-            {Array(maxFood).fill(0).map(function(_, idx) {
+            {Array(maxFood).fill(0).map(function (_, idx) {
               const value = idx + 1;
               return (
                 <div key={idx} className="flex flex-col items-center">
@@ -355,7 +359,6 @@ export default function PlayerScorePanel({
             monuments={monuments}
           />
           <ResourcesDisplay goodsPositions={player.goodsPositions} food={player.food} />
-          <DisastersDisplay disasters={player.disasters} />
         </div>
 
         {/* Colonne de droite */}
@@ -369,6 +372,7 @@ export default function PlayerScorePanel({
             selectedDevelopmentId={selectedDevelopmentId}
             developments={developments}
           />
+          <DisastersDisplay disasters={player.disasters} />
         </div>
       </div>
     </div>

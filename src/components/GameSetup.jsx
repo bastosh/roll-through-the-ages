@@ -9,7 +9,7 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
   const [selectedVariant, setSelectedVariant] = useState(VARIANTS[0].id);
   const [isSoloMode, setIsSoloMode] = useState(true);
   const [showConfig, setShowConfig] = useState(false);
-  const [scoreHistory, setScoreHistory] = useState({ solo: [], multi: [] });
+  const [scoreHistory, setScoreHistory] = useState({});
   const [playerHistory, setPlayerHistory] = useState([]);
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [editedName, setEditedName] = useState('');
@@ -69,7 +69,7 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
       if (onClearSavedGame) {
         onClearSavedGame();
       }
-      setScoreHistory({ solo: [], multi: [] });
+      setScoreHistory({});
       setPlayerHistory([]);
       setShowConfig(false);
       alert('Le jeu a été réinitialisé avec succès.');
@@ -363,69 +363,81 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
         </div>
 
         {/* Score History */}
-        {(scoreHistory.solo.length > 0 || scoreHistory.multi.length > 0) && (
-          <div className="bg-white rounded-xl shadow-2xl p-6">
-            <h2 className="text-2xl font-bold mb-4 text-amber-800 text-center">
-              🏆 Meilleurs scores
-            </h2>
+        {(function() {
+          const variantScores = scoreHistory[selectedVariant];
+          if (!variantScores) return false;
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {scoreHistory.solo.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-bold mb-3 text-gray-700">Mode Solo</h3>
-                  <div className="space-y-2">
-                    {scoreHistory.solo.map(function(entry, i) {
-                      return (
-                        <div
-                          key={i}
-                          className={'flex items-center justify-between p-2 rounded ' + (
-                            i === 0 ? 'bg-yellow-100 border-2 border-yellow-400' : 'bg-gray-50'
-                          )}
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-gray-600">{i + 1}.</span>
-                            <span className="font-semibold">{entry.playerName}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-amber-700">{entry.score} pts</span>
-                            <span className="text-xs text-gray-500">{formatDate(entry.date)}</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+          const hasSoloScores = variantScores.solo && variantScores.solo.length > 0;
+          const hasMultiScores = variantScores.multi && variantScores.multi.length > 0;
 
-              {scoreHistory.multi.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-bold mb-3 text-gray-700">Mode Multijoueur</h3>
-                  <div className="space-y-2">
-                    {scoreHistory.multi.map(function(entry, i) {
-                      return (
-                        <div
-                          key={i}
-                          className={'flex items-center justify-between p-2 rounded ' + (
-                            i === 0 ? 'bg-yellow-100 border-2 border-yellow-400' : 'bg-gray-50'
-                          )}
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-gray-600">{i + 1}.</span>
-                            <span className="font-semibold">{entry.playerName}</span>
+          if (!hasSoloScores && !hasMultiScores) return false;
+
+          const selectedVariantConfig = VARIANTS.find(v => v.id === selectedVariant);
+
+          return (
+            <div className="bg-white rounded-xl shadow-2xl p-6">
+              <h2 className="text-2xl font-bold mb-4 text-amber-800 text-center">
+                🏆 Meilleurs scores - {selectedVariantConfig ? selectedVariantConfig.displayName : ''}
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {hasSoloScores && (
+                  <div>
+                    <h3 className="text-lg font-bold mb-3 text-gray-700">Mode Solo</h3>
+                    <div className="space-y-2">
+                      {variantScores.solo.map(function(entry, i) {
+                        return (
+                          <div
+                            key={i}
+                            className={'flex items-center justify-between p-2 rounded ' + (
+                              i === 0 ? 'bg-yellow-100 border-2 border-yellow-400' : 'bg-gray-50'
+                            )}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-gray-600">{i + 1}.</span>
+                              <span className="font-semibold">{entry.playerName}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-amber-700">{entry.score} pts</span>
+                              <span className="text-xs text-gray-500">{formatDate(entry.date)}</span>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-amber-700">{entry.score} pts</span>
-                            <span className="text-xs text-gray-500">{formatDate(entry.date)}</span>
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+
+                {hasMultiScores && (
+                  <div>
+                    <h3 className="text-lg font-bold mb-3 text-gray-700">Mode Multijoueur</h3>
+                    <div className="space-y-2">
+                      {variantScores.multi.map(function(entry, i) {
+                        return (
+                          <div
+                            key={i}
+                            className={'flex items-center justify-between p-2 rounded ' + (
+                              i === 0 ? 'bg-yellow-100 border-2 border-yellow-400' : 'bg-gray-50'
+                            )}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-gray-600">{i + 1}.</span>
+                              <span className="font-semibold">{entry.playerName}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-amber-700">{entry.score} pts</span>
+                              <span className="text-xs text-gray-500">{formatDate(entry.date)}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );

@@ -5,7 +5,6 @@ import { addGoods, handleDisasters, getGoodsValue, getTotalGoodsCount } from '..
 import { addScore } from '../utils/scoreHistory';
 import PlayerScorePanel from './PlayerScorePanel';
 import ActionPanel from './ActionPanel';
-import ScoreDisplay from './shared/ScoreDisplay';
 import DisasterHelp from './shared/DisasterHelp';
 
 export default function Game({ playerNames, variantId, isSoloMode }) {
@@ -1109,9 +1108,14 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     setPlayers(newPlayers);
     setGameEnded(true);
 
-    // Save scores to history
-    for (let i = 0; i < newPlayers.length; i++) {
-      addScore(newPlayers[i].name, newPlayers[i].score, isSoloMode);
+    // Save scores to history (only for solo mode or multiplayer with 2+ players)
+    // Don't save scores for "partie libre" (1 player, not solo mode)
+    const shouldSaveScores = isSoloMode || playerNames.length > 1;
+
+    if (shouldSaveScores) {
+      for (let i = 0; i < newPlayers.length; i++) {
+        addScore(newPlayers[i].name, newPlayers[i].score, isSoloMode, variantId);
+      }
     }
 
     // Clear saved game state
@@ -1236,9 +1240,85 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
         </div>
 
         {/* Score Display */}
-        <div className="flex-shrink-0">
+        {/* <div className="flex-shrink-0">
           <ScoreDisplay players={players} currentPlayerIndex={currentPlayerIndex} />
-        </div>
+        </div> */}
+
+        {/* Dice Display - Compact bar (always) */}
+        {(diceResults || (phase === 'roll' && isRolling)) && (
+          <div className="flex-shrink-0 bg-white rounded-lg shadow-lg px-4 py-3 mb-4 flex items-center gap-4 h-24">
+            <div className="flex gap-2">
+              {isRolling ? (
+                <div className="flex items-center gap-3">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
+                  <span className="text-sm font-semibold text-gray-700">Lancer en cours...</span>
+                </div>
+              ) : diceResults ? (
+                diceResults.map(function(result, i) {
+                  const isLocked = lockedDice.indexOf(i) !== -1;
+                  const hasSkulls = result && result.skulls > 0;
+                  const canToggle = phase === 'roll' && (!hasSkulls || (leadershipMode || (isSoloMode && !variantConfig.soloSkullsLocked)));
+
+                  // Déterminer l'image de la face du dé
+                  let imageSrc = '';
+
+                  if (result.type === 'food') {
+                    imageSrc = '/src/assets/food.png';
+                  } else if (result.type === 'goods') {
+                    if (result.skulls > 0 && result.value === 2) {
+                      imageSrc = '/src/assets/crane-goods.png';
+                    } else {
+                      imageSrc = '/src/assets/good.png';
+                    }
+                  } else if (result.type === 'workers') {
+                    imageSrc = '/src/assets/workers.png';
+                  } else if (result.type === 'food_or_workers') {
+                    imageSrc = '/src/assets/food-workers.png';
+                  } else if (result.type === 'coins') {
+                    imageSrc = '/src/assets/coin.png';
+                  }
+
+                  return (
+                    <img
+                      key={i}
+                      src={imageSrc}
+                      alt={result.type}
+                      onClick={canToggle ? () => toggleLock(i) : undefined}
+                      className={'w-16 h-16 object-contain transition rounded-lg ' +
+                        (canToggle ? 'cursor-pointer hover:opacity-80 ' : 'cursor-default ') +
+                        (isLocked && result.skulls > 0 ? 'ring-4 ring-red-500 ' :
+                         isLocked ? 'ring-4 ring-amber-500 ' : '')}
+                    />
+                  );
+                })
+              ) : null}
+            </div>
+            {phase === 'roll' && (
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col items-start gap-1">
+                  <span className="text-sm font-bold text-amber-700">Lancer {rollCount + 1}/3</span>
+                  <span className="text-xs text-gray-500">Cliquez pour verrouiller</span>
+                </div>
+                {(function() {
+                  const hasLeadership = currentPlayer.developments.indexOf('leadership') !== -1;
+                  const canReroll = rollCount < 2 && diceResults && lockedDice.length < diceResults.length;
+
+                  if (canReroll && !leadershipMode && !isRolling) {
+                    return (
+                      <button
+                        onClick={handleReroll}
+                        className="h-16 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition cursor-pointer whitespace-nowrap"
+                      >
+                        Relancer les dés non verrouillés
+                      </button>
+                    );
+                  }
+                  return null;
+                })()}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-3 gap-4 mb-4 flex-1 min-h-0">
           <div className="col-span-2">

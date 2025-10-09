@@ -79,7 +79,8 @@ export default function DiceRollPhase({
   onUseLeadership,
   onLeadershipReroll,
   onCancelLeadership,
-  skullsCanBeToggled
+  skullsCanBeToggled,
+  isRollPhase = true
 }) {
   const canReroll = rollCount < 2 && lockedDice.length < diceResults.length;
   const hasAgriculture = currentPlayer.developments.indexOf('agriculture') !== -1;
@@ -157,8 +158,8 @@ export default function DiceRollPhase({
           })}
         </div>
 
-        {/* Boutons de relance au milieu */}
-        {leadershipMode ? (
+        {/* Boutons de relance au milieu - seulement en phase roll */}
+        {isRollPhase && (leadershipMode ? (
           <div className="space-y-3">
             <div className="bg-purple-50 border-2 border-purple-400 rounded-lg p-3">
               <div className="text-center text-purple-700 font-bold mb-2">
@@ -203,11 +204,11 @@ export default function DiceRollPhase({
               </button>
             )}
           </div>
-        )}
+        ))}
       </div>
 
-      {/* Bouton valider en bas à droite */}
-      {!leadershipMode && (
+      {/* Bouton valider en bas à droite - seulement en phase roll */}
+      {isRollPhase && !leadershipMode && (
         <div className="mt-auto">
           <div className="grid grid-cols-2 gap-4">
             <div></div>
