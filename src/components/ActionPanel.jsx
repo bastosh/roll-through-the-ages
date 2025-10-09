@@ -109,18 +109,6 @@ export default function ActionPanel({
               </div>
             )}
           </div>
-
-          {!leadershipMode && (
-            <div className="mt-auto">
-              <button
-                onClick={onKeep}
-                disabled={isRolling}
-                className="w-full h-16 rounded-lg font-bold text-xl text-white transition bg-green-600 hover:bg-green-700 disabled:bg-gray-400 cursor-pointer disabled:cursor-not-allowed"
-              >
-                Valider
-              </button>
-            </div>
-          )}
         </div>
       )}
 

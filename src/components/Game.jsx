@@ -67,6 +67,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   const [rollCount, setRollCount] = useState(0);
   const [lockedDice, setLockedDice] = useState([]);
   const [isRolling, setIsRolling] = useState(false);
+  const [rollingDice, setRollingDice] = useState([]);
   const [pendingWorkers, setPendingWorkers] = useState(0);
   const [pendingFoodOrWorkers, setPendingFoodOrWorkers] = useState(0);
   const [pendingCoins, setPendingCoins] = useState(0);
@@ -116,11 +117,11 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   // Auto-roll dice when entering roll phase
   useEffect(function() {
     if (phase === 'roll' && !diceResults) {
-      rollDice(true);
+      rollDice(true, 0);
     }
   }, [phase]);
 
-  function rollDice(initial) {
+  function rollDice(initial, currentRollCount) {
     setIsRolling(true);
     let diceToRoll = [];
 
@@ -136,6 +137,9 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
       }
     }
 
+    // Set which dice are currently rolling for individual animations
+    setRollingDice(diceToRoll);
+
     setTimeout(function() {
       const newResults = [...diceResults || []];
       for (let i = 0; i < diceToRoll.length; i++) {
@@ -144,18 +148,37 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
       }
       setDiceResults(newResults);
       setIsRolling(false);
+      setRollingDice([]);
 
       // Skulls auto-locked unless in solo mode AND variant allows rerolling skulls
       const shouldLockSkulls = !isSoloMode || variantConfig.soloSkullsLocked;
+      let newLockedDice = [...lockedDice];
       if (shouldLockSkulls) {
-        const newLocked = [...lockedDice];
         for (let i = 0; i < newResults.length; i++) {
           const result = newResults[i];
-          if (result && result.skulls > 0 && newLocked.indexOf(i) === -1) {
-            newLocked.push(i);
+          if (result && result.skulls > 0 && newLockedDice.indexOf(i) === -1) {
+            newLockedDice.push(i);
           }
         }
-        setLockedDice(newLocked);
+        setLockedDice(newLockedDice);
+      }
+
+      // Auto-validate if:
+      // 1. No more rerolls available (currentRollCount will be 2 after the 3rd roll)
+      // 2. OR all dice are locked
+      // BUT only if Leadership is not available (doesn't have it OR already used it)
+      const hasLeadership = newResults.length > 0 && currentPlayer.developments.indexOf('leadership') !== -1;
+      const canUseLeadership = hasLeadership && !leadershipUsed;
+      const allDiceLocked = newLockedDice.length >= newResults.length;
+
+      // Check if we can reroll after this roll (rollCount starts at 0, after 3rd roll currentRollCount is 2)
+      const noMoreRerolls = currentRollCount >= 2;
+
+      if ((noMoreRerolls || allDiceLocked) && !leadershipMode && !canUseLeadership) {
+        // Auto-validate after a short delay
+        setTimeout(function() {
+          processResults(newResults);
+        }, 300);
       }
     }, 600);
   }
@@ -177,8 +200,9 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
 
   function handleReroll() {
     if (rollCount < 2 && lockedDice.length < diceResults.length) {
-      setRollCount(rollCount + 1);
-      rollDice(false);
+      const newRollCount = rollCount + 1;
+      setRollCount(newRollCount);
+      rollDice(false, newRollCount);
     }
   }
 
@@ -209,7 +233,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
 
     // Only allow if exactly 1 die is unlocked
     if (unlockedCount === 1) {
-      rollDice(false);
+      rollDice(false, rollCount);
       setLeadershipMode(false);
     }
   }
@@ -1069,9 +1093,98 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   }
 
   if (gameEnded) {
-    const sortedPlayers = [...players].sort(function(a, b) {
-      return b.score - a.score;
+    // Calculate score breakdown and resources for each player
+    const playersWithDetails = players.map(function(player) {
+      let developmentScore = 0;
+      for (let j = 0; j < player.developments.length; j++) {
+        const devId = player.developments[j];
+        for (let k = 0; k < DEVELOPMENTS.length; k++) {
+          if (DEVELOPMENTS[k].id === devId) {
+            developmentScore += DEVELOPMENTS[k].points;
+            break;
+          }
+        }
+      }
+
+      let monumentScore = 0;
+      for (let j = 0; j < player.monuments.length; j++) {
+        const m = player.monuments[j];
+        if (m.completed) {
+          for (let k = 0; k < MONUMENTS.length; k++) {
+            if (MONUMENTS[k].id === m.id) {
+              const monument = MONUMENTS[k];
+              monumentScore += m.firstToComplete ? monument.points[0] : monument.points[1];
+              break;
+            }
+          }
+        }
+      }
+
+      let bonusScore = 0;
+
+      if (player.developments.indexOf('architecture') !== -1) {
+        let completedCount = 0;
+        for (let j = 0; j < player.monuments.length; j++) {
+          if (player.monuments[j].completed) completedCount++;
+        }
+        let architectureDev = null;
+        for (let k = 0; k < DEVELOPMENTS.length; k++) {
+          if (DEVELOPMENTS[k].id === 'architecture') {
+            architectureDev = DEVELOPMENTS[k];
+            break;
+          }
+        }
+        const multiplier = architectureDev && architectureDev.cost >= 60 ? 2 : 1;
+        bonusScore += completedCount * multiplier;
+      }
+
+      if (player.developments.indexOf('empire') !== -1) {
+        let cityCount = 3;
+        for (let j = 0; j < player.cities.length; j++) {
+          if (player.cities[j].built) cityCount++;
+        }
+        bonusScore += cityCount;
+      }
+
+      if (player.developments.indexOf('commerce') !== -1) {
+        const totalGoodsCount = getTotalGoodsCount(player.goodsPositions);
+        bonusScore += totalGoodsCount;
+      }
+
+      const totalResourcesCount = getTotalGoodsCount(player.goodsPositions) + player.food;
+
+      return {
+        player: player,
+        developmentScore: developmentScore,
+        monumentScore: monumentScore,
+        bonusScore: bonusScore,
+        disasterScore: player.disasters,
+        totalScore: player.score,
+        totalResourcesCount: totalResourcesCount
+      };
     });
+
+    // Sort by score, then by resources for tie-breaking
+    const sortedPlayers = [...playersWithDetails].sort(function(a, b) {
+      if (b.totalScore !== a.totalScore) {
+        return b.totalScore - a.totalScore;
+      }
+      // Tie-break by total resources
+      return b.totalResourcesCount - a.totalResourcesCount;
+    });
+
+    // Determine winners (handle ties)
+    const winnerScore = sortedPlayers[0].totalScore;
+    const winnersWithSameScore = sortedPlayers.filter(p => p.totalScore === winnerScore);
+    const isTie = winnersWithSameScore.length > 1;
+
+    let winners = [];
+    if (isTie) {
+      const maxResources = Math.max(...winnersWithSameScore.map(p => p.totalResourcesCount));
+      winners = winnersWithSameScore.filter(p => p.totalResourcesCount === maxResources);
+    } else {
+      winners = [sortedPlayers[0]];
+    }
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-200 p-8">
@@ -1080,30 +1193,35 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
             🏆 Partie terminée !
           </h1>
 
-          {sortedPlayers.map(function(player, i) {
-            let completedMonuments = 0;
-            for (let j = 0; j < player.monuments.length; j++) {
-              if (player.monuments[j].completed) completedMonuments++;
-            }
+          {sortedPlayers.map(function(playerDetail, i) {
+            const player = playerDetail.player;
+            const isWinner = winners.some(w => w.player.name === player.name);
+            const showResources = isTie && winnersWithSameScore.some(w => w.player.name === player.name);
 
             return (
               <div key={i} className={'mb-4 p-6 rounded-lg ' + (
-                i === 0 ? 'bg-yellow-100 border-4 border-yellow-400' : 'bg-gray-100'
+                isWinner ? 'bg-yellow-100 border-4 border-yellow-400' : 'bg-gray-100'
               )}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-2xl font-bold">
-                      {i === 0 ? '👑 ' : ''}
-                      {player.name}
-                    </h3>
-                    <p className="text-gray-600">
-                      Développements: {player.developments.length} |
-                      Monuments: {completedMonuments}
-                    </p>
-                  </div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-2xl font-bold">
+                    {isWinner ? '👑 ' : ''}
+                    {player.name}
+                  </h3>
                   <div className="text-4xl font-bold text-amber-700">
-                    {player.score} pts
+                    {playerDetail.totalScore} pts
                   </div>
+                </div>
+                <div className="text-sm text-gray-700 space-y-1">
+                  <div>• développements : {playerDetail.developmentScore}</div>
+                  <div>+ monuments : {playerDetail.monumentScore}</div>
+                  <div>+ bonus : {playerDetail.bonusScore}</div>
+                  <div>- catastrophes : {playerDetail.disasterScore}</div>
+                  <div className="font-bold">= total : {playerDetail.totalScore}</div>
+                  {showResources && (
+                    <div className="mt-2 text-amber-700 font-semibold">
+                      Ressources restantes : {playerDetail.totalResourcesCount}
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -1188,16 +1306,12 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
         {(diceResults || (phase === 'roll' && isRolling)) && (
           <div className="flex-shrink-0 bg-white rounded-lg shadow-lg px-4 py-3 mb-4 flex items-center gap-4 h-24">
             <div className="flex gap-2">
-              {isRolling ? (
-                <div className="flex items-center gap-3">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
-                  <span className="text-sm font-semibold text-gray-700">Lancer en cours...</span>
-                </div>
-              ) : diceResults ? (
+              {diceResults ? (
                 diceResults.map(function(result, i) {
                   const isLocked = lockedDice.indexOf(i) !== -1;
                   const hasSkulls = result && result.skulls > 0;
                   const canToggle = phase === 'roll' && (!hasSkulls || (leadershipMode || (isSoloMode && !variantConfig.soloSkullsLocked)));
+                  const isDiceRolling = rollingDice.indexOf(i) !== -1;
 
                   // Déterminer l'image de la face du dé
                   let imageSrc = '';
@@ -1219,41 +1333,67 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
                   }
 
                   return (
-                    <img
-                      key={i}
-                      src={imageSrc}
-                      alt={result.type}
-                      onClick={canToggle ? () => toggleLock(i) : undefined}
-                      className={'w-16 h-16 object-contain transition rounded-lg ' +
-                        (canToggle ? 'cursor-pointer hover:opacity-80 ' : 'cursor-default ') +
-                        (isLocked && result.skulls > 0 ? 'ring-4 ring-red-500 ' :
-                         isLocked ? 'ring-4 ring-amber-500 ' : '')}
-                    />
+                    <div key={i} className="relative w-16 h-16">
+                      {isDiceRolling ? (
+                        <div className="w-16 h-16 flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
+                        </div>
+                      ) : (
+                        <img
+                          src={imageSrc}
+                          alt={result.type}
+                          onClick={canToggle ? () => toggleLock(i) : undefined}
+                          className={'w-16 h-16 object-contain transition rounded-lg ' +
+                            (canToggle ? 'cursor-pointer hover:opacity-80 ' : 'cursor-default ') +
+                            (isLocked && result.skulls > 0 ? 'ring-4 ring-red-500 ' :
+                             isLocked ? 'ring-4 ring-amber-500 ' : '')}
+                        />
+                      )}
+                    </div>
                   );
                 })
-              ) : null}
+              ) : (
+                <div className="flex items-center gap-3">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
+                  <span className="text-sm font-semibold text-gray-700">Lancer en cours...</span>
+                </div>
+              )}
             </div>
             {phase === 'roll' && (
               <div className="flex items-center gap-4">
-                <div className="flex flex-col items-start gap-1">
-                  <span className="text-sm font-bold text-amber-700">Lancer {rollCount + 1}/3</span>
-                  <span className="text-xs text-gray-500">Cliquez pour verrouiller</span>
-                </div>
                 {(function() {
                   const hasLeadership = currentPlayer.developments.indexOf('leadership') !== -1;
                   const canReroll = rollCount < 2 && diceResults && lockedDice.length < diceResults.length;
+                  const canUseLeadership = hasLeadership && !leadershipUsed;
+                  const isLastRoll = rollCount === 2 || (diceResults && lockedDice.length >= diceResults.length);
+                  const willAutoValidate = isLastRoll && !canUseLeadership;
 
-                  if (canReroll && !leadershipMode && !isRolling) {
-                    return (
-                      <button
-                        onClick={handleReroll}
-                        className="h-16 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition cursor-pointer whitespace-nowrap"
-                      >
-                        Relancer les dés non verrouillés
-                      </button>
-                    );
-                  }
-                  return null;
+                  return (
+                    <>
+                      <div className="flex flex-col items-start gap-1">
+                        <span className="text-sm font-bold text-amber-700">Lancer {rollCount + 1}/3</span>
+                        {canReroll && <span className="text-xs text-gray-500">Cliquez pour verrouiller</span>}
+                      </div>
+                      {canReroll && !leadershipMode && (
+                        <button
+                          onClick={handleReroll}
+                          disabled={isRolling}
+                          className="h-16 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer whitespace-nowrap"
+                        >
+                          Relancer les dés non verrouillés
+                        </button>
+                      )}
+                      {diceResults && !leadershipMode && !willAutoValidate && (
+                        <button
+                          onClick={handleKeep}
+                          disabled={isRolling}
+                          className="h-16 bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer whitespace-nowrap min-w-32"
+                        >
+                          Valider
+                        </button>
+                      )}
+                    </>
+                  );
                 })()}
               </div>
             )}
