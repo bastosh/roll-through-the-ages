@@ -1204,7 +1204,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto h-full flex flex-col">
+      <div className="h-full flex flex-col">
         <div className="bg-white rounded-lg shadow-lg p-4 mb-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-amber-800">
@@ -1240,66 +1240,70 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
           <ScoreDisplay players={players} currentPlayerIndex={currentPlayerIndex} />
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-4 flex-1 min-h-0">
-          <PlayerScorePanel
-            player={currentPlayer}
-            onBuyDevelopment={handleSelectDevelopment}
-            canBuy={phase === 'buy' && !selectedDevelopmentToBuy}
-            pendingCoins={pendingCoins}
-            onBuildCity={handleBuildCity}
-            onBuildMonument={handleBuildMonument}
-            canBuild={phase === 'build'}
-            pendingWorkers={pendingWorkers}
-            selectedDevelopmentId={selectedDevelopmentToBuy ? selectedDevelopmentToBuy.id : null}
-            allPlayers={players}
-            currentPlayerIndex={currentPlayerIndex}
-            monuments={MONUMENTS}
-            developments={DEVELOPMENTS}
-          />
-          <ActionPanel
-            phase={phase}
-            diceResults={diceResults}
-            rollCount={rollCount}
-            lockedDice={lockedDice}
-            isRolling={isRolling}
-            onToggleLock={toggleLock}
-            onReroll={handleReroll}
-            onKeep={handleKeep}
-            pendingFoodOrWorkers={pendingFoodOrWorkers}
-            currentPlayer={currentPlayer}
-            onChooseFoodOrWorkers={handleUseFoodOrWorkers}
-            citiesToFeed={citiesToFeed}
-            onFeed={handleFeed}
-            pendingWorkers={pendingWorkers}
-            onResetBuild={handleResetBuild}
-            onSkipBuild={handleSkipBuild}
-            stoneToTradeForWorkers={stoneToTradeForWorkers}
-            onTradeStone={handleTradeStone}
-            onResetStone={handleResetStone}
-            pendingCoins={pendingCoins}
-            onResetBuy={handleResetBuy}
-            onSkipBuy={handleSkipBuy}
-            hasPurchased={originalGoodsPositions !== null}
-            selectedDevelopment={selectedDevelopmentToBuy}
-            selectedGoods={selectedGoodsForPurchase}
-            selectedCoins={coinsForPurchase}
-            onToggleGood={handleToggleGoodForPurchase}
-            onConfirmPurchase={handleConfirmPurchase}
-            onCancelSelection={handleCancelPurchaseSelection}
-            calculateSelectedValue={calculateSelectedValue}
-            lastPurchasedDevelopment={lastPurchasedDevelopment}
-            onDiscard={handleDiscard}
-            leadershipUsed={leadershipUsed}
-            leadershipMode={leadershipMode}
-            onUseLeadership={handleUseLeadership}
-            onLeadershipReroll={handleLeadershipReroll}
-            onCancelLeadership={handleCancelLeadership}
-            skullsCanBeToggled={leadershipMode || (isSoloMode && !variantConfig.soloSkullsLocked)}
-            granariesRate={getGranariesRate()}
-            foodToTradeForCoins={foodToTradeForCoins}
-            onTradeFood={handleTradeFood}
-            onResetTrade={handleResetTrade}
-          />
+        <div className="grid grid-cols-3 gap-4 mb-4 flex-1 min-h-0">
+          <div className="col-span-2">
+            <PlayerScorePanel
+              player={currentPlayer}
+              onBuyDevelopment={handleSelectDevelopment}
+              canBuy={phase === 'buy' && !selectedDevelopmentToBuy}
+              pendingCoins={pendingCoins}
+              onBuildCity={handleBuildCity}
+              onBuildMonument={handleBuildMonument}
+              canBuild={phase === 'build'}
+              pendingWorkers={pendingWorkers}
+              selectedDevelopmentId={selectedDevelopmentToBuy ? selectedDevelopmentToBuy.id : null}
+              allPlayers={players}
+              currentPlayerIndex={currentPlayerIndex}
+              monuments={MONUMENTS}
+              developments={DEVELOPMENTS}
+            />
+          </div>
+          <div className="col-span-1">
+            <ActionPanel
+              phase={phase}
+              diceResults={diceResults}
+              rollCount={rollCount}
+              lockedDice={lockedDice}
+              isRolling={isRolling}
+              onToggleLock={toggleLock}
+              onReroll={handleReroll}
+              onKeep={handleKeep}
+              pendingFoodOrWorkers={pendingFoodOrWorkers}
+              currentPlayer={currentPlayer}
+              onChooseFoodOrWorkers={handleUseFoodOrWorkers}
+              citiesToFeed={citiesToFeed}
+              onFeed={handleFeed}
+              pendingWorkers={pendingWorkers}
+              onResetBuild={handleResetBuild}
+              onSkipBuild={handleSkipBuild}
+              stoneToTradeForWorkers={stoneToTradeForWorkers}
+              onTradeStone={handleTradeStone}
+              onResetStone={handleResetStone}
+              pendingCoins={pendingCoins}
+              onResetBuy={handleResetBuy}
+              onSkipBuy={handleSkipBuy}
+              hasPurchased={originalGoodsPositions !== null}
+              selectedDevelopment={selectedDevelopmentToBuy}
+              selectedGoods={selectedGoodsForPurchase}
+              selectedCoins={coinsForPurchase}
+              onToggleGood={handleToggleGoodForPurchase}
+              onConfirmPurchase={handleConfirmPurchase}
+              onCancelSelection={handleCancelPurchaseSelection}
+              calculateSelectedValue={calculateSelectedValue}
+              lastPurchasedDevelopment={lastPurchasedDevelopment}
+              onDiscard={handleDiscard}
+              leadershipUsed={leadershipUsed}
+              leadershipMode={leadershipMode}
+              onUseLeadership={handleUseLeadership}
+              onLeadershipReroll={handleLeadershipReroll}
+              onCancelLeadership={handleCancelLeadership}
+              skullsCanBeToggled={leadershipMode || (isSoloMode && !variantConfig.soloSkullsLocked)}
+              granariesRate={getGranariesRate()}
+              foodToTradeForCoins={foodToTradeForCoins}
+              onTradeFood={handleTradeFood}
+              onResetTrade={handleResetTrade}
+            />
+          </div>
         </div>
 
         {/* Disaster Help Button */}
