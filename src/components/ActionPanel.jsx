@@ -299,6 +299,24 @@ function ChooseFoodOrWorkers({ pendingFoodOrWorkers, currentPlayer, onChoose, fo
       <h3 className="text-xl font-bold mb-4 text-amber-800">Choisir nourriture ou ouvriers</h3>
 
       <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="bg-purple-50 rounded-lg p-3">
+          <div className="text-xs text-gray-600 mb-2 font-semibold">⚒️ Ouvriers</div>
+          <div className="text-sm space-y-1">
+            <div className="flex justify-between">
+              <span>Dés ouvriers:</span>
+              <span className="font-bold">{pendingWorkers}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Dés à répartir:</span>
+              <span className="font-bold">+{totalWorkers}</span>
+            </div>
+            <div className="flex justify-between border-t border-purple-200 pt-1 mt-1 font-bold text-purple-700">
+              <span>Total:</span>
+              <span className="text-lg">{pendingWorkers + totalWorkers}</span>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-amber-50 rounded-lg p-3">
           <div className="text-xs text-gray-600 mb-2 font-semibold">🌾 Nourriture</div>
           <div className="text-sm space-y-1">
@@ -323,24 +341,6 @@ function ChooseFoodOrWorkers({ pendingFoodOrWorkers, currentPlayer, onChoose, fo
                 ⚠️ Famine: -{foodShortage} pt(s)
               </div>
             )}
-          </div>
-        </div>
-
-        <div className="bg-purple-50 rounded-lg p-3">
-          <div className="text-xs text-gray-600 mb-2 font-semibold">⚒️ Ouvriers</div>
-          <div className="text-sm space-y-1">
-            <div className="flex justify-between">
-              <span>Dés ouvriers:</span>
-              <span className="font-bold">{pendingWorkers}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Dés à répartir:</span>
-              <span className="font-bold">+{totalWorkers}</span>
-            </div>
-            <div className="flex justify-between border-t border-purple-200 pt-1 mt-1 font-bold text-purple-700">
-              <span>Total:</span>
-              <span className="text-lg">{pendingWorkers + totalWorkers}</span>
-            </div>
           </div>
         </div>
       </div>

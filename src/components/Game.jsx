@@ -14,21 +14,18 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   const MONUMENTS = variantConfig.monuments;
   const DEVELOPMENTS = variantConfig.developments;
 
-  // Shuffle player order for multiplayer
-  const shuffledPlayerNames = useMemo(function() {
-    if (isSoloMode || playerNames.length === 1) {
-      return playerNames;
-    }
-    const shuffled = [...playerNames];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  }, [playerNames, isSoloMode]);
-
   const [players, setPlayers] = useState(function() {
-    return shuffledPlayerNames.map(function(name, i) {
+    // Shuffle player order for multiplayer
+    let orderedNames = playerNames;
+    if (!isSoloMode && playerNames.length > 1) {
+      orderedNames = [...playerNames];
+      for (let i = orderedNames.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [orderedNames[i], orderedNames[j]] = [orderedNames[j], orderedNames[i]];
+      }
+    }
+
+    return orderedNames.map(function(name, i) {
       // Déterminer quels monuments sont disponibles selon le nombre de joueurs
       const numPlayers = playerNames.length;
       const excludedMonuments = variantConfig.monumentRestrictions[numPlayers] || [];
@@ -338,7 +335,44 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     }
 
     setPlayers(newPlayers);
-    setPhase('build');
+
+    // Skip build phase if no workers
+    if (pendingWorkers === 0) {
+      skipToBuyPhase();
+    } else {
+      setPhase('build');
+    }
+  }
+
+  function skipToBuyPhase() {
+    // Calculate minimum cost of available developments
+    const purchasedDevIds = players[currentPlayerIndex].developments;
+    const availableDevs = DEVELOPMENTS.filter(d => purchasedDevIds.indexOf(d.id) === -1);
+    const minCost = availableDevs.length > 0 ? Math.min(...availableDevs.map(d => d.cost)) : Infinity;
+
+    // Calculate total value available
+    const goodsValue = getGoodsValue(players[currentPlayerIndex].goodsPositions);
+    const totalValue = goodsValue + pendingCoins;
+
+    // Skip buy phase if can't afford anything
+    if (totalValue < minCost) {
+      checkAndSkipDiscard();
+    } else {
+      setPhase('buy');
+    }
+  }
+
+  function checkAndSkipDiscard() {
+    const player = players[currentPlayerIndex];
+    const totalGoods = getTotalGoodsCount(player.goodsPositions);
+    const hasCaravans = player.developments.indexOf('caravans') !== -1;
+
+    // Skip discard phase if player has 6 or fewer goods, or has Caravans
+    if (totalGoods <= 6 || hasCaravans) {
+      nextTurn();
+    } else {
+      setPhase('discard');
+    }
   }
 
   function handleBuildCity(cityIndex) {
@@ -473,7 +507,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     setPendingWorkers(0);
     setPendingFoodOrWorkers(0);
     setStoneToTradeForWorkers(0);
-    setPhase('buy');
+    skipToBuyPhase();
   }
 
   function handleTradeStone(amount) {
@@ -644,13 +678,15 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     player.developments.push(selectedDevelopmentToBuy.id);
     setPlayers(newPlayers);
 
-    // Store last purchased development
-    setLastPurchasedDevelopment(selectedDevelopmentToBuy);
-
-    // Reset selection
+    // Reset selection and state
     setSelectedDevelopmentToBuy(null);
     setSelectedGoodsForPurchase({ wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 });
     setCoinsForPurchase(0);
+    setOriginalGoodsPositions(null);
+    setOriginalCoins(0);
+    setOriginalDevelopments(null);
+    setLastPurchasedDevelopment(null);
+    setFoodToTradeForCoins(0);
 
     // Check end game condition based on variant (but not in test mode)
     if (!testMode && player.developments.length >= variantConfig.endGameConditions.developmentCount) {
@@ -661,6 +697,9 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
       }
       return;
     }
+
+    // Automatically proceed to next phase
+    checkAndSkipDiscard();
   }
 
   function handleCancelPurchaseSelection() {
@@ -752,7 +791,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     setOriginalDevelopments(null);
     setLastPurchasedDevelopment(null);
     setFoodToTradeForCoins(0);
-    setPhase('discard');
+    checkAndSkipDiscard();
   }
 
   function handleTradeFood(amount) {
