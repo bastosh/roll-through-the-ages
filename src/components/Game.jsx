@@ -776,64 +776,6 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     setCoinsForPurchase(0);
   }
 
-  function handleBuyDevelopment(devId) {
-    let dev = null;
-    for (let i = 0; i < DEVELOPMENTS.length; i++) {
-      if (DEVELOPMENTS[i].id === devId) {
-        dev = DEVELOPMENTS[i];
-        break;
-      }
-    }
-
-    const newPlayers = [...players];
-    const player = newPlayers[currentPlayerIndex];
-
-    const totalValue = getGoodsValue(player.goodsPositions) + pendingCoins;
-
-    if (totalValue >= dev.cost && player.developments.indexOf(devId) === -1) {
-      // Only allow one purchase per turn
-      if (originalGoodsPositions) {
-        return; // Already purchased something this turn
-      }
-
-      // Save original state before purchase
-      setOriginalGoodsPositions({ ...player.goodsPositions });
-      setOriginalCoins(pendingCoins);
-      setOriginalDevelopments([...player.developments]);
-
-      let remaining = dev.cost;
-
-      if (pendingCoins > 0) {
-        const coinsUsed = Math.min(pendingCoins, remaining);
-        remaining -= coinsUsed;
-        setPendingCoins(pendingCoins - coinsUsed);
-      }
-
-      if (remaining > 0) {
-        const goodsOrder = ['spearheads', 'cloth', 'pottery', 'stone', 'wood'];
-        for (let i = 0; i < goodsOrder.length; i++) {
-          const type = goodsOrder[i];
-          while (player.goodsPositions[type] > 0 && remaining > 0) {
-            const currentValue = GOODS_VALUES[type][player.goodsPositions[type]];
-            const previousValue = GOODS_VALUES[type][player.goodsPositions[type] - 1];
-            const valueToDeduct = currentValue - previousValue;
-            player.goodsPositions[type]--;
-            remaining -= valueToDeduct;
-          }
-        }
-      }
-
-      player.developments.push(devId);
-      setPlayers(newPlayers);
-
-      // Check end game condition based on variant
-      if (player.developments.length >= variantConfig.endGameConditions.developmentCount) {
-        endGame();
-        return;
-      }
-    }
-  }
-
   function handleResetBuy() {
     if (originalGoodsPositions) {
       const newPlayers = [...players];
@@ -1241,11 +1183,6 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
             </div>
           </div>
         </div>
-
-        {/* Score Display */}
-        {/* <div className="flex-shrink-0">
-          <ScoreDisplay players={players} currentPlayerIndex={currentPlayerIndex} />
-        </div> */}
 
         {/* Dice Display - Compact bar (always) */}
         {(diceResults || (phase === 'roll' && isRolling)) && (
