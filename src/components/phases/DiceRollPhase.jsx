@@ -97,67 +97,70 @@ export default function DiceRollPhase({
   }
 
   return (
-    <div>
+    <div className="h-full flex flex-col">
+      {/* Titre en haut */}
       <h3 className="text-xl font-bold mb-4 text-amber-800">Lancer de dés</h3>
 
-      <div className="mb-4 text-center">
-        <p className="text-lg text-gray-600">Lancer {rollCount + 1}/3</p>
-        <p className="text-sm text-gray-500 mt-1">
-          Cliquez sur un dé pour le verrouiller/déverrouiller
-        </p>
-      </div>
+      {/* Contenu principal centré */}
+      <div className="flex-1 flex flex-col justify-center">
+        <div className="mb-4 text-center">
+          <p className="text-lg text-gray-600">Lancer {rollCount + 1}/3</p>
+          <p className="text-sm text-gray-500 mt-1">
+            Cliquez sur un dé pour le verrouiller/déverrouiller
+          </p>
+        </div>
 
-      <DisasterWarning totalSkulls={totalSkulls} currentPlayer={currentPlayer} />
+        <DisasterWarning totalSkulls={totalSkulls} currentPlayer={currentPlayer} />
 
-      <div className="grid grid-cols-3 gap-3 mb-6">
-        {diceResults.map(function(result, i) {
-          const isLocked = lockedDice.indexOf(i) !== -1;
-          const hasSkulls = result && result.skulls > 0;
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          {diceResults.map(function(result, i) {
+            const isLocked = lockedDice.indexOf(i) !== -1;
+            const hasSkulls = result && result.skulls > 0;
 
-          let buttonClass = 'aspect-square rounded-lg flex flex-col items-center justify-center text-4xl font-bold transition-all ';
-          if (isLocked) {
-            if (hasSkulls) {
-              if (skullsCanBeToggled) {
-                buttonClass += 'bg-red-200 border-4 border-red-400 cursor-pointer hover:border-red-600';
+            let buttonClass = 'aspect-square rounded-lg flex flex-col items-center justify-center text-4xl font-bold transition-all ';
+            if (isLocked) {
+              if (hasSkulls) {
+                if (skullsCanBeToggled) {
+                  buttonClass += 'bg-red-200 border-4 border-red-400 cursor-pointer hover:border-red-600';
+                } else {
+                  buttonClass += 'bg-red-200 border-4 border-red-400 cursor-not-allowed';
+                }
               } else {
-                buttonClass += 'bg-red-200 border-4 border-red-400 cursor-not-allowed';
+                buttonClass += 'bg-amber-200 border-4 border-amber-500 cursor-pointer';
               }
             } else {
-              buttonClass += 'bg-amber-200 border-4 border-amber-500 cursor-pointer';
+              buttonClass += 'bg-gray-100 border-4 border-gray-300 hover:border-amber-300 cursor-pointer';
             }
-          } else {
-            buttonClass += 'bg-gray-100 border-4 border-gray-300 hover:border-amber-300 cursor-pointer';
-          }
 
-          return (
-            <button
-              key={i}
-              onClick={() => onToggleLock(i)}
-              disabled={hasSkulls && !skullsCanBeToggled}
-              className={buttonClass}
-            >
-              {isRolling && !isLocked ? (
-                <div className="flex flex-col items-center justify-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-amber-600"></div>
-                  <div className="text-xs text-gray-600 mt-2">...</div>
-                </div>
-              ) : (
-                <>
-                  <div className="text-4xl mb-1">{getDiceIcon(result, hasAgriculture, hasMasonry)}</div>
-                  <div className="text-xs text-gray-600 text-center px-1">
-                    {getDiceText(result, hasAgriculture, hasMasonry, hasCoinage)}
+            return (
+              <button
+                key={i}
+                onClick={() => onToggleLock(i)}
+                disabled={hasSkulls && !skullsCanBeToggled}
+                className={buttonClass}
+              >
+                {isRolling && !isLocked ? (
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-amber-600"></div>
+                    <div className="text-xs text-gray-600 mt-2">...</div>
                   </div>
-                </>
-              )}
-            </button>
-          );
-        })}
-      </div>
+                ) : (
+                  <>
+                    <div className="text-4xl mb-1">{getDiceIcon(result, hasAgriculture, hasMasonry)}</div>
+                    <div className="text-xs text-gray-600 text-center px-1">
+                      {getDiceText(result, hasAgriculture, hasMasonry, hasCoinage)}
+                    </div>
+                  </>
+                )}
+              </button>
+            );
+          })}
+        </div>
 
-      <div className="flex flex-col gap-3">
+        {/* Boutons de relance au milieu */}
         {leadershipMode ? (
-          <>
-            <div className="bg-purple-50 border-2 border-purple-400 rounded-lg p-3 mb-2">
+          <div className="space-y-3">
+            <div className="bg-purple-50 border-2 border-purple-400 rounded-lg p-3">
               <div className="text-center text-purple-700 font-bold mb-2">
                 👑 Mode Leadership
               </div>
@@ -178,9 +181,9 @@ export default function DiceRollPhase({
             >
               Annuler
             </button>
-          </>
+          </div>
         ) : (
-          <>
+          <div className="space-y-3">
             {canReroll && (
               <button
                 onClick={onReroll}
@@ -199,16 +202,25 @@ export default function DiceRollPhase({
                 👑 Utiliser Leadership (relancer 1 dé)
               </button>
             )}
+          </div>
+        )}
+      </div>
+
+      {/* Bouton valider en bas à droite */}
+      {!leadershipMode && (
+        <div className="mt-auto">
+          <div className="grid grid-cols-2 gap-4">
+            <div></div>
             <button
               onClick={onKeep}
               disabled={isRolling}
-              className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 disabled:bg-gray-400 transition cursor-pointer disabled:cursor-not-allowed"
+              className="h-24 rounded-lg font-bold text-xl text-white transition flex items-center justify-center bg-green-600 hover:bg-green-700 disabled:bg-gray-400 cursor-pointer disabled:cursor-not-allowed"
             >
-              Conserver et continuer
+              Valider
             </button>
-          </>
-        )}
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

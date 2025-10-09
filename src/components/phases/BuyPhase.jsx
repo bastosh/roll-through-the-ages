@@ -117,118 +117,125 @@ export default function BuyPhase({
   }
 
   return (
-    <div>
+    <div className="h-full flex flex-col">
+      {/* Titre en haut */}
       <h3 className="text-xl font-bold mb-4 text-amber-800">Acheter un développement</h3>
 
-      {hasGranaries && (
-        <div className="bg-green-50 border-2 border-green-400 rounded-lg p-4 mb-4">
+      {/* Contenu principal centré */}
+      <div className="flex-1 flex flex-col justify-center overflow-y-auto">
+        {hasGranaries && (
+          <div className="bg-green-50 border-2 border-green-400 rounded-lg p-4 mb-4">
+            <div className="text-center mb-3">
+              <div className="text-sm font-bold text-green-700 mb-2">🌾 Greniers</div>
+              <div className="text-xs text-gray-600 mb-2">
+                Échangez de la nourriture contre {granariesRate} pièces/unité
+              </div>
+              <div className="flex items-center justify-center gap-3">
+                <div className="text-sm">
+                  Nourriture: <span className="font-bold">{totalFoodAvailable}</span>
+                </div>
+                <input
+                  type="number"
+                  min="0"
+                  max={totalFoodAvailable}
+                  value={foodToTradeForCoins}
+                  onChange={(e) => onTradeFood(parseInt(e.target.value) || 0)}
+                  className="w-20 px-2 py-1 border-2 border-green-400 rounded text-center font-bold"
+                />
+                <div className="text-sm">
+                  → <span className="font-bold text-amber-600">{foodToTradeForCoins * granariesRate} 💰</span>
+                </div>
+              </div>
+              {foodToTradeForCoins > 0 && (
+                <button
+                  onClick={onResetTrade}
+                  className="mt-2 px-3 py-1 bg-orange-500 text-white text-xs rounded hover:bg-orange-600 cursor-pointer"
+                >
+                  Annuler l'échange
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="bg-gray-50 rounded-lg p-4 mb-4">
           <div className="text-center mb-3">
-            <div className="text-sm font-bold text-green-700 mb-2">🌾 Greniers</div>
-            <div className="text-xs text-gray-600 mb-2">
-              Échangez de la nourriture contre {granariesRate} pièces/unité
-            </div>
-            <div className="flex items-center justify-center gap-3">
-              <div className="text-sm">
-                Nourriture: <span className="font-bold">{totalFoodAvailable}</span>
+            <div className="text-sm text-gray-600 mb-1">Valeur disponible</div>
+            <div className="text-3xl font-bold text-amber-700">{totalValue} 💰</div>
+            {pendingCoins > 0 && (
+              <div className="text-xs text-gray-500 mt-1">
+                Ressources: {goodsValue} + Pièces: {pendingCoins}
               </div>
-              <input
-                type="number"
-                min="0"
-                max={totalFoodAvailable}
-                value={foodToTradeForCoins}
-                onChange={(e) => onTradeFood(parseInt(e.target.value) || 0)}
-                className="w-20 px-2 py-1 border-2 border-green-400 rounded text-center font-bold"
-              />
-              <div className="text-sm">
-                → <span className="font-bold text-amber-600">{foodToTradeForCoins * granariesRate} 💰</span>
-              </div>
-            </div>
-            {foodToTradeForCoins > 0 && (
-              <button
-                onClick={onResetTrade}
-                className="mt-2 px-3 py-1 bg-orange-500 text-white text-xs rounded hover:bg-orange-600 cursor-pointer"
-              >
-                Annuler l'échange
-              </button>
             )}
           </div>
-        </div>
-      )}
 
-      <div className="bg-gray-50 rounded-lg p-4 mb-4">
-        <div className="text-center mb-3">
-          <div className="text-sm text-gray-600 mb-1">Valeur disponible</div>
-          <div className="text-3xl font-bold text-amber-700">{totalValue} 💰</div>
-          {pendingCoins > 0 && (
-            <div className="text-xs text-gray-500 mt-1">
-              Ressources: {goodsValue} + Pièces: {pendingCoins}
+          <div className="border-t border-gray-200 pt-3">
+            <div className="text-sm font-semibold text-gray-700 mb-2">
+              Biens ({totalGoods}/6)
             </div>
-          )}
-        </div>
+            <div className="space-y-2">
+              {[...GOODS_TYPES].reverse().map(function(type) {
+                const position = player.goodsPositions[type];
+                const value = GOODS_VALUES[type][position];
 
-        <div className="border-t border-gray-200 pt-3">
-          <div className="text-sm font-semibold text-gray-700 mb-2">
-            Biens ({totalGoods}/6)
-          </div>
-          <div className="space-y-2">
-            {[...GOODS_TYPES].reverse().map(function(type) {
-              const position = player.goodsPositions[type];
-              const value = GOODS_VALUES[type][position];
-
-              return (
-                <div key={type} className="flex items-center gap-2">
-                  <div className="text-xs w-20 text-gray-600">{GOODS_NAMES[type]}</div>
-                  <GoodsTrack type={type} position={position} />
-                  <div className="text-xs font-bold w-8 text-right">{value}</div>
-                </div>
-              );
-            })}
+                return (
+                  <div key={type} className="flex items-center gap-2">
+                    <div className="text-xs w-20 text-gray-600">{GOODS_NAMES[type]}</div>
+                    <GoodsTrack type={type} position={position} />
+                    <div className="text-xs font-bold w-8 text-right">{value}</div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
+
+        {hasPurchased && lastPurchasedDevelopment ? (
+          <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4">
+            <div className="text-center">
+              <div className="text-lg font-bold text-green-700 mb-2">✓ Achat effectué</div>
+              <div className="text-md font-semibold text-gray-800">{lastPurchasedDevelopment.name}</div>
+              <div className="text-sm text-gray-600 mt-1">{lastPurchasedDevelopment.effect}</div>
+              <div className="text-xs text-gray-500 mt-2">
+                Coût: {lastPurchasedDevelopment.cost} 💰 | Points: {lastPurchasedDevelopment.points} 🏆
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p className="text-center text-sm text-gray-600">
+            Cliquez sur un développement dans le panneau de gauche pour l'acheter
+          </p>
+        )}
       </div>
 
-      {hasPurchased && lastPurchasedDevelopment ? (
-        <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4 mb-4">
-          <div className="text-center">
-            <div className="text-lg font-bold text-green-700 mb-2">✓ Achat effectué</div>
-            <div className="text-md font-semibold text-gray-800">{lastPurchasedDevelopment.name}</div>
-            <div className="text-sm text-gray-600 mt-1">{lastPurchasedDevelopment.effect}</div>
-            <div className="text-xs text-gray-500 mt-2">
-              Coût: {lastPurchasedDevelopment.cost} 💰 | Points: {lastPurchasedDevelopment.points} 🏆
-            </div>
-          </div>
+      {/* Bouton valider en bas à droite */}
+      <div className="mt-auto">
+        <div className="grid grid-cols-2 gap-4">
+          {hasPurchased && (
+            <button
+              onClick={onReset}
+              className="h-24 rounded-lg font-bold text-xl text-white transition flex items-center justify-center bg-orange-500 hover:bg-orange-600 cursor-pointer"
+            >
+              Annuler
+            </button>
+          )}
+          {!hasPurchased && <div></div>}
+          {hasPurchased ? (
+            <button
+              onClick={onSkip}
+              className="h-24 rounded-lg font-bold text-xl text-white transition flex items-center justify-center bg-green-600 hover:bg-green-700 cursor-pointer"
+            >
+              Valider
+            </button>
+          ) : (
+            <button
+              onClick={onSkip}
+              className="h-24 rounded-lg font-bold text-xl text-white transition flex items-center justify-center bg-gray-600 hover:bg-gray-700 cursor-pointer"
+            >
+              Passer
+            </button>
+          )}
         </div>
-      ) : (
-        <p className="text-center mb-4 text-sm text-gray-600">
-          Cliquez sur un développement dans le panneau de gauche pour l'acheter
-        </p>
-      )}
-
-      <div className="flex flex-col gap-3">
-        {hasPurchased && (
-          <button
-            onClick={onReset}
-            className="w-full bg-orange-500 text-white py-3 rounded-lg font-bold hover:bg-orange-600 cursor-pointer"
-          >
-            Annuler la sélection
-          </button>
-        )}
-
-        {hasPurchased ? (
-          <button
-            onClick={onSkip}
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 cursor-pointer"
-          >
-            Valider et continuer
-          </button>
-        ) : (
-          <button
-            onClick={onSkip}
-            className="w-full bg-gray-600 text-white py-3 rounded-lg font-bold hover:bg-gray-700 cursor-pointer"
-          >
-            Ne rien acheter
-          </button>
-        )}
       </div>
     </div>
   );

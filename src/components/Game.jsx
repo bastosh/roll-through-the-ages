@@ -2,9 +2,12 @@ import { useState, useEffect, useMemo } from 'react';
 import { GOODS_TYPES, GOODS_VALUES, DICE_FACES } from '../constants/gameData';
 import { getVariantById } from '../constants/variants';
 import { addGoods, handleDisasters, getGoodsValue, getTotalGoodsCount } from '../utils/gameUtils';
+import { addScore } from '../utils/scoreHistory';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 import PlayerScorePanel from './PlayerScorePanel';
 import ActionPanel from './ActionPanel';
 import ScoreDisplay from './shared/ScoreDisplay';
+import DisasterHelp from './shared/DisasterHelp';
 
 export default function Game({ playerNames, variantId, isSoloMode }) {
   // Load variant configuration
@@ -341,6 +344,25 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     if (pendingWorkers === 0) {
       skipToBuyPhase();
     } else {
+      // Save the initial state before entering build phase
+      const cities = [];
+      for (let i = 0; i < player.cities.length; i++) {
+        cities.push({
+          built: player.cities[i].built,
+          progress: player.cities[i].progress,
+          requiredWorkers: player.cities[i].requiredWorkers
+        });
+      }
+      const monuments = [];
+      for (let i = 0; i < player.monuments.length; i++) {
+        monuments.push({
+          id: player.monuments[i].id,
+          progress: player.monuments[i].progress,
+          completed: player.monuments[i].completed,
+          firstToComplete: player.monuments[i].firstToComplete
+        });
+      }
+      setBuildPhaseInitialState({ cities, monuments });
       setPhase('build');
     }
   }
@@ -478,23 +500,44 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   }
 
   function handleResetBuild() {
+    if (!buildPhaseInitialState) return;
+
     const newPlayers = [...players];
     const player = newPlayers[currentPlayerIndex];
 
-    // Reset city progress and return workers
+    // Calculate workers to return (only workers placed during this turn)
     let workersToReturn = 0;
+
+    // Calculate workers placed on cities during this turn
     for (let i = 0; i < player.cities.length; i++) {
-      workersToReturn += player.cities[i].progress;
-      player.cities[i].progress = 0;
-      player.cities[i].built = false; // Reset built status
+      const initialProgress = buildPhaseInitialState.cities[i].progress;
+      const currentProgress = player.cities[i].progress;
+      workersToReturn += currentProgress - initialProgress;
     }
 
-    // Reset monument progress and return workers
+    // Calculate workers placed on monuments during this turn
     for (let i = 0; i < player.monuments.length; i++) {
-      workersToReturn += player.monuments[i].progress;
-      player.monuments[i].progress = 0;
-      player.monuments[i].completed = false; // Reset completed status
-      player.monuments[i].firstToComplete = false; // Reset first to complete
+      const initialMonument = buildPhaseInitialState.monuments.find(m => m.id === player.monuments[i].id);
+      if (initialMonument) {
+        const initialProgress = initialMonument.progress;
+        const currentProgress = player.monuments[i].progress;
+        workersToReturn += currentProgress - initialProgress;
+      }
+    }
+
+    // Restore initial state
+    for (let i = 0; i < player.cities.length; i++) {
+      player.cities[i].built = buildPhaseInitialState.cities[i].built;
+      player.cities[i].progress = buildPhaseInitialState.cities[i].progress;
+    }
+
+    for (let i = 0; i < player.monuments.length; i++) {
+      const initialMonument = buildPhaseInitialState.monuments.find(m => m.id === player.monuments[i].id);
+      if (initialMonument) {
+        player.monuments[i].progress = initialMonument.progress;
+        player.monuments[i].completed = initialMonument.completed;
+        player.monuments[i].firstToComplete = initialMonument.firstToComplete;
+      }
     }
 
     setPendingWorkers(pendingWorkers + workersToReturn);
@@ -551,6 +594,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   const [selectedGoodsForPurchase, setSelectedGoodsForPurchase] = useState({ wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 });
   const [coinsForPurchase, setCoinsForPurchase] = useState(0);
   const [lastPurchasedDevelopment, setLastPurchasedDevelopment] = useState(null);
+  const [buildPhaseInitialState, setBuildPhaseInitialState] = useState(null);
 
   function handleSelectDevelopment(devId) {
     const dev = DEVELOPMENTS.find(d => d.id === devId);
@@ -617,9 +661,9 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     // Store last purchased development
     setLastPurchasedDevelopment(dev);
 
-    // Check end game condition based on variant (but not in test mode)
-    if (!testMode && player.developments.length >= variantConfig.endGameConditions.developmentCount) {
-      if (isSoloMode || players.length === 1) {
+    // Check end game condition based on variant (but not in test mode or solo mode)
+    if (!testMode && !isSoloMode && player.developments.length >= variantConfig.endGameConditions.developmentCount) {
+      if (players.length === 1) {
         endGame();
       } else {
         setGameEndTriggered(true);
@@ -689,9 +733,9 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     setLastPurchasedDevelopment(null);
     setFoodToTradeForCoins(0);
 
-    // Check end game condition based on variant (but not in test mode)
-    if (!testMode && player.developments.length >= variantConfig.endGameConditions.developmentCount) {
-      if (isSoloMode || players.length === 1) {
+    // Check end game condition based on variant (but not in test mode or solo mode)
+    if (!testMode && !isSoloMode && player.developments.length >= variantConfig.endGameConditions.developmentCount) {
+      if (players.length === 1) {
         endGame();
       } else {
         setGameEndTriggered(true);
@@ -982,6 +1026,55 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     }
   }, [players]);
 
+  // Save game state to localStorage
+  useEffect(function() {
+    if (!gameEnded && players.length > 0) {
+      const gameState = {
+        players: players,
+        currentPlayerIndex: currentPlayerIndex,
+        round: round,
+        soloTurn: soloTurn,
+        phase: phase,
+        diceResults: diceResults,
+        rollCount: rollCount,
+        lockedDice: lockedDice,
+        pendingWorkers: pendingWorkers,
+        pendingFoodOrWorkers: pendingFoodOrWorkers,
+        pendingCoins: pendingCoins,
+        gameEndTriggered: gameEndTriggered,
+        leadershipUsed: leadershipUsed,
+        playerNames: playerNames,
+        variantId: variantId,
+        isSoloMode: isSoloMode,
+        timestamp: new Date().toISOString()
+      };
+
+      try {
+        window.localStorage.setItem('rtta_game_state', JSON.stringify(gameState));
+      } catch (error) {
+        console.error('Error saving game state:', error);
+      }
+    }
+  }, [
+    players,
+    currentPlayerIndex,
+    round,
+    soloTurn,
+    phase,
+    diceResults,
+    rollCount,
+    lockedDice,
+    pendingWorkers,
+    pendingFoodOrWorkers,
+    pendingCoins,
+    gameEndTriggered,
+    leadershipUsed,
+    gameEnded,
+    playerNames,
+    variantId,
+    isSoloMode
+  ]);
+
   function endGame() {
     const newPlayers = [...players];
 
@@ -991,6 +1084,18 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
 
     setPlayers(newPlayers);
     setGameEnded(true);
+
+    // Save scores to history
+    for (let i = 0; i < newPlayers.length; i++) {
+      addScore(newPlayers[i].name, newPlayers[i].score, isSoloMode);
+    }
+
+    // Clear saved game state
+    try {
+      window.localStorage.removeItem('rtta_game_state');
+    } catch (error) {
+      console.error('Error clearing game state:', error);
+    }
   }
 
   if (gameEnded) {
@@ -1051,7 +1156,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-200 p-4">
+    <div className="h-screen overflow-hidden bg-gradient-to-br from-amber-100 to-orange-200 p-4">
       {/* Player Turn Modal */}
       {showPlayerTurnModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -1075,8 +1180,8 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
+      <div className="max-w-7xl mx-auto h-full flex flex-col">
+        <div className="bg-white rounded-lg shadow-lg p-4 mb-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-amber-800">
               Roll Through the Ages{players.length > 1 ? ' - Manche ' + round : ''}
@@ -1107,9 +1212,11 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
         </div>
 
         {/* Score Display */}
-        <ScoreDisplay players={players} currentPlayerIndex={currentPlayerIndex} />
+        <div className="flex-shrink-0">
+          <ScoreDisplay players={players} currentPlayerIndex={currentPlayerIndex} />
+        </div>
 
-        <div className="grid grid-cols-2 gap-4" style={{ height: 'calc(100vh - 180px)' }}>
+        <div className="grid grid-cols-2 gap-4 mb-4 flex-1 min-h-0">
           <PlayerScorePanel
             player={currentPlayer}
             onBuyDevelopment={handleSelectDevelopment}
@@ -1170,6 +1277,9 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
             onResetTrade={handleResetTrade}
           />
         </div>
+
+        {/* Disaster Help Button */}
+        <DisasterHelp currentPlayer={currentPlayer} developments={DEVELOPMENTS} />
       </div>
     </div>
   );
