@@ -199,18 +199,17 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   }
 
   function handleLeadershipReroll() {
-    // Count how many non-skull dice are unlocked in leadership mode
-    let unlockedNonSkullCount = 0;
+    // Count how many dice are unlocked in leadership mode (skulls allowed)
+    let unlockedCount = 0;
     for (let i = 0; i < diceResults.length; i++) {
       const isLocked = lockedDice.indexOf(i) !== -1;
-      const hasSkulls = diceResults[i] && diceResults[i].skulls > 0;
-      if (!isLocked && !hasSkulls) {
-        unlockedNonSkullCount++;
+      if (!isLocked) {
+        unlockedCount++;
       }
     }
 
-    // Only allow if exactly 1 non-skull die is unlocked
-    if (unlockedNonSkullCount === 1) {
+    // Only allow if exactly 1 die is unlocked
+    if (unlockedCount === 1) {
       rollDice(false);
       setLeadershipMode(false);
     }
@@ -544,9 +543,35 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   }
 
   function handleSkipBuild() {
+    // Vérifier si le joueur peut encore placer des ouvriers
     if (pendingWorkers > 0) {
-      return; // Ne pas permettre de passer si des ouvriers restent
+      const player = players[currentPlayerIndex];
+      let canPlaceWorkers = false;
+
+      // Vérifier si des cités peuvent être construites
+      for (let i = 0; i < player.cities.length; i++) {
+        if (!player.cities[i].built) {
+          canPlaceWorkers = true;
+          break;
+        }
+      }
+
+      // Vérifier si des monuments peuvent être construits
+      if (!canPlaceWorkers) {
+        for (let i = 0; i < player.monuments.length; i++) {
+          if (!player.monuments[i].completed) {
+            canPlaceWorkers = true;
+            break;
+          }
+        }
+      }
+
+      // Si le joueur peut encore placer des ouvriers, on ne permet pas de passer
+      if (canPlaceWorkers) {
+        return;
+      }
     }
+
     setPendingWorkers(0);
     setPendingFoodOrWorkers(0);
     setStoneToTradeForWorkers(0);
@@ -1269,7 +1294,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
             onUseLeadership={handleUseLeadership}
             onLeadershipReroll={handleLeadershipReroll}
             onCancelLeadership={handleCancelLeadership}
-            skullsCanBeToggled={isSoloMode && !variantConfig.soloSkullsLocked}
+            skullsCanBeToggled={leadershipMode || (isSoloMode && !variantConfig.soloSkullsLocked)}
             granariesRate={getGranariesRate()}
             foodToTradeForCoins={foodToTradeForCoins}
             onTradeFood={handleTradeFood}

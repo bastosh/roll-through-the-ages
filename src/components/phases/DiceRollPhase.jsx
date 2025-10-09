@@ -165,7 +165,7 @@ export default function DiceRollPhase({
                 👑 Mode Leadership
               </div>
               <p className="text-sm text-gray-600 text-center">
-                Déverrouillez exactement 1 dé (sans crâne) pour le relancer
+                Déverrouillez exactement 1 dé pour le relancer
               </p>
             </div>
             <button
