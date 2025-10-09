@@ -1209,7 +1209,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
       )}
 
       <div className="h-full flex flex-col">
-        <div className="bg-white rounded-lg shadow-lg p-4 mb-4 flex-shrink-0">
+        <div className="bg-white rounded-lg shadow-lg py-2 px-4 mb-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-amber-800">
               Roll Through the Ages{players.length > 1 ? ' - Manche ' + round : ''}
@@ -1229,9 +1229,12 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
               )}
               {isSoloMode && (
                 <div className="text-xl font-bold text-amber-700 bg-amber-100 px-4 py-2 rounded-lg">
-                  Tour {soloTurn}/10 · Reste {11 - soloTurn} tour{11 - soloTurn > 1 ? 's' : ''}
+                  Tour {soloTurn}/10
                 </div>
               )}
+                <div className="text-xl font-bold text-amber-700 bg-amber-100 px-4 py-2 rounded-lg">
+                { 'Score : ' + currentPlayer.score }
+              </div>
               <div className="text-lg font-semibold text-gray-700">
                 {players.length > 1 ? 'Tour de ' + currentPlayer.name : currentPlayer.name}
               </div>
@@ -1320,7 +1323,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
           </div>
         )}
 
-        <div className="grid grid-cols-3 gap-4 mb-4 flex-1 min-h-0">
+        <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
           <div className="col-span-2">
             <PlayerScorePanel
               player={currentPlayer}

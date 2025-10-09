@@ -3,9 +3,9 @@ import { getGoodsValue, getTotalGoodsCount } from '../utils/gameUtils';
 
 function CityDisplay({ cities, onBuildCity, canBuild, pendingWorkers }) {
   const allCities = [
-    { built: true, progress: 0, requiredWorkers: 0, number: 1 },
-    { built: true, progress: 0, requiredWorkers: 0, number: 2 },
-    { built: true, progress: 0, requiredWorkers: 0, number: 3 },
+    { built: true, progress: 3, requiredWorkers: 3, number: 1 },
+    { built: true, progress: 3, requiredWorkers: 3, number: 2 },
+    { built: true, progress: 3, requiredWorkers: 3, number: 3 },
     ...cities.map((city, i) => ({ ...city, number: i + 4, index: i }))
   ];
 
@@ -14,10 +14,10 @@ function CityDisplay({ cities, onBuildCity, canBuild, pendingWorkers }) {
       <h3 className="text-sm font-bold mb-2 text-gray-800">Cités</h3>
       <div className="flex gap-1.5">
         {allCities.map(function (city, i) {
-          const height = city.requiredWorkers === 0 ? 'h-20' :
-            city.requiredWorkers === 3 ? 'h-20' :
-              city.requiredWorkers === 4 ? 'h-20' :
-                city.requiredWorkers === 5 ? 'h-24' : 'h-24';
+          const height = city.requiredWorkers === 0 ? 'h-16' :
+            city.requiredWorkers === 3 ? 'h-16' :
+              city.requiredWorkers === 4 ? 'h-16' :
+                city.requiredWorkers === 5 ? 'h-20' : 'h-20';
 
           const isClickable = canBuild && !city.built && (pendingWorkers >= 1 || city.progress > 0);
           let containerClass = 'flex-1';
@@ -34,7 +34,6 @@ function CityDisplay({ cities, onBuildCity, canBuild, pendingWorkers }) {
               <div className={'border-3 rounded-lg flex flex-col items-center justify-start p-1.5 ' + height + ' ' + (
                 city.built ? 'bg-green-100 border-green-600' : 'bg-gray-100 border-gray-400'
               ) + (isClickable ? ' hover:bg-blue-100 hover:border-blue-500' : '')}>
-                <div className="text-xs font-bold mb-0.5">Cité {city.number}</div>
                 {city.requiredWorkers > 0 && (
                   <div className="grid grid-cols-2 gap-1">
                     {Array(city.requiredWorkers).fill(0).map(function (_, j) {
@@ -235,12 +234,17 @@ function ResourcesDisplay({ goodsPositions, food }) {
 
   return (
     <div className="flex-shrink-0">
-      <h3 className="text-sm font-bold mb-2 text-gray-800">Biens et Nourriture</h3>
-
       <div className="bg-gray-50 rounded-lg p-2">
-        <div className="text-xs font-semibold text-gray-700 mb-1">
+        <div className='flex items-center justify-between'>
+    <div className="text-xs font-semibold text-gray-700 mb-1">
           Biens ({totalGoods}/6)
         </div>
+          {/* Valeur totale des biens */}
+          <div className="text-xs text-gray-500 font-semibold">
+            Valeur totale: {goodsValue} pièces
+          </div>
+        </div>
+    
         <div className="space-y-1">
           {[...GOODS_TYPES].reverse().map(function (type) {
             const position = goodsPositions[type];
@@ -280,11 +284,6 @@ function ResourcesDisplay({ goodsPositions, food }) {
               </div>
             );
           })}
-        </div>
-
-        {/* Valeur totale des biens */}
-        <div className="text-xs text-gray-500 mt-1 font-semibold border-t border-gray-300 pt-1">
-          Valeur totale: {goodsValue} pièces
         </div>
 
         {/* Ligne de la nourriture */}
@@ -331,18 +330,10 @@ export default function PlayerScorePanel({
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 h-full flex flex-col overflow-hidden">
-      {/* En-tête avec nom et score */}
-      <div className="mb-3 flex items-center justify-between flex-shrink-0">
-        <h2 className="text-xl font-bold text-amber-800">{player.name}</h2>
-        <div className="text-2xl font-bold text-amber-700">
-          {player.score} pts
-        </div>
-      </div>
-
       {/* Contenu principal en grille */}
       <div className="grid grid-cols-2 gap-4 flex-1 min-h-0">
         {/* Colonne de gauche */}
-        <div className="flex flex-col gap-3 overflow-y-auto">
+        <div className="flex flex-col gap-2 overflow-y-auto">
           <CityDisplay
             cities={player.cities}
             onBuildCity={onBuildCity}
