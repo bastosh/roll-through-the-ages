@@ -4,14 +4,26 @@ export default function ChooseFoodOrWorkersPhase({
   onChoose,
   foodSelected,
   setFoodSelected,
-  pendingWorkers
+  pendingWorkers,
+  foodOrWorkerChoices
 }) {
   const hasAgriculture = currentPlayer.developments.indexOf('agriculture') !== -1;
   const hasMasonry = currentPlayer.developments.indexOf('masonry') !== -1;
 
+  // Count how many dice are selected as food or workers
+  let foodDiceCount = 0;
+  let workerDiceCount = 0;
+  for (let i = 0; i < foodOrWorkerChoices.length; i++) {
+    if (foodOrWorkerChoices[i] === 'food') {
+      foodDiceCount++;
+    } else if (foodOrWorkerChoices[i] === 'workers') {
+      workerDiceCount++;
+    }
+  }
+
   // Chaque dé donne 2 de base
-  const totalFood = foodSelected * 2 + (hasAgriculture ? foodSelected : 0);
-  const totalWorkers = (pendingFoodOrWorkers - foodSelected) * 2 + (hasMasonry ? (pendingFoodOrWorkers - foodSelected) : 0);
+  const totalFood = foodDiceCount * 2 + (hasAgriculture ? foodDiceCount : 0);
+  const totalWorkers = workerDiceCount * 2 + (hasMasonry ? workerDiceCount : 0);
 
   // Calculate cities to feed
   let citiesToFeed = 3; // Base 3 cities
@@ -78,69 +90,10 @@ export default function ChooseFoodOrWorkersPhase({
           </div>
         </div>
 
-        <p className="text-center mb-4 font-semibold">
-          Vous avez {pendingFoodOrWorkers} dé(s) à répartir
-          <span className="text-sm text-gray-600 block mt-1">(chaque dé donne 2 ressources de base)</span>
+        <p className="text-center mb-4 font-semibold text-gray-600">
+          Cliquez sur les dés dans le bandeau pour choisir
+          <span className="text-sm text-gray-500 block mt-1">(chaque dé donne 2 ressources de base)</span>
         </p>
-
-        {/* Visualisation des dés */}
-        <div className="flex items-center justify-center gap-3 mb-6">
-          {Array.from({ length: pendingFoodOrWorkers }).map(function(_, i) {
-            const isFood = i < foodSelected;
-            return (
-              <div
-                key={i}
-                className={`w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-bold border-4 transition-all ${
-                  isFood
-                    ? 'bg-amber-100 border-amber-400'
-                    : 'bg-purple-100 border-purple-400'
-                }`}
-              >
-                {isFood ? '🌾' : '⚒️'}
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="text-center">
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col items-center">
-              <div className="text-4xl mb-1">⚒️</div>
-              <div className="text-2xl font-bold text-purple-700">{totalWorkers}</div>
-              {hasMasonry && (pendingFoodOrWorkers - foodSelected) > 0 && (
-                <span className="text-xs text-gray-600">(+Maçonnerie)</span>
-              )}
-            </div>
-            <input
-              type="range"
-              min="0"
-              max={pendingFoodOrWorkers}
-              value={foodSelected}
-              onChange={(e) => setFoodSelected(parseInt(e.target.value))}
-              className="flex-1"
-            />
-            <div className="flex flex-col items-center">
-              <div className="text-4xl mb-1">🌾</div>
-              <div className="text-2xl font-bold text-amber-700">{totalFood}</div>
-              {hasAgriculture && foodSelected > 0 && (
-                <span className="text-xs text-gray-600">(+Agriculture)</span>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Bouton valider en bas à droite */}
-      <div className="mt-auto">
-        <div className="grid grid-cols-2 gap-4">
-          <div></div>
-          <button
-            onClick={() => onChoose(foodSelected)}
-            className="h-16 rounded-lg font-bold text-xl text-white transition flex items-center justify-center bg-green-600 hover:bg-green-700 cursor-pointer"
-          >
-            Valider
-          </button>
-        </div>
       </div>
     </div>
   );

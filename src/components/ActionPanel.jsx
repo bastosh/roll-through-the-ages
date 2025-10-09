@@ -17,6 +17,7 @@ export default function ActionPanel({
   pendingFoodOrWorkers,
   currentPlayer,
   onChooseFoodOrWorkers,
+  foodOrWorkerChoices,
   citiesToFeed,
   onFeed,
   pendingWorkers,
@@ -120,6 +121,7 @@ export default function ActionPanel({
           foodSelected={foodSelected}
           setFoodSelected={setFoodSelected}
           pendingWorkers={pendingWorkers}
+          foodOrWorkerChoices={foodOrWorkerChoices}
         />
       )}
 

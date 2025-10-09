@@ -71,6 +71,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   const [pendingWorkers, setPendingWorkers] = useState(0);
   const [pendingFoodOrWorkers, setPendingFoodOrWorkers] = useState(0);
   const [pendingCoins, setPendingCoins] = useState(0);
+  const [foodOrWorkerChoices, setFoodOrWorkerChoices] = useState([]);
   const [gameEnded, setGameEnded] = useState(false);
   const [leadershipUsed, setLeadershipUsed] = useState(false);
   const [leadershipMode, setLeadershipMode] = useState(false);
@@ -312,10 +313,63 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     setPlayers(newPlayers);
 
     if (foodOrWorkersDice > 0) {
+      // Initialize choices array with 'none' for each die
+      const initialChoices = [];
+      for (let i = 0; i < foodOrWorkersDice; i++) {
+        initialChoices.push('none');
+      }
+      setFoodOrWorkerChoices(initialChoices);
       setPhase('choose_food_or_workers');
     } else {
       setPhase('feed');
     }
+  }
+
+  function handleToggleFoodOrWorkerDie(dieIndex) {
+    const newChoices = [...foodOrWorkerChoices];
+    if (newChoices[dieIndex] === 'none') {
+      newChoices[dieIndex] = 'food';
+    } else if (newChoices[dieIndex] === 'food') {
+      newChoices[dieIndex] = 'workers';
+    } else {
+      newChoices[dieIndex] = 'food';
+    }
+    setFoodOrWorkerChoices(newChoices);
+  }
+
+  function handleValidateFoodOrWorkers() {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+
+    let foodDiceCount = 0;
+    let workerDiceCount = 0;
+
+    for (let i = 0; i < foodOrWorkerChoices.length; i++) {
+      if (foodOrWorkerChoices[i] === 'food') {
+        foodDiceCount++;
+      } else if (foodOrWorkerChoices[i] === 'workers') {
+        workerDiceCount++;
+      }
+    }
+
+    // Add food - chaque dé donne 2 nourriture de base
+    let foodToAdd = foodDiceCount * 2;
+    if (player.developments.indexOf('agriculture') !== -1) {
+      foodToAdd += foodDiceCount; // Agriculture ajoute +1 par dé
+    }
+    player.food = Math.min(player.food + foodToAdd, 15);
+
+    // Add workers - chaque dé donne 2 ouvriers de base
+    let workersToAdd = workerDiceCount * 2;
+    if (player.developments.indexOf('masonry') !== -1) {
+      workersToAdd += workerDiceCount; // Maçonnerie ajoute +1 par dé
+    }
+    setPendingWorkers(pendingWorkers + workersToAdd);
+
+    setPendingFoodOrWorkers(0);
+    setFoodOrWorkerChoices([]);
+    setPlayers(newPlayers);
+    setPhase('feed');
   }
 
   function handleUseFoodOrWorkers(foodDiceCount) {
@@ -1303,7 +1357,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
         </div>
 
         {/* Dice Display - Compact bar (always) */}
-        {(diceResults || (phase === 'roll' && isRolling)) && (
+        {(diceResults || (phase === 'roll' && isRolling) || phase === 'choose_food_or_workers') && (
           <div className="flex-shrink-0 bg-white rounded-lg shadow-lg px-4 py-3 mb-4 flex items-center gap-4 h-24">
             <div className="flex gap-2">
               {diceResults ? (
@@ -1313,10 +1367,37 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
                   const canToggle = phase === 'roll' && (!hasSkulls || (leadershipMode || (isSoloMode && !variantConfig.soloSkullsLocked)));
                   const isDiceRolling = rollingDice.indexOf(i) !== -1;
 
+                  // Check if this is a food_or_workers die in choose phase
+                  let foodOrWorkerIndex = -1;
+                  if (phase === 'choose_food_or_workers' && result.type === 'food_or_workers') {
+                    // Find which food_or_worker die this is
+                    let count = 0;
+                    for (let j = 0; j <= i; j++) {
+                      if (diceResults[j].type === 'food_or_workers') {
+                        if (j === i) {
+                          foodOrWorkerIndex = count;
+                          break;
+                        }
+                        count++;
+                      }
+                    }
+                  }
+
                   // Déterminer l'image de la face du dé
                   let imageSrc = '';
+                  let isClickable = false;
 
-                  if (result.type === 'food') {
+                  if (foodOrWorkerIndex !== -1 && foodOrWorkerIndex < foodOrWorkerChoices.length) {
+                    const choice = foodOrWorkerChoices[foodOrWorkerIndex];
+                    if (choice === 'none') {
+                      imageSrc = '/src/assets/food-workers.png';
+                    } else if (choice === 'food') {
+                      imageSrc = '/src/assets/food-selection.png';
+                    } else if (choice === 'workers') {
+                      imageSrc = '/src/assets/worker-selection.png';
+                    }
+                    isClickable = true;
+                  } else if (result.type === 'food') {
                     imageSrc = '/src/assets/food.png';
                   } else if (result.type === 'goods') {
                     if (result.skulls > 0 && result.value === 2) {
@@ -1342,9 +1423,9 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
                         <img
                           src={imageSrc}
                           alt={result.type}
-                          onClick={canToggle ? () => toggleLock(i) : undefined}
+                          onClick={isClickable ? () => handleToggleFoodOrWorkerDie(foodOrWorkerIndex) : (canToggle ? () => toggleLock(i) : undefined)}
                           className={'w-16 h-16 object-contain transition rounded-lg ' +
-                            (canToggle ? 'cursor-pointer hover:opacity-80 ' : 'cursor-default ') +
+                            (isClickable || canToggle ? 'cursor-pointer hover:opacity-80 ' : 'cursor-default ') +
                             (isLocked && result.skulls > 0 ? 'ring-4 ring-red-500 ' :
                              isLocked ? 'ring-4 ring-amber-500 ' : '')}
                         />
@@ -1397,6 +1478,21 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
                 })()}
               </div>
             )}
+            {phase === 'choose_food_or_workers' && (
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col items-start gap-1">
+                  <span className="text-sm font-bold text-amber-700">Choisir nourriture ou ouvriers</span>
+                  <span className="text-xs text-gray-500">Cliquez sur les dés pour choisir</span>
+                </div>
+                <button
+                  onClick={handleValidateFoodOrWorkers}
+                  disabled={foodOrWorkerChoices.some(c => c === 'none')}
+                  className="h-16 bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer whitespace-nowrap min-w-32"
+                >
+                  Valider
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -1431,6 +1527,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
               pendingFoodOrWorkers={pendingFoodOrWorkers}
               currentPlayer={currentPlayer}
               onChooseFoodOrWorkers={handleUseFoodOrWorkers}
+              foodOrWorkerChoices={foodOrWorkerChoices}
               citiesToFeed={citiesToFeed}
               onFeed={handleFeed}
               pendingWorkers={pendingWorkers}
