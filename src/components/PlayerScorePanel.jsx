@@ -236,15 +236,15 @@ function ResourcesDisplay({ goodsPositions, food }) {
     <div className="flex-shrink-0">
       <div className="bg-gray-50 rounded-lg p-2">
         <div className='flex items-center justify-between'>
-    <div className="text-xs font-semibold text-gray-700 mb-1">
-          Biens ({totalGoods}/6)
-        </div>
+          <div className="text-sm  text-gray-700 font-semibold mb-3">
+            Biens ({totalGoods}/6)
+          </div>
           {/* Valeur totale des biens */}
-          <div className="text-xs text-gray-500 font-semibold">
-            Valeur totale: {goodsValue} pièces
+          <div className="text-sm text-gray-700 font-semibold">
+            Valeur totale: {goodsValue}
           </div>
         </div>
-    
+
         <div className="space-y-1">
           {[...GOODS_TYPES].reverse().map(function (type) {
             const position = goodsPositions[type];

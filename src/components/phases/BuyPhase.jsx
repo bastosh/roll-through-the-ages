@@ -161,7 +161,7 @@ export default function BuyPhase({
         <div className="bg-gray-50 rounded-lg p-4 mb-4">
           <div className="text-center mb-3">
             <div className="text-sm text-gray-600 mb-1">Valeur disponible</div>
-            <div className="text-3xl font-bold text-amber-700">{totalValue} 💰</div>
+            <div className="text-3xl font-bold text-amber-700">{totalValue} ({pendingCoins})</div>
             {pendingCoins > 0 && (
               <div className="text-xs text-gray-500 mt-1">
                 Ressources: {goodsValue} + Pièces: {pendingCoins}
@@ -170,9 +170,15 @@ export default function BuyPhase({
           </div>
 
           <div className="border-t border-gray-200 pt-3">
-            <div className="text-sm font-semibold text-gray-700 mb-2">
+          <div className='flex items-center justify-between'>
+            <div className="text-sm  text-gray-700 font-semibold mb-3">
               Biens ({totalGoods}/6)
             </div>
+            {/* Valeur totale des biens */}
+            <div className="text-sm text-gray-700 font-semibold">
+              Valeur totale: {goodsValue}
+            </div>
+          </div>
             <div className="space-y-2">
               {[...GOODS_TYPES].reverse().map(function(type) {
                 const position = player.goodsPositions[type];

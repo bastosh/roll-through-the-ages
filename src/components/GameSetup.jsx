@@ -133,7 +133,7 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
                   onClick={handleResetGame}
                   className="w-full bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700 transition cursor-pointer"
                 >
-                  🗑️ Réinitialiser complètement le jeu
+                  Réinitialiser complètement le jeu
                 </button>
                 <p className="text-xs text-gray-500 mt-2">
                   Supprime tous les scores, joueurs et parties sauvegardées
@@ -180,13 +180,13 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
                                 onClick={() => handleStartEdit(player.name)}
                                 className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 cursor-pointer"
                               >
-                                ✏️
+                                Modifier
                               </button>
                               <button
                                 onClick={() => handleDeletePlayer(player.name)}
                                 className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 cursor-pointer"
                               >
-                                🗑️
+                                Supprimer
                               </button>
                             </>
                           )}

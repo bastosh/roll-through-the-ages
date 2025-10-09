@@ -1129,7 +1129,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     <div className="h-screen overflow-hidden bg-gradient-to-br from-amber-100 to-orange-200 p-4">
       {/* Player Turn Modal */}
       {showPlayerTurnModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-amber-100 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md mx-4">
             <h2 className="text-3xl font-bold text-center mb-4 text-amber-800">
               Tour de {currentPlayer.name}

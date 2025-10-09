@@ -30,7 +30,7 @@ export default function DiscardPhase({ player, onContinue }) {
             );
           })}
         </div>
-        <div className="text-xs text-gray-500 mt-2 font-semibold">Valeur totale: {goodsValue} pièces</div>
+        <div className="text-xs text-gray-500 mt-2 font-semibold">Valeur totale: {goodsValue}</div>
       </div>
 
       {hasCaravans ? (
