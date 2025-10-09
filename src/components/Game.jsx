@@ -14,8 +14,21 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   const MONUMENTS = variantConfig.monuments;
   const DEVELOPMENTS = variantConfig.developments;
 
+  // Shuffle player order for multiplayer
+  const shuffledPlayerNames = useMemo(function() {
+    if (isSoloMode || playerNames.length === 1) {
+      return playerNames;
+    }
+    const shuffled = [...playerNames];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  }, [playerNames, isSoloMode]);
+
   const [players, setPlayers] = useState(function() {
-    return playerNames.map(function(name, i) {
+    return shuffledPlayerNames.map(function(name, i) {
       // Déterminer quels monuments sont disponibles selon le nombre de joueurs
       const numPlayers = playerNames.length;
       const excludedMonuments = variantConfig.monumentRestrictions[numPlayers] || [];
@@ -64,6 +77,8 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   const [foodToTradeForCoins, setFoodToTradeForCoins] = useState(0);
   const [stoneToTradeForWorkers, setStoneToTradeForWorkers] = useState(0);
   const [testMode, setTestMode] = useState(false);
+  const [gameEndTriggered, setGameEndTriggered] = useState(false);
+  const [showPlayerTurnModal, setShowPlayerTurnModal] = useState(!isSoloMode && playerNames.length > 1);
 
   const currentPlayer = players[currentPlayerIndex];
   let numDice = 3;
@@ -416,7 +431,11 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
           }
         }
         if (allMonumentsBuilt) {
-          endGame();
+          if (isSoloMode || players.length === 1) {
+            endGame();
+          } else {
+            setGameEndTriggered(true);
+          }
           return;
         }
       }
@@ -565,7 +584,11 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
 
     // Check end game condition based on variant (but not in test mode)
     if (!testMode && player.developments.length >= variantConfig.endGameConditions.developmentCount) {
-      endGame();
+      if (isSoloMode || players.length === 1) {
+        endGame();
+      } else {
+        setGameEndTriggered(true);
+      }
       return;
     }
   }
@@ -631,7 +654,11 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
 
     // Check end game condition based on variant (but not in test mode)
     if (!testMode && player.developments.length >= variantConfig.endGameConditions.developmentCount) {
-      endGame();
+      if (isSoloMode || players.length === 1) {
+        endGame();
+      } else {
+        setGameEndTriggered(true);
+      }
       return;
     }
   }
@@ -787,7 +814,15 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   }
 
   function nextTurn() {
-    if (currentPlayerIndex === players.length - 1) {
+    const isLastPlayer = currentPlayerIndex === players.length - 1;
+
+    if (isLastPlayer) {
+      // End of round - check if game should end
+      if (gameEndTriggered && !isSoloMode) {
+        endGame();
+        return;
+      }
+
       setRound(round + 1);
       setCurrentPlayerIndex(0);
 
@@ -801,8 +836,18 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
           return;
         }
       }
+
+      // Show player turn modal for multiplayer
+      if (!isSoloMode && players.length > 1) {
+        setShowPlayerTurnModal(true);
+      }
     } else {
       setCurrentPlayerIndex(currentPlayerIndex + 1);
+
+      // Show player turn modal for multiplayer
+      if (!isSoloMode && players.length > 1) {
+        setShowPlayerTurnModal(true);
+      }
     }
 
     setPhase('roll');
@@ -967,6 +1012,29 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-200 p-4">
+      {/* Player Turn Modal */}
+      {showPlayerTurnModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md mx-4">
+            <h2 className="text-3xl font-bold text-center mb-4 text-amber-800">
+              Tour de {currentPlayer.name}
+            </h2>
+            <div className="text-center mb-6">
+              <div className="text-6xl mb-4">🎲</div>
+              <p className="text-gray-600">
+                {gameEndTriggered ? 'Dernier tour !' : `Manche ${round}`}
+              </p>
+            </div>
+            <button
+              onClick={() => setShowPlayerTurnModal(false)}
+              className="w-full bg-amber-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-amber-700 transition cursor-pointer"
+            >
+              Commencer mon tour
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
           <div className="flex items-center justify-between">
