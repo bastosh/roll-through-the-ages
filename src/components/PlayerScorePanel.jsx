@@ -331,10 +331,10 @@ export default function PlayerScorePanel({
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 h-full overflow-y-auto">
-      <div className="mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <h2 className="text-2xl font-bold text-amber-800">{player.name}</h2>
-        <div className="text-lg font-semibold text-gray-600 mt-1">
-          Score: {player.score} pts
+        <div className="text-3xl font-bold text-amber-700">
+          {player.score} pts
         </div>
       </div>
 
