@@ -62,7 +62,7 @@ export default function FeedPhase({ currentPlayer, citiesToFeed, onContinue }) {
             onClick={onContinue}
             className="h-24 rounded-lg font-bold text-xl text-white transition flex items-center justify-center bg-green-600 hover:bg-green-700 cursor-pointer"
           >
-            Valider
+            OK
           </button>
         </div>
       </div>

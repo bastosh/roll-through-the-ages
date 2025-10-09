@@ -3,7 +3,6 @@ import { GOODS_TYPES, GOODS_VALUES, DICE_FACES } from '../constants/gameData';
 import { getVariantById } from '../constants/variants';
 import { addGoods, handleDisasters, getGoodsValue, getTotalGoodsCount } from '../utils/gameUtils';
 import { addScore } from '../utils/scoreHistory';
-import { useLocalStorage } from '../hooks/useLocalStorage';
 import PlayerScorePanel from './PlayerScorePanel';
 import ActionPanel from './ActionPanel';
 import ScoreDisplay from './shared/ScoreDisplay';

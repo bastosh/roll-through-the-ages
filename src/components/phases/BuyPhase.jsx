@@ -214,7 +214,7 @@ export default function BuyPhase({
           {hasPurchased && (
             <button
               onClick={onReset}
-              className="h-24 rounded-lg font-bold text-xl text-white transition flex items-center justify-center bg-orange-500 hover:bg-orange-600 cursor-pointer"
+              className="h-24 rounded-lg font-bold text-xl text-white transition flex items-center justify-center bg-gray-500 hover:bg-orange-600 cursor-pointer"
             >
               Annuler
             </button>
