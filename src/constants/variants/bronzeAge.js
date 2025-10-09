@@ -16,7 +16,7 @@ export const BRONZE_AGE_CONFIG = {
 
   // Monument restrictions based on player count
   monumentRestrictions: {
-    1: ['temple', 'great_pyramid'],
+    1: [],
     2: ['temple', 'great_pyramid'],
     3: ['hanging_gardens'],
     4: []
