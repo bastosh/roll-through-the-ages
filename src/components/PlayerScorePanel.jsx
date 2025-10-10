@@ -20,7 +20,12 @@ export default function PlayerScorePanel({
   monuments,
   developments,
   previewFood,
-  previewGoodsCount
+  previewGoodsCount,
+  interactionMode = null,
+  tempGoodsPositions = null,
+  selectedGoodsForPurchase = null,
+  onDiscardGood = null,
+  onToggleGoodForPurchase = null
 }) {
   const goodsValue = getGoodsValue(player.goodsPositions);
 
@@ -50,11 +55,16 @@ export default function PlayerScorePanel({
             food={player.food}
             previewFood={previewFood}
             previewGoodsCount={previewGoodsCount}
+            interactionMode={interactionMode}
+            tempGoodsPositions={tempGoodsPositions}
+            selectedGoodsForPurchase={selectedGoodsForPurchase}
+            onDiscardGood={onDiscardGood}
+            onToggleGoodForPurchase={onToggleGoodForPurchase}
           />
         </div>
 
         {/* Colonne de droite */}
-        <div className="flex flex-col gap-3 overflow-y-auto">
+        <div className="flex flex-col justify-between gap-3 overflow-y-auto">
           <DevelopmentsList
             playerDevelopments={player.developments}
             onBuyDevelopment={onBuyDevelopment}

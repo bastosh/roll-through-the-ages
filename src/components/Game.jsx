@@ -5,9 +5,10 @@ import { getGoodsValue, getTotalGoodsCount } from '../utils/gameUtils';
 import { addScore } from '../utils/scoreHistory';
 import { calculatePlayerScore } from '../utils/scoring';
 import { useDiceRolling } from '../hooks/useDiceRolling';
-import { discardExcessGoods, feedCities, toggleFoodOrWorkerDie, validateFoodOrWorkers, processRollResults } from '../utils/phaseHandlers';
+import { feedCities, toggleFoodOrWorkerDie, validateFoodOrWorkers, processRollResults } from '../utils/phaseHandlers';
 import PlayerScorePanel from './PlayerScorePanel';
-import ActionPanel from './ActionPanel';
+import PhaseInfoBar from './shared/PhaseInfoBar';
+import ActionButtonsBar from './shared/ActionButtonsBar';
 import DisasterHelp from './shared/DisasterHelp';
 
 export default function Game({ playerNames, variantId, isSoloMode, savedGameState }) {
@@ -210,31 +211,6 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
     setPhase(result.nextPhase);
   }
 
-  function handleUseFoodOrWorkers(foodDiceCount) {
-    const newPlayers = [...players];
-    const player = newPlayers[currentPlayerIndex];
-
-    const workerDiceCount = pendingFoodOrWorkers - foodDiceCount;
-
-    // Add food - chaque dé donne 2 nourriture de base
-    let foodToAdd = foodDiceCount * 2;
-    if (player.developments.indexOf('agriculture') !== -1) {
-      foodToAdd += foodDiceCount; // Agriculture ajoute +1 par dé
-    }
-    player.food = Math.min(player.food + foodToAdd, 15);
-
-    // Add workers - chaque dé donne 2 ouvriers de base
-    let workersToAdd = workerDiceCount * 2;
-    if (player.developments.indexOf('masonry') !== -1) {
-      workersToAdd += workerDiceCount; // Maçonnerie ajoute +1 par dé
-    }
-    setPendingWorkers(pendingWorkers + workersToAdd);
-
-    setPendingFoodOrWorkers(0);
-    setPlayers(newPlayers);
-    setPhase('feed');
-  }
-
   function handleFeed() {
     const newPlayers = [...players];
     const result = feedCities(newPlayers[currentPlayerIndex], pendingWorkers);
@@ -283,6 +259,15 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
     if (totalValue < minCost) {
       checkAndSkipDiscard();
     } else {
+      // Reset buy phase state when entering the phase
+      setOriginalGoodsPositions(null);
+      setOriginalCoins(0);
+      setOriginalDevelopments(null);
+      setLastPurchasedDevelopment(null);
+      setSelectedDevelopmentToBuy(null);
+      setSelectedGoodsForPurchase({ wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 });
+      setCoinsForPurchase(0);
+      setFoodToTradeForCoins(0);
       setPhase('buy');
     }
   }
@@ -303,6 +288,7 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
     if (totalGoods <= 6 || hasCaravans) {
       nextTurn();
     } else {
+      setTempGoodsPositions({ ...player.goodsPositions });
       setPhase('discard');
     }
   }
@@ -530,6 +516,7 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
   const [coinsForPurchase, setCoinsForPurchase] = useState(0);
   const [lastPurchasedDevelopment, setLastPurchasedDevelopment] = useState(null);
   const [buildPhaseInitialState, setBuildPhaseInitialState] = useState(null);
+  const [tempGoodsPositions, setTempGoodsPositions] = useState(null);
 
   function handleSelectDevelopment(devId) {
     const dev = DEVELOPMENTS.find(d => d.id === devId);
@@ -539,10 +526,6 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
     const totalValue = getGoodsValue(player.goodsPositions) + pendingCoins;
 
     if (totalValue >= dev.cost && player.developments.indexOf(devId) === -1) {
-      if (originalGoodsPositions) {
-        return; // Already purchased something this turn
-      }
-
       // Si le montant total est exactement égal au coût, acheter automatiquement
       if (totalValue === dev.cost) {
         handleAutoBuyDevelopment(dev);
@@ -567,10 +550,12 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
     const newPlayers = [...players];
     const player = newPlayers[currentPlayerIndex];
 
-    // Save original state
-    setOriginalGoodsPositions({ ...player.goodsPositions });
-    setOriginalCoins(pendingCoins);
-    setOriginalDevelopments([...player.developments]);
+    // Save original state only if not already saved (first purchase this turn)
+    if (!originalGoodsPositions) {
+      setOriginalGoodsPositions({ ...player.goodsPositions });
+      setOriginalCoins(pendingCoins);
+      setOriginalDevelopments([...player.developments]);
+    }
 
     // Use all coins first
     let remaining = dev.cost - pendingCoins;
@@ -650,10 +635,12 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
     const newPlayers = [...players];
     const player = newPlayers[currentPlayerIndex];
 
-    // Save original state
-    setOriginalGoodsPositions({ ...player.goodsPositions });
-    setOriginalCoins(pendingCoins);
-    setOriginalDevelopments([...player.developments]);
+    // Save original state only if not already saved (first purchase this turn)
+    if (!originalGoodsPositions) {
+      setOriginalGoodsPositions({ ...player.goodsPositions });
+      setOriginalCoins(pendingCoins);
+      setOriginalDevelopments([...player.developments]);
+    }
 
     // Apply the purchase
     for (const type of GOODS_TYPES) {
@@ -664,14 +651,13 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
     player.developments.push(selectedDevelopmentToBuy.id);
     setPlayers(newPlayers);
 
-    // Reset selection and state
+    // Store last purchased development
+    setLastPurchasedDevelopment(selectedDevelopmentToBuy);
+
+    // Reset selection state (but keep lastPurchasedDevelopment for display)
     setSelectedDevelopmentToBuy(null);
     setSelectedGoodsForPurchase({ wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 });
     setCoinsForPurchase(0);
-    setOriginalGoodsPositions(null);
-    setOriginalCoins(0);
-    setOriginalDevelopments(null);
-    setLastPurchasedDevelopment(null);
     setFoodToTradeForCoins(0);
 
     // Check end game condition based on variant (but not in test mode or solo mode)
@@ -683,9 +669,6 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
       }
       return;
     }
-
-    // Automatically proceed to next phase
-    checkAndSkipDiscard();
   }
 
   function handleCancelPurchaseSelection() {
@@ -759,13 +742,25 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
     }
   }
 
-  function handleDiscard(newGoodsPositions) {
+  function handleDiscardGood(type) {
+    if (tempGoodsPositions && tempGoodsPositions[type] > 0) {
+      setTempGoodsPositions({
+        ...tempGoodsPositions,
+        [type]: tempGoodsPositions[type] - 1
+      });
+    }
+  }
+
+  function handleContinueDiscard() {
+    if (!tempGoodsPositions) return;
+
     const newPlayers = [...players];
     newPlayers[currentPlayerIndex] = {
       ...newPlayers[currentPlayerIndex],
-      goodsPositions: newGoodsPositions
+      goodsPositions: tempGoodsPositions
     };
     setPlayers(newPlayers);
+    setTempGoodsPositions(null);
 
     // In solo mode, check if game should end at turn 10
     if (isSoloMode && soloTurn >= 10) {
@@ -1179,9 +1174,9 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
           </div>
         </div>
 
-        {/* Dice Display - Compact bar (always) */}
-        {(diceResults || (phase === 'roll' && isRolling) || phase === 'choose_food_or_workers') && (
-          <div className="flex-shrink-0 bg-white rounded-lg shadow-lg px-4 py-3 mb-4 flex items-center gap-4 h-24">
+        {/* Dice Display - Compact bar with phase info and action buttons */}
+        <div className="flex-shrink-0 bg-white rounded-lg shadow-lg px-4 py-3 mb-4 flex items-center gap-4 min-h-24">
+          {(diceResults || (phase === 'roll' && isRolling) || phase === 'choose_food_or_workers') && (
             <div className="flex gap-2">
               {diceResults ? (
                 diceResults.map(function(result, i) {
@@ -1265,129 +1260,94 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
                 </div>
               )}
             </div>
-            {phase === 'roll' && (
-              <div className="flex items-center gap-4">
-                {(function() {
-                  const hasLeadership = currentPlayer.developments.indexOf('leadership') !== -1;
-                  const canReroll = rollCount < 2 && diceResults && lockedDice.length < diceResults.length;
-                  const canUseLeadership = hasLeadership && !leadershipUsed;
-                  const isLastRoll = rollCount === 2 || (diceResults && lockedDice.length >= diceResults.length);
-                  const willAutoValidate = isLastRoll && !canUseLeadership;
+          )}
 
-                  return (
-                    <>
-                      <div className="flex flex-col items-start gap-1">
-                        <span className="text-sm font-bold text-amber-700">Lancer {rollCount + 1}/3</span>
-                        {canReroll && <span className="text-xs text-gray-500">Cliquez pour verrouiller</span>}
-                      </div>
-                      {canReroll && !leadershipMode && (
-                        <button
-                          onClick={handleReroll}
-                          disabled={isRolling}
-                          className="h-16 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer whitespace-nowrap"
-                        >
-                          Relancer les dés non verrouillés
-                        </button>
-                      )}
-                      {diceResults && !leadershipMode && !willAutoValidate && (
-                        <button
-                          onClick={handleKeep}
-                          disabled={isRolling}
-                          className="h-16 bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer whitespace-nowrap min-w-32"
-                        >
-                          Valider
-                        </button>
-                      )}
-                    </>
-                  );
-                })()}
-              </div>
-            )}
-            {phase === 'choose_food_or_workers' && (
-              <div className="flex items-center gap-4">
-                <div className="flex flex-col items-start gap-1">
-                  <span className="text-sm font-bold text-amber-700">Choisir nourriture ou ouvriers</span>
-                  <span className="text-xs text-gray-500">Cliquez sur les dés pour choisir</span>
-                </div>
-                <button
-                  onClick={handleValidateFoodOrWorkers}
-                  disabled={foodOrWorkerChoices.some(c => c === 'none')}
-                  className="h-16 bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer whitespace-nowrap min-w-32"
-                >
-                  Valider
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        <div className="grid grid-cols-3 gap-4 flex-1 min-h-0">
-          <div className="col-span-2">
-            <PlayerScorePanel
-              player={currentPlayer}
-              onBuyDevelopment={handleSelectDevelopment}
-              canBuy={phase === 'buy' && !selectedDevelopmentToBuy}
-              pendingCoins={pendingCoins}
-              onBuildCity={handleBuildCity}
-              onBuildMonument={handleBuildMonument}
-              canBuild={phase === 'build'}
+          {/* Phase info bar - always visible */}
+          <div className="flex-1">
+            <PhaseInfoBar
+              phase={phase}
+              currentPlayer={currentPlayer}
               pendingWorkers={pendingWorkers}
-              selectedDevelopmentId={selectedDevelopmentToBuy ? selectedDevelopmentToBuy.id : null}
-              allPlayers={players}
-              currentPlayerIndex={currentPlayerIndex}
-              monuments={MONUMENTS}
-              developments={DEVELOPMENTS}
-              previewFood={previewFood}
-              previewGoodsCount={previewGoodsCount}
+              pendingCoins={pendingCoins}
+              citiesToFeed={citiesToFeed}
+              totalGoodsCount={getTotalGoodsCount(tempGoodsPositions || currentPlayer.goodsPositions)}
+              goodsValue={getGoodsValue(currentPlayer.goodsPositions)}
+              selectedDevelopment={selectedDevelopmentToBuy}
+              hasPurchased={originalGoodsPositions !== null}
+              lastPurchasedDevelopment={lastPurchasedDevelopment}
+              stoneToTradeForWorkers={stoneToTradeForWorkers}
+              onTradeStone={handleTradeStone}
+              onResetStone={handleResetStone}
+              foodToTradeForCoins={foodToTradeForCoins}
+              onTradeFood={handleTradeFood}
+              onResetTrade={handleResetTrade}
+              granariesRate={getGranariesRate()}
+              needsToDiscard={!currentPlayer.developments.includes('caravans') && getTotalGoodsCount(tempGoodsPositions || currentPlayer.goodsPositions) > 6}
+              hasCaravans={currentPlayer.developments.indexOf('caravans') !== -1}
+              foodOrWorkerChoices={foodOrWorkerChoices}
+              pendingFoodOrWorkers={pendingFoodOrWorkers}
             />
           </div>
-          <div className="col-span-1">
-            <ActionPanel
+
+          {/* Action buttons - always visible */}
+          <div>
+            <ActionButtonsBar
               phase={phase}
               diceResults={diceResults}
               rollCount={rollCount}
               lockedDice={lockedDice}
               isRolling={isRolling}
-              onToggleLock={toggleLock}
               onReroll={handleReroll}
               onKeep={handleKeep}
-              pendingFoodOrWorkers={pendingFoodOrWorkers}
-              currentPlayer={currentPlayer}
-              onChooseFoodOrWorkers={handleUseFoodOrWorkers}
-              foodOrWorkerChoices={foodOrWorkerChoices}
-              citiesToFeed={citiesToFeed}
-              onFeed={handleFeed}
-              pendingWorkers={pendingWorkers}
-              onResetBuild={handleResetBuild}
-              onSkipBuild={handleSkipBuild}
-              stoneToTradeForWorkers={stoneToTradeForWorkers}
-              onTradeStone={handleTradeStone}
-              onResetStone={handleResetStone}
-              pendingCoins={pendingCoins}
-              onResetBuy={handleResetBuy}
-              onSkipBuy={handleSkipBuy}
-              hasPurchased={originalGoodsPositions !== null}
-              selectedDevelopment={selectedDevelopmentToBuy}
-              selectedGoods={selectedGoodsForPurchase}
-              selectedCoins={coinsForPurchase}
-              onToggleGood={handleToggleGoodForPurchase}
-              onConfirmPurchase={handleConfirmPurchase}
-              onCancelSelection={handleCancelPurchaseSelection}
-              calculateSelectedValue={calculateSelectedValue}
-              lastPurchasedDevelopment={lastPurchasedDevelopment}
-              onDiscard={handleDiscard}
               leadershipUsed={leadershipUsed}
               leadershipMode={leadershipMode}
               onUseLeadership={handleUseLeadership}
               onLeadershipReroll={handleLeadershipReroll}
               onCancelLeadership={handleCancelLeadership}
-              skullsCanBeToggled={leadershipMode || (isSoloMode && !variantConfig.soloSkullsLocked)}
-              granariesRate={getGranariesRate()}
-              foodToTradeForCoins={foodToTradeForCoins}
-              onTradeFood={handleTradeFood}
-              onResetTrade={handleResetTrade}
+              currentPlayer={currentPlayer}
+              foodOrWorkerChoices={foodOrWorkerChoices}
+              onValidateFoodOrWorkers={handleValidateFoodOrWorkers}
+              onFeed={handleFeed}
+              pendingWorkers={pendingWorkers}
+              onResetBuild={handleResetBuild}
+              onSkipBuild={handleSkipBuild}
+              hasPurchased={originalGoodsPositions !== null}
+              onResetBuy={handleResetBuy}
+              onSkipBuy={handleSkipBuy}
+              selectedDevelopment={selectedDevelopmentToBuy}
+              onCancelSelection={handleCancelPurchaseSelection}
+              onConfirmPurchase={handleConfirmPurchase}
+              calculateSelectedValue={calculateSelectedValue}
+              canContinueDiscard={!tempGoodsPositions || !currentPlayer.developments.includes('caravans') && getTotalGoodsCount(tempGoodsPositions) <= 6 || currentPlayer.developments.includes('caravans')}
+              onContinueDiscard={handleContinueDiscard}
             />
           </div>
+        </div>
+
+        {/* Player panel - full width */}
+        <div className="flex-1 min-h-0">
+          <PlayerScorePanel
+            player={currentPlayer}
+            onBuyDevelopment={handleSelectDevelopment}
+            canBuy={phase === 'buy' && !selectedDevelopmentToBuy}
+            pendingCoins={pendingCoins}
+            onBuildCity={handleBuildCity}
+            onBuildMonument={handleBuildMonument}
+            canBuild={phase === 'build'}
+            pendingWorkers={pendingWorkers}
+            selectedDevelopmentId={selectedDevelopmentToBuy ? selectedDevelopmentToBuy.id : null}
+            allPlayers={players}
+            currentPlayerIndex={currentPlayerIndex}
+            monuments={MONUMENTS}
+            developments={DEVELOPMENTS}
+            previewFood={previewFood}
+            previewGoodsCount={previewGoodsCount}
+            interactionMode={phase === 'discard' ? 'discard' : (phase === 'buy' && selectedDevelopmentToBuy ? 'buy' : null)}
+            tempGoodsPositions={tempGoodsPositions}
+            selectedGoodsForPurchase={selectedGoodsForPurchase}
+            onDiscardGood={handleDiscardGood}
+            onToggleGoodForPurchase={handleToggleGoodForPurchase}
+          />
         </div>
 
         {/* Disaster Help Button */}

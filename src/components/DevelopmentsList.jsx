@@ -11,7 +11,7 @@ export default function DevelopmentsList({ playerDevelopments, onBuyDevelopment,
           const isSelected = selectedDevelopmentId === dev.id;
 
           let bgClass = isOwned ? 'bg-green-50' : isSelected ? 'bg-blue-200 border-2 border-blue-600' : 'bg-gray-50';
-          let className = 'flex items-center gap-1.5 p-1.5 rounded text-xs ' + bgClass;
+          let className = 'flex items-center gap-1.5 py-2.5 rounded text-xs ' + bgClass;
           if (isClickable) {
             className += ' hover:bg-blue-100 cursor-pointer';
           } else if (!isOwned && !canAfford) {
@@ -30,7 +30,7 @@ export default function DevelopmentsList({ playerDevelopments, onBuyDevelopment,
               </div>
               <div className="flex-1 font-medium">{dev.name}</div>
               <div className="w-10 text-center font-semibold text-amber-700 text-xs">{dev.points}🏆</div>
-              <div className="w-32 text-xs text-gray-600 italic">
+              <div className="w-64 text-xs text-gray-600 italic">
                 {dev.effect}
               </div>
             </div>

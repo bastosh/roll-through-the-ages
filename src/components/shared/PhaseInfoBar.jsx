@@ -1,0 +1,223 @@
+export default function PhaseInfoBar({
+  phase,
+  currentPlayer,
+  pendingWorkers,
+  pendingCoins,
+  citiesToFeed,
+  totalGoodsCount,
+  goodsValue,
+  selectedDevelopment,
+  hasPurchased,
+  lastPurchasedDevelopment,
+  stoneToTradeForWorkers,
+  onTradeStone,
+  onResetStone,
+  foodToTradeForCoins,
+  onTradeFood,
+  onResetTrade,
+  granariesRate,
+  needsToDiscard,
+  hasCaravans,
+  foodOrWorkerChoices = [],
+  pendingFoodOrWorkers = 0
+}) {
+  const hasEngineering = currentPlayer.developments.indexOf('engineering') !== -1;
+  const hasGranaries = currentPlayer.developments.indexOf('granaries') !== -1;
+  const totalStoneAvailable = currentPlayer.goodsPositions.stone + stoneToTradeForWorkers;
+  const totalFoodAvailable = currentPlayer.food + foodToTradeForCoins;
+  const foodAvailable = currentPlayer.food;
+  const foodNeeded = citiesToFeed;
+  const foodShortage = Math.max(0, foodNeeded - foodAvailable);
+  const foodRemaining = Math.max(0, foodAvailable - foodNeeded);
+  const hasFamine = foodShortage > 0;
+  const totalValue = goodsValue + pendingCoins;
+
+  if (phase === 'roll') {
+    return (
+      <div className="flex flex-col gap-1">
+        <div className="text-sm font-semibold text-amber-800">Phase de lancer</div>
+        <div className="text-xs text-gray-600">Cliquez sur les dés pour les verrouiller/déverrouiller</div>
+      </div>
+    );
+  }
+
+  if (phase === 'choose_food_or_workers') {
+    // Calculer le nombre de dés choisis pour nourriture
+    const hasAgriculture = currentPlayer.developments.indexOf('agriculture') !== -1;
+    let foodDiceCount = 0;
+    for (let i = 0; i < foodOrWorkerChoices.length; i++) {
+      if (foodOrWorkerChoices[i] === 'food') foodDiceCount++;
+    }
+    const workerDiceCount = pendingFoodOrWorkers - foodDiceCount;
+
+    // Calculer la nourriture qui sera ajoutée
+    let foodToAdd = foodDiceCount * 2;
+    if (hasAgriculture) {
+      foodToAdd += foodDiceCount;
+    }
+
+    const futureFood = currentPlayer.food + foodToAdd;
+    const futureFoodAfterFeeding = futureFood - citiesToFeed;
+    const willHaveFamine = futureFoodAfterFeeding < 0;
+    const faminePoints = Math.abs(Math.min(0, futureFoodAfterFeeding));
+
+    return (
+      <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-1">
+          <div className="text-sm font-semibold text-amber-800">Choisir nourriture ou ouvriers</div>
+          <div className="text-xs text-gray-600">
+            {foodOrWorkerChoices.some(c => c === 'none') ? (
+              <span>Cliquez sur les dés pour faire votre choix</span>
+            ) : willHaveFamine ? (
+              <span className="text-red-600 font-semibold">⚠️ Famine ! Vous perdrez {faminePoints} point{faminePoints > 1 ? 's' : ''}</span>
+            ) : (
+              <span className="text-green-600 font-semibold">✓ Cités nourries (reste: {futureFoodAfterFeeding})</span>
+            )}
+          </div>
+        </div>
+        {!foodOrWorkerChoices.some(c => c === 'none') && (
+          <div className="flex items-center gap-3 text-xs bg-gray-50 rounded px-3 py-1">
+            <div>🌾 {futureFood}</div>
+            <div className="text-gray-400">→</div>
+            <div>🏛️ {citiesToFeed}</div>
+            <div className="text-gray-400">=</div>
+            <div className={willHaveFamine ? 'text-red-600 font-bold' : 'text-green-600 font-bold'}>
+              {futureFoodAfterFeeding >= 0 ? futureFoodAfterFeeding : 0}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (phase === 'feed') {
+    return (
+      <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-1">
+          <div className="text-sm font-semibold text-amber-800">Nourrir les cités</div>
+          <div className="text-xs text-gray-600">
+            {hasFamine ? (
+              <span className="text-red-600 font-semibold">⚠️ Famine ! Vous perdrez {foodShortage} point{foodShortage > 1 ? 's' : ''}</span>
+            ) : (
+              <span className="text-green-600 font-semibold">✅ Cités nourries avec succès (reste: {foodRemaining})</span>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-3 text-sm">
+          <div>🌾 {foodAvailable}</div>
+          <div className="text-gray-400">→</div>
+          <div>🏛️ {foodNeeded}</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (phase === 'build') {
+    return (
+      <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-1">
+          <div className="text-sm font-semibold text-amber-800">Phase de construction</div>
+          <div className="text-xs text-gray-600">
+            {pendingWorkers > 0 ? (
+              <span className="text-amber-600 font-semibold">⚠️ Utilisez tous vos ouvriers ({pendingWorkers} restants)</span>
+            ) : (
+              <span>Cliquez sur les cités et monuments</span>
+            )}
+          </div>
+        </div>
+        <div className="text-sm font-bold">
+          ⚒️ {pendingWorkers}
+        </div>
+        {hasEngineering && (
+          <div className="flex items-center gap-2 bg-blue-50 border border-blue-400 rounded px-3 py-1">
+            <div className="text-xs font-semibold text-blue-700">🏗️ Ingénierie</div>
+            <div className="text-xs text-gray-600">Pierre:</div>
+            <input
+              type="number"
+              min="0"
+              max={totalStoneAvailable}
+              value={stoneToTradeForWorkers}
+              onChange={(e) => onTradeStone(parseInt(e.target.value) || 0)}
+              className="w-12 px-1 py-0.5 border border-blue-400 rounded text-center text-xs font-bold"
+            />
+            <div className="text-xs">→ {stoneToTradeForWorkers * 3} ⚒️</div>
+            {stoneToTradeForWorkers > 0 && (
+              <button
+                onClick={onResetStone}
+                className="px-2 py-0.5 bg-orange-500 text-white text-xs rounded hover:bg-orange-600 cursor-pointer"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (phase === 'buy') {
+    return (
+      <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-1">
+          <div className="text-sm font-semibold text-amber-800">
+            {selectedDevelopment ? `Acheter: ${selectedDevelopment.name}` : 'Acheter un développement'}
+          </div>
+          <div className="text-xs text-gray-600">
+            {selectedDevelopment ? (
+              <span>Cliquez sur les ressources à utiliser (Coût: {selectedDevelopment.cost} 💰)</span>
+            ) : hasPurchased && lastPurchasedDevelopment ? (
+              <span className="text-green-600 font-semibold">✓ {lastPurchasedDevelopment.name} acheté</span>
+            ) : (
+              <span>Cliquez sur un développement pour l'acheter</span>
+            )}
+          </div>
+        </div>
+        <div className="text-sm font-bold">
+          💰 {totalValue} {pendingCoins > 0 && `(+${pendingCoins})`}
+        </div>
+        {hasGranaries && !selectedDevelopment && (
+          <div className="flex items-center gap-2 bg-green-50 border border-green-400 rounded px-3 py-1">
+            <div className="text-xs font-semibold text-green-700">🌾 Greniers</div>
+            <div className="text-xs text-gray-600">Nourriture:</div>
+            <input
+              type="number"
+              min="0"
+              max={totalFoodAvailable}
+              value={foodToTradeForCoins}
+              onChange={(e) => onTradeFood(parseInt(e.target.value) || 0)}
+              className="w-12 px-1 py-0.5 border border-green-400 rounded text-center text-xs font-bold"
+            />
+            <div className="text-xs">→ {foodToTradeForCoins * granariesRate} 💰</div>
+            {foodToTradeForCoins > 0 && (
+              <button
+                onClick={onResetTrade}
+                className="px-2 py-0.5 bg-orange-500 text-white text-xs rounded hover:bg-orange-600 cursor-pointer"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (phase === 'discard') {
+    return (
+      <div className="flex flex-col gap-1">
+        <div className="text-sm font-semibold text-amber-800">Fin du tour</div>
+        <div className="text-xs text-gray-600">
+          {hasCaravans ? (
+            <span className="text-green-600 font-semibold">✓ Caravanes: vous pouvez garder toutes vos ressources</span>
+          ) : needsToDiscard ? (
+            <span className="text-red-600 font-semibold">⚠️ Défaussez {totalGoodsCount - 6} ressource(s) (limite: 6)</span>
+          ) : (
+            <span className="text-green-600 font-semibold">✓ Vous respectez la limite de 6 ressources</span>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}

@@ -1,16 +1,27 @@
 import { GOODS_TYPES, GOODS_NAMES, GOODS_COLORS, GOODS_VALUES } from '../constants/gameData';
 import { getGoodsValue, getTotalGoodsCount } from '../utils/gameUtils';
 
-export default function ResourcesDisplay({ goodsPositions, food, previewFood, previewGoodsCount }) {
-  const totalGoods = getTotalGoodsCount(goodsPositions);
-  const goodsValue = getGoodsValue(goodsPositions);
+export default function ResourcesDisplay({
+  goodsPositions,
+  food,
+  previewFood,
+  previewGoodsCount,
+  interactionMode = null,
+  tempGoodsPositions = null,
+  selectedGoodsForPurchase = null,
+  onDiscardGood = null,
+  onToggleGoodForPurchase = null
+}) {
+  const displayGoodsPositions = tempGoodsPositions || goodsPositions;
+  const totalGoods = getTotalGoodsCount(displayGoodsPositions);
+  const goodsValue = getGoodsValue(displayGoodsPositions);
 
   // Calculer le nombre maximum de cases pour aligner toutes les lignes
   const maxSlots = Math.max(...GOODS_TYPES.map(type => GOODS_VALUES[type].length - 1));
   const maxFood = 15;
 
   // Calculate preview goods positions (simulate adding goods)
-  let previewGoodsPositions = { ...goodsPositions };
+  let previewGoodsPositions = { ...displayGoodsPositions };
   if (previewGoodsCount > 0) {
     let resourceIndex = 0;
     for (let i = 0; i < previewGoodsCount; i++) {
@@ -48,13 +59,32 @@ export default function ResourcesDisplay({ goodsPositions, food, previewFood, pr
       <div className="bg-gray-50 rounded-lg p-2">
         <div className="space-y-1">
           {[...GOODS_TYPES].reverse().map(function (type) {
-            const position = goodsPositions[type];
+            const position = displayGoodsPositions[type];
             const previewPosition = previewGoodsPositions[type];
             const value = GOODS_VALUES[type][position];
             const maxForType = GOODS_VALUES[type].length - 1;
 
+            const canDiscard = interactionMode === 'discard' && position > 0;
+            const canToggleForBuy = interactionMode === 'buy' && position > 0;
+            const isSelectedForBuy = selectedGoodsForPurchase && selectedGoodsForPurchase[type] > 0;
+
+            function handleClick() {
+              if (canDiscard && onDiscardGood) {
+                onDiscardGood(type);
+              } else if (canToggleForBuy && onToggleGoodForPurchase) {
+                onToggleGoodForPurchase(type);
+              }
+            }
+
+            const rowClass = (canDiscard || canToggleForBuy) ? 'cursor-pointer hover:bg-gray-100 rounded px-1 -mx-1' : '';
+            const highlightClass = isSelectedForBuy ? 'bg-green-100 border border-green-500 rounded px-1 -mx-1' : '';
+
             return (
-              <div key={type} className="flex items-start gap-1.5">
+              <div
+                key={type}
+                className={'flex items-start gap-1.5 ' + (highlightClass || rowClass)}
+                onClick={handleClick}
+              >
                 <div className="text-xs w-16 text-gray-600 pt-0.5">{GOODS_NAMES[type]}</div>
                 <div className="flex-1 flex gap-1">
                   {/* Afficher toutes les cases existantes pour ce type */}
@@ -78,7 +108,7 @@ export default function ResourcesDisplay({ goodsPositions, food, previewFood, pr
                     return (
                       <div key={idx} className="flex flex-col items-center">
                         <div
-                          className={'w-6 h-7 border-2 border-gray-400 rounded ' + bgClass}
+                          className={'w-7 h-6 border-2 border-gray-400 rounded ' + bgClass}
                           title={val.toString()}
                         />
                         <div className="text-xs text-gray-500 mt-0.5">{val}</div>
@@ -89,7 +119,7 @@ export default function ResourcesDisplay({ goodsPositions, food, previewFood, pr
                   {Array(maxSlots - maxForType).fill(0).map(function (_, idx) {
                     return (
                       <div key={'empty-' + idx} className="flex flex-col items-center">
-                        <div className="w-6 h-7 border-2 border-transparent rounded bg-transparent" />
+                        <div className="w-7 h-6 border-2 border-transparent rounded bg-transparent" />
                         <div className="text-xs text-transparent mt-0.5">-</div>
                       </div>
                     );
@@ -119,7 +149,7 @@ export default function ResourcesDisplay({ goodsPositions, food, previewFood, pr
 
               return (
                 <div key={idx} className="flex flex-col items-center">
-                  <div className={'w-6 h-7 border-2 border-gray-400 rounded ' + bgClass} />
+                  <div className={'w-7 h-6 border-2 border-gray-400 rounded ' + bgClass} />
                   <div className="text-xs text-gray-500 mt-0.5">{value}</div>
                 </div>
               );
