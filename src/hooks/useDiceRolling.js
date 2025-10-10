@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { DICE_FACES } from '../constants/gameData';
 
-export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer, onAutoValidate) {
-  const [diceResults, setDiceResults] = useState(null);
-  const [rollCount, setRollCount] = useState(0);
-  const [lockedDice, setLockedDice] = useState([]);
+export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer, onAutoValidate, savedState) {
+  const [diceResults, setDiceResults] = useState(savedState?.diceResults ?? null);
+  const [rollCount, setRollCount] = useState(savedState?.rollCount ?? 0);
+  const [lockedDice, setLockedDice] = useState(savedState?.lockedDice ?? []);
   const [isRolling, setIsRolling] = useState(false);
   const [rollingDice, setRollingDice] = useState([]);
-  const [leadershipUsed, setLeadershipUsed] = useState(false);
+  const [leadershipUsed, setLeadershipUsed] = useState(savedState?.leadershipUsed ?? false);
   const [leadershipMode, setLeadershipMode] = useState(false);
 
   function rollDice(initial, currentRollCount) {

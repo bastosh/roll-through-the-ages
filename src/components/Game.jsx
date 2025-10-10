@@ -10,7 +10,7 @@ import PlayerScorePanel from './PlayerScorePanel';
 import ActionPanel from './ActionPanel';
 import DisasterHelp from './shared/DisasterHelp';
 
-export default function Game({ playerNames, variantId, isSoloMode }) {
+export default function Game({ playerNames, variantId, isSoloMode, savedGameState }) {
   // Load variant configuration
   const variantConfig = useMemo(function() {
     return getVariantById(variantId);
@@ -20,6 +20,12 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   const DEVELOPMENTS = variantConfig.developments;
 
   const [players, setPlayers] = useState(function() {
+    // If there's a saved game state, use it
+    if (savedGameState && savedGameState.players) {
+      return savedGameState.players;
+    }
+
+    // Otherwise, initialize new game
     // Shuffle player order for multiplayer
     let orderedNames = playerNames;
     if (!isSoloMode && playerNames.length > 1) {
@@ -62,20 +68,20 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     });
   });
 
-  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
-  const [round, setRound] = useState(1);
-  const [soloTurn, setSoloTurn] = useState(isSoloMode ? 1 : 0);
-  const [phase, setPhase] = useState('roll');
-  const [pendingWorkers, setPendingWorkers] = useState(0);
-  const [pendingFoodOrWorkers, setPendingFoodOrWorkers] = useState(0);
-  const [pendingCoins, setPendingCoins] = useState(0);
+  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(savedGameState?.currentPlayerIndex ?? 0);
+  const [round, setRound] = useState(savedGameState?.round ?? 1);
+  const [soloTurn, setSoloTurn] = useState(savedGameState?.soloTurn ?? (isSoloMode ? 1 : 0));
+  const [phase, setPhase] = useState(savedGameState?.phase ?? 'roll');
+  const [pendingWorkers, setPendingWorkers] = useState(savedGameState?.pendingWorkers ?? 0);
+  const [pendingFoodOrWorkers, setPendingFoodOrWorkers] = useState(savedGameState?.pendingFoodOrWorkers ?? 0);
+  const [pendingCoins, setPendingCoins] = useState(savedGameState?.pendingCoins ?? 0);
   const [foodOrWorkerChoices, setFoodOrWorkerChoices] = useState([]);
   const [gameEnded, setGameEnded] = useState(false);
   const [foodToTradeForCoins, setFoodToTradeForCoins] = useState(0);
   const [stoneToTradeForWorkers, setStoneToTradeForWorkers] = useState(0);
   const [testMode, setTestMode] = useState(false);
-  const [gameEndTriggered, setGameEndTriggered] = useState(false);
-  const [showPlayerTurnModal, setShowPlayerTurnModal] = useState(!isSoloMode && playerNames.length > 1);
+  const [gameEndTriggered, setGameEndTriggered] = useState(savedGameState?.gameEndTriggered ?? false);
+  const [showPlayerTurnModal, setShowPlayerTurnModal] = useState(!isSoloMode && playerNames.length > 1 && !savedGameState);
 
   const currentPlayer = players[currentPlayerIndex];
   let numDice = 3;
@@ -84,7 +90,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   }
 
   // Use dice rolling hook
-  const diceHook = useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer, processResults);
+  const diceHook = useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer, processResults, savedGameState);
   const {
     diceResults,
     rollCount,
@@ -131,9 +137,9 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     setPlayers(newPlayers);
   }
 
-  // Auto-roll dice when entering roll phase
+  // Auto-roll dice when entering roll phase (but not on initial load from saved state)
   useEffect(function() {
-    if (phase === 'roll' && !diceResults) {
+    if (phase === 'roll' && !diceResults && !savedGameState) {
       rollDice(true, 0);
     }
   }, [phase]);
@@ -282,6 +288,13 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   }
 
   function checkAndSkipDiscard() {
+    // In solo mode, check if game should end at turn 10
+    if (isSoloMode && soloTurn >= 10) {
+      console.log('🎯 Solo game ending at turn', soloTurn);
+      endGame();
+      return;
+    }
+
     const player = players[currentPlayerIndex];
     const totalGoods = getTotalGoodsCount(player.goodsPositions);
     const hasCaravans = player.developments.indexOf('caravans') !== -1;
@@ -550,6 +563,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   }
 
   function handleAutoBuyDevelopment(dev) {
+    console.log('🛒 handleAutoBuyDevelopment', { isSoloMode, soloTurn });
     const newPlayers = [...players];
     const player = newPlayers[currentPlayerIndex];
 
@@ -585,6 +599,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
 
     // Check end game condition based on variant (but not in test mode or solo mode)
     if (!testMode && !isSoloMode && player.developments.length >= variantConfig.endGameConditions.developmentCount) {
+      console.log('🎮 End game condition triggered (multiplayer dev count)');
       if (players.length === 1) {
         endGame();
       } else {
@@ -592,6 +607,10 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
       }
       return;
     }
+
+    console.log('➡️ Calling checkAndSkipDiscard from handleAutoBuyDevelopment');
+    // Automatically proceed to next phase
+    checkAndSkipDiscard();
   }
 
   function handleToggleGoodForPurchase(type) {
@@ -694,12 +713,14 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   }
 
   function handleSkipBuy() {
+    console.log('⏭️ handleSkipBuy called', { isSoloMode, soloTurn });
     setPendingCoins(0);
     setOriginalGoodsPositions(null);
     setOriginalCoins(0);
     setOriginalDevelopments(null);
     setLastPurchasedDevelopment(null);
     setFoodToTradeForCoins(0);
+    console.log('➡️ Calling checkAndSkipDiscard from handleSkipBuy');
     checkAndSkipDiscard();
   }
 
@@ -738,11 +759,20 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     }
   }
 
-  function handleDiscard() {
+  function handleDiscard(newGoodsPositions) {
     const newPlayers = [...players];
-    const updatedPlayer = discardExcessGoods(newPlayers[currentPlayerIndex]);
-    newPlayers[currentPlayerIndex] = updatedPlayer;
+    newPlayers[currentPlayerIndex] = {
+      ...newPlayers[currentPlayerIndex],
+      goodsPositions: newGoodsPositions
+    };
     setPlayers(newPlayers);
+
+    // In solo mode, check if game should end at turn 10
+    if (isSoloMode && soloTurn >= 10) {
+      endGame();
+      return;
+    }
+
     nextTurn();
   }
 
@@ -750,6 +780,12 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     const isLastPlayer = currentPlayerIndex === players.length - 1;
 
     if (isLastPlayer) {
+      // In solo mode, check if game should end BEFORE incrementing
+      if (isSoloMode && soloTurn >= 10) {
+        endGame();
+        return;
+      }
+
       // End of round - check if game should end
       if (gameEndTriggered && !isSoloMode) {
         endGame();
@@ -759,15 +795,9 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
       setRound(round + 1);
       setCurrentPlayerIndex(0);
 
-      // In solo mode, increment turn counter and check if game should end
+      // In solo mode, increment turn counter
       if (isSoloMode) {
-        const nextTurn = soloTurn + 1;
-        setSoloTurn(nextTurn);
-
-        if (nextTurn > 10) {
-          endGame();
-          return;
-        }
+        setSoloTurn(soloTurn + 1);
       }
 
       // Show player turn modal for multiplayer
@@ -858,14 +888,16 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   ]);
 
   function endGame() {
+    console.log('🏁 endGame called!');
     const newPlayers = [...players];
 
     for (let i = 0; i < newPlayers.length; i++) {
-      newPlayers[i].score = calculatePlayerScore(newPlayers[i]);
+      newPlayers[i].score = calculatePlayerScore(newPlayers[i], DEVELOPMENTS, MONUMENTS);
     }
 
     setPlayers(newPlayers);
     setGameEnded(true);
+    console.log('✅ Game ended, gameEnded state set to true');
 
     // Save scores to history (only for solo mode or multiplayer with 2+ players)
     // Don't save scores for "partie libre" (1 player, not solo mode)
@@ -1004,17 +1036,37 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
                     {playerDetail.totalScore} pts
                   </div>
                 </div>
-                <div className="text-sm text-gray-700 space-y-1">
-                  <div>• développements : {playerDetail.developmentScore}</div>
-                  <div>+ monuments : {playerDetail.monumentScore}</div>
-                  <div>+ bonus : {playerDetail.bonusScore}</div>
-                  <div>- catastrophes : {playerDetail.disasterScore}</div>
-                  <div className="font-bold">= total : {playerDetail.totalScore}</div>
-                  {showResources && (
-                    <div className="mt-2 text-amber-700 font-semibold">
-                      Ressources restantes : {playerDetail.totalResourcesCount}
-                    </div>
-                  )}
+                <div className="bg-white rounded-lg p-4">
+                  <table className="w-full text-base">
+                    <tbody>
+                      <tr className="border-b border-gray-200">
+                        <td className="py-2 text-gray-700">Développements</td>
+                        <td className="py-2 text-right font-semibold text-gray-900">{playerDetail.developmentScore}</td>
+                      </tr>
+                      <tr className="border-b border-gray-200">
+                        <td className="py-2 text-gray-700">Monuments</td>
+                        <td className="py-2 text-right font-semibold text-gray-900">+ {playerDetail.monumentScore}</td>
+                      </tr>
+                      <tr className="border-b border-gray-200">
+                        <td className="py-2 text-gray-700">Bonus</td>
+                        <td className="py-2 text-right font-semibold text-gray-900">+ {playerDetail.bonusScore}</td>
+                      </tr>
+                      <tr className="border-b border-gray-200">
+                        <td className="py-2 text-gray-700">Catastrophes</td>
+                        <td className="py-2 text-right font-semibold text-red-600">- {playerDetail.disasterScore}</td>
+                      </tr>
+                      <tr className="border-t-2 border-gray-400">
+                        <td className="py-2 text-gray-900 font-bold">Total</td>
+                        <td className="py-2 text-right font-bold text-amber-700 text-lg">= {playerDetail.totalScore}</td>
+                      </tr>
+                      {showResources && (
+                        <tr className="border-t border-gray-200">
+                          <td className="py-2 text-amber-700 font-semibold">Ressources restantes</td>
+                          <td className="py-2 text-right font-semibold text-amber-700">{playerDetail.totalResourcesCount}</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             );
