@@ -78,12 +78,11 @@ export default function ResourcesDisplay({
             }
 
             const rowClass = (canDiscard || canToggleForBuy) ? 'cursor-pointer hover:bg-gray-100 rounded px-1 -mx-1' : '';
-            const highlightClass = selectedQuantity > 0 ? 'bg-green-50 border border-green-400 rounded px-1 -mx-1' : '';
 
             return (
               <div
                 key={type}
-                className={'flex items-start gap-1.5 ' + (highlightClass || rowClass)}
+                className={'flex items-start gap-1.5 ' + rowClass}
                 onClick={handleClick}
               >
                 <div className="text-xs w-16 text-gray-600 pt-0.5">{GOODS_NAMES[type]}</div>
@@ -95,14 +94,21 @@ export default function ResourcesDisplay({
                     const isPreview = idx > position && idx <= previewPosition;
                     const isSelected = selectedQuantity > 0 && idx <= selectedQuantity;
 
+                    // Si la ressource est sélectionnée pour l'achat, la case redevient blanche
+                    if (isSelected) {
+                      return (
+                        <div key={idx} className="flex flex-col items-center">
+                          <div className="w-6 h-7 border-2 border-gray-400 rounded bg-white" />
+                          <div className="text-xs text-gray-500 mt-0.5">{val}</div>
+                        </div>
+                      );
+                    }
+
                     let bgClass = 'bg-white';
                     let borderClass = 'border-gray-400';
 
                     if (isCurrent) {
                       bgClass = GOODS_COLORS[type];
-                      if (isSelected) {
-                        borderClass = 'border-green-500';
-                      }
                     } else if (isPreview) {
                       // Lighter version of the color for preview
                       if (type === 'wood') bgClass = 'bg-brown-300';

@@ -189,8 +189,8 @@ export default function PhaseInfoBar({
             </div>
           </div>
         ) : (
-          <div className="text-sm font-bold">
-            💰 {totalValue} {pendingCoins > 0 && `(+${pendingCoins})`}
+          <div className="text-xl font-bold">
+            💰 {totalValue} {pendingCoins > 0 && `(${pendingCoins})`}
           </div>
         )}
 
