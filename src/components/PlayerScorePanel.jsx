@@ -291,11 +291,11 @@ function ResourcesDisplay({ goodsPositions, food, previewFood, previewGoodsCount
                       bgClass = GOODS_COLORS[type];
                     } else if (isPreview) {
                       // Lighter version of the color for preview
-                      if (type === 'wood') bgClass = 'bg-yellow-200';
+                      if (type === 'wood') bgClass = 'bg-brown-300';
                       else if (type === 'stone') bgClass = 'bg-gray-200';
-                      else if (type === 'pottery') bgClass = 'bg-orange-200';
-                      else if (type === 'cloth') bgClass = 'bg-purple-200';
-                      else if (type === 'spearheads') bgClass = 'bg-red-200';
+                      else if (type === 'pottery') bgClass = 'bg-red-200';
+                      else if (type === 'cloth') bgClass = 'bg-blue-100';
+                      else if (type === 'spearheads') bgClass = 'bg-orange-200';
                     }
 
                     return (
@@ -335,9 +335,9 @@ function ResourcesDisplay({ goodsPositions, food, previewFood, previewGoodsCount
 
               let bgClass = 'bg-white';
               if (isCurrent) {
-                bgClass = 'bg-amber-600';
+                bgClass = 'bg-yellow-400';
               } else if (isPreview) {
-                bgClass = 'bg-amber-200'; // Lighter amber for preview
+                bgClass = 'bg-yellow-200'; // Lighter amber for preview
               }
 
               return (

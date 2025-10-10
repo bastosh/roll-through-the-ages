@@ -11,7 +11,7 @@ export const GOODS_NAMES = {
 };
 
 export const GOODS_COLORS = {
-  wood: 'bg-amber-700',
+  wood: 'bg-brown-700',
   stone: 'bg-gray-500',
   pottery: 'bg-red-600',
   cloth: 'bg-blue-600',

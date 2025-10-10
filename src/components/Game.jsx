@@ -1,8 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
-import { GOODS_TYPES, GOODS_VALUES, DICE_FACES } from '../constants/gameData';
+import { GOODS_TYPES, GOODS_VALUES } from '../constants/gameData';
 import { getVariantById } from '../constants/variants';
-import { addGoods, handleDisasters, getGoodsValue, getTotalGoodsCount } from '../utils/gameUtils';
+import { getGoodsValue, getTotalGoodsCount } from '../utils/gameUtils';
 import { addScore } from '../utils/scoreHistory';
+import { calculatePlayerScore } from '../utils/scoring';
+import { useDiceRolling } from '../hooks/useDiceRolling';
+import { discardExcessGoods, feedCities, toggleFoodOrWorkerDie, validateFoodOrWorkers, processRollResults } from '../utils/phaseHandlers';
 import PlayerScorePanel from './PlayerScorePanel';
 import ActionPanel from './ActionPanel';
 import DisasterHelp from './shared/DisasterHelp';
@@ -63,18 +66,11 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   const [round, setRound] = useState(1);
   const [soloTurn, setSoloTurn] = useState(isSoloMode ? 1 : 0);
   const [phase, setPhase] = useState('roll');
-  const [diceResults, setDiceResults] = useState(null);
-  const [rollCount, setRollCount] = useState(0);
-  const [lockedDice, setLockedDice] = useState([]);
-  const [isRolling, setIsRolling] = useState(false);
-  const [rollingDice, setRollingDice] = useState([]);
   const [pendingWorkers, setPendingWorkers] = useState(0);
   const [pendingFoodOrWorkers, setPendingFoodOrWorkers] = useState(0);
   const [pendingCoins, setPendingCoins] = useState(0);
   const [foodOrWorkerChoices, setFoodOrWorkerChoices] = useState([]);
   const [gameEnded, setGameEnded] = useState(false);
-  const [leadershipUsed, setLeadershipUsed] = useState(false);
-  const [leadershipMode, setLeadershipMode] = useState(false);
   const [foodToTradeForCoins, setFoodToTradeForCoins] = useState(0);
   const [stoneToTradeForWorkers, setStoneToTradeForWorkers] = useState(0);
   const [testMode, setTestMode] = useState(false);
@@ -86,6 +82,26 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
   for (let i = 0; i < currentPlayer.cities.length; i++) {
     if (currentPlayer.cities[i].built) numDice++;
   }
+
+  // Use dice rolling hook
+  const diceHook = useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer, processResults);
+  const {
+    diceResults,
+    rollCount,
+    lockedDice,
+    isRolling,
+    rollingDice,
+    leadershipUsed,
+    leadershipMode,
+    rollDice,
+    toggleLock,
+    handleReroll,
+    handleUseLeadership,
+    handleLeadershipReroll,
+    handleCancelLeadership,
+    resetForNewTurn,
+    setDiceResults
+  } = diceHook;
 
   // Get Granaries exchange rate from development effect
   function getGranariesRate() {
@@ -122,254 +138,70 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     }
   }, [phase]);
 
-  function rollDice(initial, currentRollCount) {
-    setIsRolling(true);
-    let diceToRoll = [];
-
-    if (initial) {
-      for (let i = 0; i < numDice; i++) {
-        diceToRoll.push(i);
-      }
-    } else {
-      for (let i = 0; i < diceResults.length; i++) {
-        if (lockedDice.indexOf(i) === -1) {
-          diceToRoll.push(i);
-        }
-      }
-    }
-
-    // Set which dice are currently rolling for individual animations
-    setRollingDice(diceToRoll);
-
-    setTimeout(function() {
-      const newResults = [...diceResults || []];
-      for (let i = 0; i < diceToRoll.length; i++) {
-        const idx = diceToRoll[i];
-        newResults[idx] = DICE_FACES[Math.floor(Math.random() * 6)];
-      }
-      setDiceResults(newResults);
-      setIsRolling(false);
-      setRollingDice([]);
-
-      // Skulls auto-locked unless in solo mode AND variant allows rerolling skulls
-      const shouldLockSkulls = !isSoloMode || variantConfig.soloSkullsLocked;
-      let newLockedDice = [...lockedDice];
-      if (shouldLockSkulls) {
-        for (let i = 0; i < newResults.length; i++) {
-          const result = newResults[i];
-          if (result && result.skulls > 0 && newLockedDice.indexOf(i) === -1) {
-            newLockedDice.push(i);
-          }
-        }
-        setLockedDice(newLockedDice);
-      }
-
-      // Auto-validate if:
-      // 1. No more rerolls available (currentRollCount will be 2 after the 3rd roll)
-      // 2. OR all dice are locked
-      // BUT only if Leadership is not available (doesn't have it OR already used it)
-      const hasLeadership = newResults.length > 0 && currentPlayer.developments.indexOf('leadership') !== -1;
-      const canUseLeadership = hasLeadership && !leadershipUsed;
-      const allDiceLocked = newLockedDice.length >= newResults.length;
-
-      // Check if we can reroll after this roll (rollCount starts at 0, after 3rd roll currentRollCount is 2)
-      const noMoreRerolls = currentRollCount >= 2;
-
-      if ((noMoreRerolls || allDiceLocked) && !leadershipMode && !canUseLeadership) {
-        // Auto-validate after a short delay
-        setTimeout(function() {
-          processResults(newResults);
-        }, 300);
-      }
-    }, 600);
-  }
-
-  function toggleLock(index) {
-    // Skulls cannot be unlocked unless in solo mode AND variant allows rerolling skulls
-    const skullsAreLocked = !isSoloMode || variantConfig.soloSkullsLocked;
-    if (skullsAreLocked && diceResults[index] && diceResults[index].skulls > 0) return;
-
-    const currentIndex = lockedDice.indexOf(index);
-    if (currentIndex === -1) {
-      setLockedDice([...lockedDice, index]);
-    } else {
-      const newLocked = [...lockedDice];
-      newLocked.splice(currentIndex, 1);
-      setLockedDice(newLocked);
-    }
-  }
-
-  function handleReroll() {
-    if (rollCount < 2 && lockedDice.length < diceResults.length) {
-      const newRollCount = rollCount + 1;
-      setRollCount(newRollCount);
-      rollDice(false, newRollCount);
-    }
-  }
-
   function handleKeep() {
     processResults(diceResults);
   }
 
-  function handleUseLeadership() {
-    // When entering leadership mode, lock all dice (user will unlock the one they want to reroll)
-    const allLocked = [];
-    for (let i = 0; i < diceResults.length; i++) {
-      allLocked.push(i);
-    }
-    setLockedDice(allLocked);
-    setLeadershipMode(true);
-    setLeadershipUsed(true);
-  }
-
-  function handleLeadershipReroll() {
-    // Count how many dice are unlocked in leadership mode (skulls allowed)
-    let unlockedCount = 0;
-    for (let i = 0; i < diceResults.length; i++) {
-      const isLocked = lockedDice.indexOf(i) !== -1;
-      if (!isLocked) {
-        unlockedCount++;
-      }
-    }
-
-    // Only allow if exactly 1 die is unlocked
-    if (unlockedCount === 1) {
-      rollDice(false, rollCount);
-      setLeadershipMode(false);
-    }
-  }
-
-  function handleCancelLeadership() {
-    // Reset locks to only skull dice (or all dice if in multiplayer/variant that locks skulls)
-    setLeadershipMode(false);
-    const skullsAreLocked = !isSoloMode || variantConfig.soloSkullsLocked;
-    const newLocked = [];
-    for (let i = 0; i < diceResults.length; i++) {
-      const result = diceResults[i];
-      if (skullsAreLocked && result && result.skulls > 0) {
-        newLocked.push(i);
-      }
-    }
-    setLockedDice(newLocked);
-  }
-
   function processResults(results) {
-    const newPlayers = [...players];
-    const player = newPlayers[currentPlayerIndex];
+    const result = processRollResults(
+      results,
+      players[currentPlayerIndex],
+      currentPlayerIndex,
+      players
+    );
 
-    let skulls = 0;
-    for (let i = 0; i < results.length; i++) {
-      skulls += results[i].skulls;
-    }
+    setPlayers(result.players);
+    setPendingWorkers(result.pendingWorkers);
+    setPendingFoodOrWorkers(result.pendingFoodOrWorkers);
+    setPendingCoins(result.pendingCoins);
 
-    let foodToAdd = 0;
-    for (let i = 0; i < results.length; i++) {
-      const r = results[i];
-      if (r.type === 'food') {
-        foodToAdd += r.value;
-        if (player.developments.indexOf('agriculture') !== -1) {
-          foodToAdd += 1;
-        }
-      }
-    }
-    player.food = Math.min(player.food + foodToAdd, 15);
-
-    let goodsToAdd = 0;
-    for (let i = 0; i < results.length; i++) {
-      if (results[i].type === 'goods') {
-        goodsToAdd += results[i].value;
-      }
-    }
-    addGoods(player, goodsToAdd);
-
-    let workers = 0;
-    let foodOrWorkersDice = 0;
-    let coins = 0;
-    for (let i = 0; i < results.length; i++) {
-      const r = results[i];
-      if (r.type === 'workers') {
-        workers += r.value;
-        if (player.developments.indexOf('masonry') !== -1) {
-          workers += 1;
-        }
-      }
-      if (r.type === 'food_or_workers') {
-        foodOrWorkersDice += 1; // Compte le nombre de dés, pas la valeur
-      }
-      if (r.type === 'coins') {
-        coins += r.value;
-        if (player.developments.indexOf('coinage') !== -1) {
-          coins += 5;
-        }
-      }
-    }
-
-    setPendingWorkers(workers);
-    setPendingFoodOrWorkers(foodOrWorkersDice);
-    setPendingCoins(coins);
-
-    handleDisasters(newPlayers, currentPlayerIndex, skulls);
-
-    setPlayers(newPlayers);
-
-    if (foodOrWorkersDice > 0) {
+    if (result.foodOrWorkerChoicesCount > 0) {
       // Initialize choices array with 'none' for each die
       const initialChoices = [];
-      for (let i = 0; i < foodOrWorkersDice; i++) {
+      for (let i = 0; i < result.foodOrWorkerChoicesCount; i++) {
         initialChoices.push('none');
       }
       setFoodOrWorkerChoices(initialChoices);
-      setPhase('choose_food_or_workers');
-    } else {
-      setPhase('feed');
     }
+
+    setPhase(result.nextPhase);
   }
 
   function handleToggleFoodOrWorkerDie(dieIndex) {
-    const newChoices = [...foodOrWorkerChoices];
-    if (newChoices[dieIndex] === 'none') {
-      newChoices[dieIndex] = 'food';
-    } else if (newChoices[dieIndex] === 'food') {
-      newChoices[dieIndex] = 'workers';
-    } else {
-      newChoices[dieIndex] = 'food';
-    }
+    const newChoices = toggleFoodOrWorkerDie(foodOrWorkerChoices, dieIndex);
     setFoodOrWorkerChoices(newChoices);
   }
 
   function handleValidateFoodOrWorkers() {
     const newPlayers = [...players];
-    const player = newPlayers[currentPlayerIndex];
+    const result = validateFoodOrWorkers(
+      foodOrWorkerChoices,
+      newPlayers[currentPlayerIndex],
+      pendingWorkers
+    );
 
-    let foodDiceCount = 0;
-    let workerDiceCount = 0;
-
-    for (let i = 0; i < foodOrWorkerChoices.length; i++) {
-      if (foodOrWorkerChoices[i] === 'food') {
-        foodDiceCount++;
-      } else if (foodOrWorkerChoices[i] === 'workers') {
-        workerDiceCount++;
+    // Transform food_or_workers dice to show the actual choice
+    const newDiceResults = [...diceResults];
+    let choiceIndex = 0;
+    for (let i = 0; i < newDiceResults.length; i++) {
+      if (newDiceResults[i].type === 'food_or_workers') {
+        const choice = foodOrWorkerChoices[choiceIndex];
+        if (choice === 'food') {
+          newDiceResults[i] = { type: 'food', value: 2, skulls: 0, wasChoice: true };
+        } else if (choice === 'workers') {
+          newDiceResults[i] = { type: 'workers', value: 2, skulls: 0, wasChoice: true };
+        }
+        choiceIndex++;
       }
     }
+    setDiceResults(newDiceResults);
 
-    // Add food - chaque dé donne 2 nourriture de base
-    let foodToAdd = foodDiceCount * 2;
-    if (player.developments.indexOf('agriculture') !== -1) {
-      foodToAdd += foodDiceCount; // Agriculture ajoute +1 par dé
-    }
-    player.food = Math.min(player.food + foodToAdd, 15);
-
-    // Add workers - chaque dé donne 2 ouvriers de base
-    let workersToAdd = workerDiceCount * 2;
-    if (player.developments.indexOf('masonry') !== -1) {
-      workersToAdd += workerDiceCount; // Maçonnerie ajoute +1 par dé
-    }
-    setPendingWorkers(pendingWorkers + workersToAdd);
-
+    newPlayers[currentPlayerIndex] = result.player;
+    setPlayers(newPlayers);
+    setPendingWorkers(result.newPendingWorkers);
     setPendingFoodOrWorkers(0);
     setFoodOrWorkerChoices([]);
-    setPlayers(newPlayers);
-    setPhase('feed');
+    setPhase(result.nextPhase);
   }
 
   function handleUseFoodOrWorkers(foodDiceCount) {
@@ -399,27 +231,16 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
 
   function handleFeed() {
     const newPlayers = [...players];
-    const player = newPlayers[currentPlayerIndex];
-    let citiesToFeed = 3;
-    for (let i = 0; i < player.cities.length; i++) {
-      if (player.cities[i].built) citiesToFeed++;
-    }
-
-    if (player.food < citiesToFeed) {
-      const unfedCities = citiesToFeed - player.food;
-      player.disasters += unfedCities;
-      player.food = 0;
-    } else {
-      player.food -= citiesToFeed;
-    }
-
+    const result = feedCities(newPlayers[currentPlayerIndex], pendingWorkers);
+    newPlayers[currentPlayerIndex] = result.player;
     setPlayers(newPlayers);
 
     // Skip build phase if no workers
-    if (pendingWorkers === 0) {
+    if (result.shouldSkipBuild) {
       skipToBuyPhase();
     } else {
       // Save the initial state before entering build phase
+      const player = result.player;
       const cities = [];
       for (let i = 0; i < player.cities.length; i++) {
         cities.push({
@@ -919,23 +740,8 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
 
   function handleDiscard() {
     const newPlayers = [...players];
-    const player = newPlayers[currentPlayerIndex];
-
-    if (player.developments.indexOf('caravans') === -1) {
-      let totalGoods = getTotalGoodsCount(player.goodsPositions);
-
-      while (totalGoods > 6) {
-        for (let i = GOODS_TYPES.length - 1; i >= 0; i--) {
-          const type = GOODS_TYPES[i];
-          if (player.goodsPositions[type] > 0) {
-            player.goodsPositions[type]--;
-            totalGoods--;
-            break;
-          }
-        }
-      }
-    }
-
+    const updatedPlayer = discardExcessGoods(newPlayers[currentPlayerIndex]);
+    newPlayers[currentPlayerIndex] = updatedPlayer;
     setPlayers(newPlayers);
     nextTurn();
   }
@@ -978,77 +784,10 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     }
 
     setPhase('roll');
-    setDiceResults(null);
-    setRollCount(0);
-    setLockedDice([]);
+    resetForNewTurn();
     setPendingCoins(0);
-    setLeadershipUsed(false);
-    setLeadershipMode(false);
     setFoodToTradeForCoins(0);
     setStoneToTradeForWorkers(0);
-  }
-
-  function calculatePlayerScore(player) {
-    let score = 0;
-
-    for (let j = 0; j < player.developments.length; j++) {
-      const devId = player.developments[j];
-      for (let k = 0; k < DEVELOPMENTS.length; k++) {
-        if (DEVELOPMENTS[k].id === devId) {
-          score += DEVELOPMENTS[k].points;
-          break;
-        }
-      }
-    }
-
-    for (let j = 0; j < player.monuments.length; j++) {
-      const m = player.monuments[j];
-      if (m.completed) {
-        for (let k = 0; k < MONUMENTS.length; k++) {
-          if (MONUMENTS[k].id === m.id) {
-            const monument = MONUMENTS[k];
-            score += m.firstToComplete ? monument.points[0] : monument.points[1];
-            break;
-          }
-        }
-      }
-    }
-
-    if (player.developments.indexOf('architecture') !== -1) {
-      let completedCount = 0;
-      for (let j = 0; j < player.monuments.length; j++) {
-        if (player.monuments[j].completed) completedCount++;
-      }
-      // Find the architecture development to get the correct multiplier for this variant
-      let architectureDev = null;
-      for (let k = 0; k < DEVELOPMENTS.length; k++) {
-        if (DEVELOPMENTS[k].id === 'architecture') {
-          architectureDev = DEVELOPMENTS[k];
-          break;
-        }
-      }
-      // Late Bronze Age: 2 points per monument, Bronze Age: 1 point per monument
-      const multiplier = architectureDev && architectureDev.cost >= 60 ? 2 : 1;
-      score += completedCount * multiplier;
-    }
-
-    if (player.developments.indexOf('empire') !== -1) {
-      let cityCount = 3;
-      for (let j = 0; j < player.cities.length; j++) {
-        if (player.cities[j].built) cityCount++;
-      }
-      score += cityCount;
-    }
-
-    // Commerce development (Late Bronze Age only)
-    if (player.developments.indexOf('commerce') !== -1) {
-      const totalGoodsCount = getTotalGoodsCount(player.goodsPositions);
-      score += totalGoodsCount;
-    }
-
-    score -= player.disasters;
-
-    return score;
   }
 
   // Update scores in real-time
@@ -1057,7 +796,7 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
     let hasChanged = false;
 
     for (let i = 0; i < newPlayers.length; i++) {
-      const newScore = calculatePlayerScore(newPlayers[i]);
+      const newScore = calculatePlayerScore(newPlayers[i], DEVELOPMENTS, MONUMENTS);
       if (newPlayers[i].score !== newScore) {
         newPlayers[i].score = newScore;
         hasChanged = true;
@@ -1430,7 +1169,8 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
                     }
                     isClickable = true;
                   } else if (result.type === 'food') {
-                    imageSrc = '/src/assets/food.png';
+                    // Use selection image if this was a food/workers choice
+                    imageSrc = result.wasChoice ? '/src/assets/food-selection.png' : '/src/assets/food.png';
                   } else if (result.type === 'goods') {
                     if (result.skulls > 0 && result.value === 2) {
                       imageSrc = '/src/assets/crane-goods.png';
@@ -1438,7 +1178,8 @@ export default function Game({ playerNames, variantId, isSoloMode }) {
                       imageSrc = '/src/assets/good.png';
                     }
                   } else if (result.type === 'workers') {
-                    imageSrc = '/src/assets/workers.png';
+                    // Use selection image if this was a food/workers choice
+                    imageSrc = result.wasChoice ? '/src/assets/worker-selection.png' : '/src/assets/workers.png';
                   } else if (result.type === 'food_or_workers') {
                     imageSrc = '/src/assets/food-workers.png';
                   } else if (result.type === 'coins') {
