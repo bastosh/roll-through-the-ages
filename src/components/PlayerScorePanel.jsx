@@ -257,10 +257,9 @@ function ResourcesDisplay({ goodsPositions, food, previewFood, previewGoodsCount
   const futureFood = Math.min(food + (previewFood || 0), 15);
 
   return (
-    <div className="flex-shrink-0">
-      <div className="bg-gray-50 rounded-lg p-2">
-        <div className='flex items-center justify-between'>
-          <div className="text-sm  text-gray-700 font-semibold mb-3">
+    <div className="flex-shrink-0 mt-2">
+        <div className='flex items-center justify-between mb-1'>
+          <div className="text-sm text-gray-700 font-semibold">
             Biens ({totalGoods}/6)
           </div>
           {/* Valeur totale des biens */}
@@ -269,6 +268,7 @@ function ResourcesDisplay({ goodsPositions, food, previewFood, previewGoodsCount
           </div>
         </div>
 
+      <div className="bg-gray-50 rounded-lg p-2">
         <div className="space-y-1">
           {[...GOODS_TYPES].reverse().map(function (type) {
             const position = goodsPositions[type];
@@ -377,9 +377,9 @@ export default function PlayerScorePanel({
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 h-full flex flex-col overflow-hidden">
       {/* Contenu principal en grille */}
-      <div className="grid grid-cols-2 gap-4 flex-1 min-h-0">
+      <div className="grid grid-cols-2 gap-12 flex-1 min-h-0">
         {/* Colonne de gauche */}
-        <div className="flex flex-col gap-2 overflow-y-auto">
+        <div className="flex flex-col overflow-y-auto">
           <CityDisplay
             cities={player.cities}
             onBuildCity={onBuildCity}
