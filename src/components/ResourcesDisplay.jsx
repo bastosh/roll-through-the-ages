@@ -46,17 +46,17 @@ export default function ResourcesDisplay({
 
   return (
     <div className="flex-shrink-0 mt-2">
-        <div className='flex items-center justify-between mb-1'>
-          <div className="text-sm text-gray-700 font-semibold">
+        <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between mb-1 gap-1'>
+          <div className="text-xs sm:text-sm text-gray-700 font-semibold">
             Biens ({totalGoods}/6)
           </div>
           {/* Valeur totale des biens */}
-          <div className="text-sm text-gray-700 font-semibold">
-            Valeur totale: {goodsValue}
+          <div className="text-xs sm:text-sm text-gray-700 font-semibold">
+            Valeur: {goodsValue}
           </div>
         </div>
 
-      <div className="bg-gray-50 rounded-lg p-2">
+      <div className="bg-gray-50 rounded-lg p-1 sm:p-2 overflow-x-auto">
         <div className="space-y-1">
           {[...GOODS_TYPES].reverse().map(function (type) {
             const position = displayGoodsPositions[type];

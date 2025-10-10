@@ -1116,7 +1116,7 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
   }
 
   return (
-    <div className="h-screen overflow-hidden bg-gradient-to-br from-amber-100 to-orange-200 p-4">
+    <div className="min-h-screen lg:h-screen lg:overflow-hidden bg-gradient-to-br from-amber-100 to-orange-200 p-4">
       {/* Player Turn Modal */}
       {showPlayerTurnModal && (
         <div className="fixed inset-0 bg-amber-100 bg-opacity-50 flex items-center justify-center z-50">
@@ -1140,17 +1140,17 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
         </div>
       )}
 
-      <div className="h-full flex flex-col">
-        <div className="bg-white rounded-lg shadow-lg py-2 px-4 mb-4 flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-amber-800">
+      <div className="lg:h-full flex flex-col">
+        <div className="bg-white rounded-lg shadow-lg py-2 px-2 sm:px-4 mb-4 flex-shrink-0">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+            <h1 className="text-lg sm:text-2xl font-bold text-amber-800">
               Roll Through the Ages{players.length > 1 ? ' - Manche ' + round : ''}
             </h1>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
               {import.meta.env.VITE_ENABLE_TEST_MODE === 'true' && (
                 <button
                   onClick={handleToggleTestMode}
-                  className={'px-4 py-2 rounded-lg font-bold text-sm transition cursor-pointer ' + (
+                  className={'px-2 sm:px-4 py-1 sm:py-2 rounded-lg font-bold text-xs sm:text-sm transition cursor-pointer ' + (
                     testMode
                       ? 'bg-red-600 text-white hover:bg-red-700'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -1160,14 +1160,14 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
                 </button>
               )}
               {isSoloMode && (
-                <div className="text-xl font-bold text-amber-700 bg-amber-100 px-4 py-2 rounded-lg">
+                <div className="text-sm sm:text-xl font-bold text-amber-700 bg-amber-100 px-2 sm:px-4 py-1 sm:py-2 rounded-lg">
                   Tour {soloTurn}/10
                 </div>
               )}
-                <div className="text-xl font-bold text-amber-700 bg-amber-100 px-4 py-2 rounded-lg">
+                <div className="text-sm sm:text-xl font-bold text-amber-700 bg-amber-100 px-2 sm:px-4 py-1 sm:py-2 rounded-lg">
                 { 'Score : ' + currentPlayer.score }
               </div>
-              <div className="text-lg font-semibold text-gray-700">
+              <div className="text-sm sm:text-lg font-semibold text-gray-700">
                 {players.length > 1 ? 'Tour de ' + currentPlayer.name : currentPlayer.name}
               </div>
             </div>
@@ -1175,9 +1175,9 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
         </div>
 
         {/* Dice Display - Compact bar with phase info and action buttons */}
-        <div className="flex-shrink-0 bg-white rounded-lg shadow-lg px-4 py-3 mb-4 flex items-center gap-4 min-h-24">
+        <div className="flex-shrink-0 bg-white rounded-lg shadow-lg px-2 sm:px-4 py-3 mb-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 min-h-24">
           {(diceResults || (phase === 'roll' && isRolling) || phase === 'choose_food_or_workers') && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-2 justify-center sm:justify-start">
               {diceResults ? (
                 diceResults.map(function(result, i) {
                   const isLocked = lockedDice.indexOf(i) !== -1;
@@ -1234,20 +1234,20 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
                   }
 
                   return (
-                    <div key={i} className="relative w-16 h-16">
+                    <div key={i} className="relative w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0">
                       {isDiceRolling ? (
-                        <div className="w-16 h-16 flex items-center justify-center">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-amber-600"></div>
                         </div>
                       ) : (
                         <img
                           src={imageSrc}
                           alt={result.type}
                           onClick={isClickable ? () => handleToggleFoodOrWorkerDie(foodOrWorkerIndex) : (canToggle ? () => toggleLock(i) : undefined)}
-                          className={'w-16 h-16 object-contain transition rounded-lg ' +
-                            (isClickable || canToggle ? 'cursor-pointer hover:opacity-80 ' : 'cursor-default ') +
-                            (isLocked && result.skulls > 0 ? 'ring-4 ring-red-500 ' :
-                             isLocked ? 'ring-4 ring-amber-500 ' : '')}
+                          className={'w-12 h-12 sm:w-16 sm:h-16 object-contain transition rounded-lg ' +
+                            (isClickable || canToggle ? 'cursor-pointer hover:opacity-80 active:opacity-60 ' : 'cursor-default ') +
+                            (isLocked && result.skulls > 0 ? 'ring-2 sm:ring-4 ring-red-500 ' :
+                             isLocked ? 'ring-2 sm:ring-4 ring-amber-500 ' : '')}
                         />
                       )}
                     </div>
@@ -1327,7 +1327,7 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
         </div>
 
         {/* Player panel - full width */}
-        <div className="flex-1 min-h-0">
+        <div className="lg:flex-1 lg:min-h-0">
           <PlayerScorePanel
             player={currentPlayer}
             onBuyDevelopment={handleSelectDevelopment}

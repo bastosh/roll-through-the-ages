@@ -30,11 +30,11 @@ export default function PlayerScorePanel({
   const goodsValue = getGoodsValue(player.goodsPositions);
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-4 h-full flex flex-col overflow-hidden">
+    <div className="bg-white rounded-lg shadow-lg p-2 sm:p-4 lg:h-full flex flex-col lg:overflow-hidden">
       {/* Contenu principal en grille */}
-      <div className="grid grid-cols-2 gap-12 flex-1 min-h-0">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 lg:flex-1 lg:min-h-0">
         {/* Colonne de gauche */}
-        <div className="flex flex-col overflow-y-auto">
+        <div className="flex flex-col lg:overflow-y-auto space-y-2">
           <CityDisplay
             cities={player.cities}
             onBuildCity={onBuildCity}
@@ -64,7 +64,7 @@ export default function PlayerScorePanel({
         </div>
 
         {/* Colonne de droite */}
-        <div className="flex flex-col justify-between gap-3 overflow-y-auto">
+        <div className="flex flex-col justify-between gap-3 lg:overflow-y-auto">
           <DevelopmentsList
             playerDevelopments={player.developments}
             onBuyDevelopment={onBuyDevelopment}
