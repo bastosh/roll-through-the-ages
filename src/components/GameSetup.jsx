@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { VARIANTS } from '../constants/variants';
 import { getScoreHistory, formatDate, clearScoreHistory } from '../utils/scoreHistory';
 import { getPlayerHistory, addPlayer, removePlayer, updatePlayerName, clearPlayerHistory } from '../utils/playerHistory';
+import VariantDetails from './VariantDetails';
 
 export default function GameSetup({ onStart, savedGameState, onResume, onClearSavedGame }) {
   const [playerCount, setPlayerCount] = useState(1);
@@ -208,11 +209,15 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
         </div>
       )}
 
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-xl shadow-2xl p-8 mb-6">
-          <h1 className="text-4xl font-bold text-center mb-8 text-amber-800">
-            Roll Through the Ages
-          </h1>
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-bold text-center mb-8 text-amber-800 bg-white rounded-xl shadow-lg p-6">
+          Roll Through the Ages
+        </h1>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          {/* Colonne de gauche : Configuration */}
+          <div className="bg-white rounded-xl shadow-2xl p-8">
+            <h2 className="text-2xl font-bold mb-6 text-amber-800">⚙️ Configuration</h2>
 
           {savedGameState && (
             <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-400 rounded-lg">
@@ -360,6 +365,14 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
               Commencer la partie
             </button>
           </div>
+          </div>
+
+          {/* Colonne de droite : Détails du variant */}
+          <VariantDetails
+            variantId={selectedVariant}
+            playerCount={playerCount}
+            isSoloMode={isSoloMode}
+          />
         </div>
 
         {/* Score History */}

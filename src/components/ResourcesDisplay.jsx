@@ -66,7 +66,8 @@ export default function ResourcesDisplay({
 
             const canDiscard = interactionMode === 'discard' && position > 0;
             const canToggleForBuy = interactionMode === 'buy' && position > 0;
-            const isSelectedForBuy = selectedGoodsForPurchase && selectedGoodsForPurchase[type] > 0;
+            const selectedQuantity = selectedGoodsForPurchase ? selectedGoodsForPurchase[type] : 0;
+            const selectedValue = selectedQuantity > 0 ? GOODS_VALUES[type][selectedQuantity] : 0;
 
             function handleClick() {
               if (canDiscard && onDiscardGood) {
@@ -77,7 +78,7 @@ export default function ResourcesDisplay({
             }
 
             const rowClass = (canDiscard || canToggleForBuy) ? 'cursor-pointer hover:bg-gray-100 rounded px-1 -mx-1' : '';
-            const highlightClass = isSelectedForBuy ? 'bg-green-100 border border-green-500 rounded px-1 -mx-1' : '';
+            const highlightClass = selectedQuantity > 0 ? 'bg-green-50 border border-green-400 rounded px-1 -mx-1' : '';
 
             return (
               <div
@@ -92,10 +93,16 @@ export default function ResourcesDisplay({
                     if (idx === 0) return null;
                     const isCurrent = idx <= position;
                     const isPreview = idx > position && idx <= previewPosition;
+                    const isSelected = selectedQuantity > 0 && idx <= selectedQuantity;
 
                     let bgClass = 'bg-white';
+                    let borderClass = 'border-gray-400';
+
                     if (isCurrent) {
                       bgClass = GOODS_COLORS[type];
+                      if (isSelected) {
+                        borderClass = 'border-green-500';
+                      }
                     } else if (isPreview) {
                       // Lighter version of the color for preview
                       if (type === 'wood') bgClass = 'bg-brown-300';
@@ -108,7 +115,7 @@ export default function ResourcesDisplay({
                     return (
                       <div key={idx} className="flex flex-col items-center">
                         <div
-                          className={'w-7 h-6 border-2 border-gray-400 rounded ' + bgClass}
+                          className={'w-6 h-7 border-2 rounded ' + bgClass + ' ' + borderClass}
                           title={val.toString()}
                         />
                         <div className="text-xs text-gray-500 mt-0.5">{val}</div>
@@ -125,7 +132,13 @@ export default function ResourcesDisplay({
                     );
                   })}
                 </div>
-                <div className="text-xs font-bold w-8 text-right pt-0.5">{value}</div>
+                <div className="text-xs font-bold w-8 text-right pt-0.5">
+                  {selectedQuantity > 0 ? (
+                    <span className="text-green-600">{selectedValue}</span>
+                  ) : (
+                    <span>{value}</span>
+                  )}
+                </div>
               </div>
             );
           })}

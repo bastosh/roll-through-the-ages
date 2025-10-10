@@ -19,7 +19,9 @@ export default function PhaseInfoBar({
   needsToDiscard,
   hasCaravans,
   foodOrWorkerChoices = [],
-  pendingFoodOrWorkers = 0
+  pendingFoodOrWorkers = 0,
+  selectedGoodsForPurchase = null,
+  calculateSelectedValue = null
 }) {
   const hasEngineering = currentPlayer.developments.indexOf('engineering') !== -1;
   const hasGranaries = currentPlayer.developments.indexOf('granaries') !== -1;
@@ -156,15 +158,18 @@ export default function PhaseInfoBar({
   }
 
   if (phase === 'buy') {
+    const selectedValue = selectedDevelopment && calculateSelectedValue ? calculateSelectedValue() : pendingCoins;
+    const canAfford = selectedDevelopment ? selectedValue >= selectedDevelopment.cost : false;
+
     return (
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-12">
         <div className="flex flex-col gap-1">
           <div className="text-sm font-semibold text-amber-800">
             {selectedDevelopment ? `Acheter: ${selectedDevelopment.name}` : 'Acheter un développement'}
           </div>
           <div className="text-xs text-gray-600">
             {selectedDevelopment ? (
-              <span>Cliquez sur les ressources à utiliser (Coût: {selectedDevelopment.cost} 💰)</span>
+              <span>Cliquez sur les ressources pour les ajouter</span>
             ) : hasPurchased && lastPurchasedDevelopment ? (
               <span className="text-green-600 font-semibold">✓ {lastPurchasedDevelopment.name} acheté</span>
             ) : (
@@ -172,9 +177,23 @@ export default function PhaseInfoBar({
             )}
           </div>
         </div>
-        <div className="text-sm font-bold">
-          💰 {totalValue} {pendingCoins > 0 && `(+${pendingCoins})`}
-        </div>
+
+        {selectedDevelopment ? (
+          <div className="flex items-center gap-3 bg-gray-50 border border-gray-400 rounded px-3 py-1">
+            <div className="text-xs text-gray-600">Coût:</div>
+            <div className="text-sm font-bold text-gray-800">{selectedDevelopment.cost} 💰</div>
+            <div className="text-gray-400">|</div>
+            <div className="text-xs text-gray-600">Engagé:</div>
+            <div className={`text-sm font-bold ${canAfford ? 'text-green-600' : 'text-red-600'}`}>
+              {selectedValue} 💰
+            </div>
+          </div>
+        ) : (
+          <div className="text-sm font-bold">
+            💰 {totalValue} {pendingCoins > 0 && `(+${pendingCoins})`}
+          </div>
+        )}
+
         {hasGranaries && !selectedDevelopment && (
           <div className="flex items-center gap-2 bg-green-50 border border-green-400 rounded px-3 py-1">
             <div className="text-xs font-semibold text-green-700">🌾 Greniers</div>

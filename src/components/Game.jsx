@@ -603,12 +603,12 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
 
     const player = players[currentPlayerIndex];
     const newSelected = { ...selectedGoodsForPurchase };
+    const maxPosition = player.goodsPositions[type];
 
-    if (newSelected[type] === 0) {
-      // Click: use this resource (set to max position to add its value)
-      newSelected[type] = player.goodsPositions[type];
+    // Increment position, cycling from 0 to max, then back to 0
+    if (newSelected[type] < maxPosition) {
+      newSelected[type]++;
     } else {
-      // Click again: don't use this resource (set to 0 to remove its value)
       newSelected[type] = 0;
     }
 
@@ -1286,6 +1286,8 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
               hasCaravans={currentPlayer.developments.indexOf('caravans') !== -1}
               foodOrWorkerChoices={foodOrWorkerChoices}
               pendingFoodOrWorkers={pendingFoodOrWorkers}
+              selectedGoodsForPurchase={selectedGoodsForPurchase}
+              calculateSelectedValue={calculateSelectedValue}
             />
           </div>
 
