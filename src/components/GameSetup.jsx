@@ -249,53 +249,10 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
             </div>
           )}
 
-          <div className="space-y-6">
-            <div>
-              <label className="block text-lg font-semibold mb-3 text-gray-700">
-                Variante du jeu
-              </label>
-              <div className="flex gap-4 flex-wrap">
-                {VARIANTS.map(function(variant) {
-                  return (
-                    <button
-                      key={variant.id}
-                      onClick={() => setSelectedVariant(variant.id)}
-                      className={'flex-1 min-w-[200px] py-3 rounded-lg font-semibold transition cursor-pointer ' + (
-                        selectedVariant === variant.id
-                          ? 'bg-amber-600 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      )}
-                    >
-                      {variant.displayName}
-                    </button>
-                  );
-                })}
-              </div>
-              {/* Option spécifique Bronze Age 2024 */}
-              {selectedVariant === 'bronze_age_2024' && (
-                <div className="mt-4">
-                  <label className="block text-md font-semibold mb-2 text-gray-700">
-                    Fin de partie :
-                  </label>
-                  <div className="flex gap-4">
-                    <button
-                      onClick={() => setBronze2024DevCount(5)}
-                      className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (bronze2024DevCount === 5 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')}
-                    >
-                      5 développements achetés
-                    </button>
-                    <button
-                      onClick={() => setBronze2024DevCount(6)}
-                      className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (bronze2024DevCount === 6 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')}
-                    >
-                      6 développements achetés
-                    </button>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">Choisissez à combien de développements la partie se termine.</p>
-                </div>
-              )}
-            </div>
 
+          <div className="space-y-6">
+
+            {/* Nombre de joueurs en premier */}
             <div>
               <label className="block text-lg font-semibold mb-3 text-gray-700">
                 Nombre de joueurs
@@ -317,6 +274,89 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
                   );
                 })}
               </div>
+            </div>
+
+            {/* Nom(s) des joueurs juste après le nombre de joueurs */}
+            <div>
+              <label className="block text-lg font-semibold mb-3 text-gray-700">
+                {playerCount === 1 ? 'Nom du joueur' : 'Noms des joueurs'}
+              </label>
+              {playerNames.map(function(name, i) {
+                return (
+                  <div key={i} className="mb-2">
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => updatePlayerName(i, e.target.value)}
+                      className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none"
+                      placeholder={'Joueur ' + (i + 1)}
+                      list={'player-history-' + i}
+                    />
+                    {playerHistory.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {playerHistory.slice(0, 5).map(function(player) {
+                          return (
+                            <button
+                              key={player.name}
+                              onClick={() => selectPlayerFromHistory(i, player.name)}
+                              className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 cursor-pointer"
+                            >
+                              {player.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Variante du jeu */}
+            <div>
+              <label className="block text-lg font-semibold mb-3 text-gray-700">
+                Variante du jeu
+              </label>
+              <div className="flex gap-4 flex-wrap">
+                {VARIANTS.map(function(variant) {
+                  return (
+                    <button
+                      key={variant.id}
+                      onClick={() => setSelectedVariant(variant.id)}
+                      className={'flex-1 min-w-[200px] py-3 rounded-lg font-semibold transition cursor-pointer ' + (
+                        selectedVariant === variant.id
+                          ? 'bg-amber-600 text-white'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      )}
+                    >
+                      {variant.displayName}
+                    </button>
+                  );
+                })}
+              </div>
+              {/* Option spécifique Bronze Age 2024, seulement pour 2 joueurs */}
+              {selectedVariant === 'bronze_age_2024' && playerCount === 2 && (
+                <div className="mt-4">
+                  <label className="block text-md font-semibold mb-2 text-gray-700">
+                    Fin de partie :
+                  </label>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => setBronze2024DevCount(5)}
+                      className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (bronze2024DevCount === 5 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')}
+                    >
+                      5 développements achetés
+                    </button>
+                    <button
+                      onClick={() => setBronze2024DevCount(6)}
+                      className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (bronze2024DevCount === 6 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')}
+                    >
+                      6 développements achetés
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Choisissez à combien de développements la partie se termine.</p>
+                </div>
+              )}
             </div>
 
             {playerCount === 1 && (
