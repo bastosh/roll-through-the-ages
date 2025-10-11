@@ -131,22 +131,25 @@ export default function PhaseInfoBar({
           ⚒️ {pendingWorkers}
         </div>
         {hasEngineering && (
-          <div className="flex items-center gap-2 bg-blue-50 border border-blue-400 rounded px-3 py-1">
-            <div className="text-xs font-semibold text-blue-700">🏗️ Ingénierie</div>
-            <div className="text-xs text-gray-600">Pierre:</div>
-            <input
-              type="number"
-              min="0"
-              max={totalStoneAvailable}
-              value={stoneToTradeForWorkers}
-              onChange={(e) => onTradeStone(parseInt(e.target.value) || 0)}
-              className="w-12 px-1 py-0.5 border border-blue-400 rounded text-center text-xs font-bold"
-            />
-            <div className="text-xs">→ {stoneToTradeForWorkers * 3} ⚒️</div>
+          <div className="flex items-center gap-4 bg-blue-50 border border-blue-400 rounded px-5 py-2">
+            <div className="text-base font-semibold text-blue-700">🏗️ Ingénierie</div>
+            <div className="text-sm text-gray-600">Pierre:</div>
+            <button
+              onClick={() => onTradeStone(Math.max(0, stoneToTradeForWorkers - 1))}
+              disabled={stoneToTradeForWorkers <= 0}
+              className="px-3 py-1 bg-blue-300 text-white text-lg rounded hover:bg-blue-400 disabled:bg-gray-200 disabled:text-gray-400"
+            >–</button>
+            <span className="w-12 text-center text-lg font-bold">{stoneToTradeForWorkers}</span>
+            <button
+              onClick={() => onTradeStone(Math.min(totalStoneAvailable, stoneToTradeForWorkers + 1))}
+              disabled={stoneToTradeForWorkers >= totalStoneAvailable}
+              className="px-3 py-1 bg-blue-500 text-white text-lg rounded hover:bg-blue-600 disabled:bg-gray-200 disabled:text-gray-400"
+            >+</button>
+            <div className="text-sm">→ {stoneToTradeForWorkers * 3} ⚒️</div>
             {stoneToTradeForWorkers > 0 && (
               <button
                 onClick={onResetStone}
-                className="px-2 py-0.5 bg-orange-500 text-white text-xs rounded hover:bg-orange-600 cursor-pointer"
+                className="px-3 py-1 bg-orange-500 text-white text-lg rounded hover:bg-orange-600 cursor-pointer ml-2"
               >
                 ✕
               </button>
@@ -189,28 +192,31 @@ export default function PhaseInfoBar({
             </div>
           </div>
         ) : (
-          <div className="text-xl font-bold">
+          <div className="w-24 text-xl font-bold">
             💰 {totalValue} {pendingCoins > 0 && `(${pendingCoins})`}
           </div>
         )}
 
         {hasGranaries && !selectedDevelopment && (
-          <div className="flex items-center gap-2 bg-green-50 border border-green-400 rounded px-3 py-1">
-            <div className="text-xs font-semibold text-green-700">🌾 Greniers</div>
-            <div className="text-xs text-gray-600">Nourriture:</div>
-            <input
-              type="number"
-              min="0"
-              max={totalFoodAvailable}
-              value={foodToTradeForCoins}
-              onChange={(e) => onTradeFood(parseInt(e.target.value) || 0)}
-              className="w-12 px-1 py-0.5 border border-green-400 rounded text-center text-xs font-bold"
-            />
-            <div className="text-xs">→ {foodToTradeForCoins * granariesRate} 💰</div>
+          <div className="flex items-center gap-4 bg-green-50 border border-green-400 rounded px-5 py-2">
+            <div className="text-base font-semibold text-green-700">🌾 Greniers</div>
+            <div className="text-sm text-gray-600">Nourriture:</div>
+            <button
+              onClick={() => onTradeFood(Math.max(0, foodToTradeForCoins - 1))}
+              disabled={foodToTradeForCoins <= 0}
+              className="px-3 py-1 bg-green-300 text-white text-lg rounded hover:bg-green-400 disabled:bg-gray-200 disabled:text-gray-400"
+            >–</button>
+            <span className="w-12 text-center text-lg font-bold">{foodToTradeForCoins}</span>
+            <button
+              onClick={() => onTradeFood(Math.min(totalFoodAvailable, foodToTradeForCoins + 1))}
+              disabled={foodToTradeForCoins >= totalFoodAvailable}
+              className="px-3 py-1 bg-green-500 text-white text-lg rounded hover:bg-green-600 disabled:bg-gray-200 disabled:text-gray-400"
+            >+</button>
+            <div className="text-sm">→ {foodToTradeForCoins * granariesRate} 💰</div>
             {foodToTradeForCoins > 0 && (
               <button
                 onClick={onResetTrade}
-                className="px-2 py-0.5 bg-orange-500 text-white text-xs rounded hover:bg-orange-600 cursor-pointer"
+                className="px-3 py-1 bg-orange-500 text-white text-lg rounded hover:bg-orange-600 cursor-pointer ml-2"
               >
                 ✕
               </button>
