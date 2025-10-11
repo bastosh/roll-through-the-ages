@@ -1,3 +1,5 @@
+import { handleDisasters } from '../../utils/gameUtils';
+import DisasterInfo from './DisasterInfo';
 export default function PhaseInfoBar({
   phase,
   currentPlayer,
@@ -34,14 +36,69 @@ export default function PhaseInfoBar({
   const hasFamine = foodShortage > 0;
   const totalValue = goodsValue + pendingCoins;
 
+    // Détection des crânes
+    let skulls = 0;
+    // diceResults must come from props (Game.jsx passes it)
+    const diceResults = arguments.length > 0 && arguments[0]?.diceResults !== undefined ? arguments[0].diceResults : undefined;
+    // But in this component, diceResults is not a prop, so we need to add it to the props and Game.jsx
+    // For now, assume diceResults is passed as a prop (as in Game.jsx)
+    if (typeof diceResults !== 'undefined' && Array.isArray(diceResults)) {
+      for (let i = 0; i < diceResults.length; i++) {
+        if (diceResults[i] && diceResults[i].skulls) {
+          skulls += diceResults[i].skulls;
+        }
+      }
+    }
+
+    // Simuler l'effet de handleDisasters pour affichage (sans modifier l'état réel)
+    let disasterInfo = null;
+    if (skulls >= 2) {
+      // Créer des copies pour ne pas modifier l'état réel
+      const fakePlayers = [JSON.parse(JSON.stringify(currentPlayer))];
+      let effect = '';
+      try {
+        handleDisasters(fakePlayers, 0, skulls);
+        if (skulls === 2) {
+          effect = fakePlayers[0].developments.indexOf('irrigation') !== -1
+            ? 'Aucune perte (Irrigation)'
+            : fakePlayers[0].disasters > currentPlayer.disasters
+              ? 'Vous perdez 2 points'
+              : '';
+        } else if (skulls === 3) {
+          effect = 'Les adversaires sans Médecine perdent 3 points';
+        } else if (skulls === 4) {
+          effect = fakePlayers[0].monuments && fakePlayers[0].monuments.some(m => m.id === 'great_wall' && m.completed)
+            ? 'Protégé par la Grande Muraille.'
+            : fakePlayers[0].disasters > currentPlayer.disasters ? 'Vous perdez 4 points' : '';
+        } else if (skulls >= 5) {
+          effect = fakePlayers[0].developments.indexOf('religion') !== -1
+            ? 'Tous les autres joueurs sans Religion perdent tous leurs biens'
+            : 'Vous perdez tous vos biens';
+        }
+      } catch (e) {
+        effect = '';
+      }
+      let label = '';
+      if (skulls === 2) label = 'Sécheresse';
+      else if (skulls === 3) label = 'Peste';
+      else if (skulls === 4) label = 'Invasion';
+      else if (skulls >= 5) label = 'Révolte';
+      disasterInfo = { icon: '💀'.repeat(skulls), label, effect };
+    }
+
   if (phase === 'roll') {
     return (
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-3">
-          <div className="text-sm font-semibold text-amber-800">Phase de lancer</div>
-          <div className="text-xs text-gray-700 font-bold bg-amber-100 rounded px-2 py-0.5">Lancer {rollCount + 1}/3</div>
+      <div className="flex flex-row items-center gap-12">
+        <div className="flex flex-col justify-center min-w-[120px]">
+          <div className="flex items-center gap-3">
+            <div className="text-sm font-semibold text-amber-800">Phase de lancer</div>
+            <div className="text-xs text-gray-700 font-bold bg-amber-100 rounded px-2 py-0.5">Lancer {rollCount + 1}/3</div>
+          </div>
+          <div className="text-xs text-gray-600 leading-tight">Cliquez sur les dés pour les verrouiller/déverrouiller</div>
         </div>
-        <div className="text-xs text-gray-600">Cliquez sur les dés pour les verrouiller/déverrouiller</div>
+        {disasterInfo && (
+          <DisasterInfo skulls={skulls} label={disasterInfo.label} effect={disasterInfo.effect} />
+        )}
       </div>
     );
   }
@@ -67,7 +124,7 @@ export default function PhaseInfoBar({
     const faminePoints = Math.abs(Math.min(0, futureFoodAfterFeeding));
 
     return (
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-12">
         <div className="flex flex-col gap-1">
           <div className="text-sm font-semibold text-amber-800">Choisir nourriture ou ouvriers</div>
           <div className="text-xs text-gray-600">
@@ -81,7 +138,7 @@ export default function PhaseInfoBar({
           </div>
         </div>
         {!foodOrWorkerChoices.some(c => c === 'none') && (
-          <div className="flex items-center gap-3 text-xs bg-gray-50 rounded px-3 py-1">
+          <div className="flex items-center gap-3 text-lg bg-gray-50 rounded px-3 py-1">
             <div>🌾 {futureFood}</div>
             <div className="text-gray-400">→</div>
             <div>🏛️ {citiesToFeed}</div>
@@ -91,13 +148,16 @@ export default function PhaseInfoBar({
             </div>
           </div>
         )}
+        {disasterInfo && (
+          <DisasterInfo skulls={skulls} label={disasterInfo.label} effect={disasterInfo.effect} />
+        )}
       </div>
     );
   }
 
   if (phase === 'feed') {
     return (
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-12">
         <div className="flex flex-col gap-1">
           <div className="text-sm font-semibold text-amber-800">Nourrir les cités</div>
           <div className="text-xs text-gray-600">
@@ -108,18 +168,21 @@ export default function PhaseInfoBar({
             )}
           </div>
         </div>
-        <div className="flex items-center gap-3 text-sm">
+        <div className="flex items-center gap-3 text-lg">
           <div>🌾 {foodAvailable}</div>
           <div className="text-gray-400">→</div>
           <div>🏛️ {foodNeeded}</div>
         </div>
+        {disasterInfo && (
+          <DisasterInfo skulls={skulls} label={disasterInfo.label} effect={disasterInfo.effect} />
+        )}
       </div>
     );
   }
 
   if (phase === 'build') {
     return (
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-12">
         <div className="flex flex-col gap-1">
           <div className="text-sm font-semibold text-amber-800">Phase de construction</div>
           <div className="text-xs text-gray-600">
@@ -130,7 +193,7 @@ export default function PhaseInfoBar({
             )}
           </div>
         </div>
-        <div className="text-sm font-bold">
+        <div className="text-xl font-bold">
           ⚒️ {pendingWorkers}
         </div>
         {hasEngineering && (
@@ -186,11 +249,11 @@ export default function PhaseInfoBar({
 
         {selectedDevelopment ? (
           <div className="flex items-center gap-3 bg-gray-50 border border-gray-400 rounded px-3 py-1">
-            <div className="text-xs text-gray-600">Coût:</div>
-            <div className="text-sm font-bold text-gray-800">{selectedDevelopment.cost} 💰</div>
+            <div className="text-gray-600">Coût:</div>
+            <div className="text-lg font-bold text-gray-800">{selectedDevelopment.cost} 💰</div>
             <div className="text-gray-400">|</div>
-            <div className="text-xs text-gray-600">Engagé:</div>
-            <div className={`text-sm font-bold ${canAfford ? 'text-green-600' : 'text-red-600'}`}>
+            <div className="text-gray-600">Engagé:</div>
+            <div className={`text-lg font-bold ${canAfford ? 'text-green-600' : 'text-red-600'}`}>
               {selectedValue} 💰
             </div>
           </div>

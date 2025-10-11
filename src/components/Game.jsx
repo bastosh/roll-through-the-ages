@@ -795,6 +795,7 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
               selectedGoodsForPurchase={selectedGoodsForPurchase}
               calculateSelectedValue={calculateSelectedValue}
               rollCount={rollCount}
+              diceResults={diceResults}
             />
           </div>
 
