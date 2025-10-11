@@ -588,8 +588,9 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
     setPhase('roll');
     resetForNewTurn();
     setPendingCoins(0);
-    setFoodToTradeForCoins(0);
-    setStoneToTradeForWorkers(0);
+    // Reset any ongoing trade states from hooks
+    resetTrade();
+    resetStone();
   }
 
   // Update scores in real-time
