@@ -20,7 +20,6 @@ export default function PhaseInfoBar({
   hasCaravans,
   foodOrWorkerChoices = [],
   pendingFoodOrWorkers = 0,
-  selectedGoodsForPurchase = null,
   calculateSelectedValue = null,
   diceResults = null
 }) {
@@ -47,7 +46,7 @@ export default function PhaseInfoBar({
     }
 
     let disaster = null;
-    if (skulls === 2) {
+    if (skulls === 2 && currentPlayer.developments.indexOf('irrigation') === -1) {
       disaster = { icon: '💀💀', label: 'Sécheresse', effect: 'Vous perdez 2 points' };
     } else if (skulls === 3) {
       disaster = { icon: '💀💀💀', label: 'Épidémie', effect: 'Vos adversaires perdent 3 points' };
