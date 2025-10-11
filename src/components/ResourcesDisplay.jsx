@@ -98,14 +98,14 @@ export default function ResourcesDisplay({
                     if (isSelected) {
                       return (
                         <div key={idx} className="flex flex-col items-center">
-                          <div className="w-6 h-7 border-2 border-gray-400 rounded bg-white" />
+                          <div className="w-14 h-7 border-2 border-gray-300 rounded bg-white" />
                           <div className="text-xs text-gray-500 mt-0.5">{val}</div>
                         </div>
                       );
                     }
 
                     let bgClass = 'bg-white';
-                    let borderClass = 'border-gray-400';
+                    let borderClass = 'border-gray-300';
 
                     if (isCurrent) {
                       bgClass = GOODS_COLORS[type];
@@ -121,7 +121,7 @@ export default function ResourcesDisplay({
                     return (
                       <div key={idx} className="flex flex-col items-center">
                         <div
-                          className={'w-6 h-7 border-2 rounded ' + bgClass + ' ' + borderClass}
+                          className={'w-14 h-7 border-2 rounded ' + bgClass + ' ' + borderClass}
                           title={val.toString()}
                         />
                         <div className="text-xs text-gray-500 mt-0.5">{val}</div>
@@ -132,7 +132,7 @@ export default function ResourcesDisplay({
                   {Array(maxSlots - maxForType).fill(0).map(function (_, idx) {
                     return (
                       <div key={'empty-' + idx} className="flex flex-col items-center">
-                        <div className="w-7 h-6 border-2 border-transparent rounded bg-transparent" />
+                        <div className="w-14 h-7 border-2 border-transparent rounded bg-transparent" />
                         <div className="text-xs text-transparent mt-0.5">-</div>
                       </div>
                     );
@@ -168,7 +168,7 @@ export default function ResourcesDisplay({
 
               return (
                 <div key={idx} className="flex flex-col items-center">
-                  <div className={'w-7 h-6 border-2 border-gray-400 rounded ' + bgClass} />
+                  <div className={'w-10 h-6 border-2 border-gray-300 rounded ' + bgClass} />
                   <div className="text-xs text-gray-500 mt-0.5">{value}</div>
                 </div>
               );

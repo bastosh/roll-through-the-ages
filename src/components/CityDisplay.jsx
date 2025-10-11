@@ -25,8 +25,8 @@ export default function CityDisplay({ cities, onBuildCity, canBuild, pendingWork
               className={containerClass}
               onClick={isClickable ? () => onBuildCity(city.index) : undefined}
             >
-              <div className={'border-3 rounded-lg flex flex-col items-center justify-start p-1.5 ' + height + ' ' + (
-                city.built ? 'bg-green-100 border-green-600' : 'bg-gray-100 border-gray-400'
+              <div className={'border-2 rounded-lg flex flex-col items-center justify-start p-1.5 ' + height + ' ' + (
+                city.built ? 'bg-green-100 border-green-600' : 'bg-gray-50 border-gray-300'
               ) + (isClickable ? ' hover:bg-blue-100 hover:border-blue-500' : '')}>
                 {city.requiredWorkers > 0 && (
                   <div className="grid grid-cols-2 gap-1">
@@ -35,7 +35,7 @@ export default function CityDisplay({ cities, onBuildCity, canBuild, pendingWork
                       return (
                         <div
                           key={j}
-                          className={'w-4 h-4 border-2 border-gray-500 rounded ' + (
+                          className={'w-4 h-4 border border-gray-400 rounded ' + (
                             j < city.progress ? 'bg-blue-600' : 'bg-white'
                           ) + (isLastOdd ? ' col-span-2 mx-auto' : '')}
                         />

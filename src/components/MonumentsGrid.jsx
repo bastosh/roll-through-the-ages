@@ -34,13 +34,13 @@ export default function MonumentsGrid({ playerMonuments, onBuildMonument, canBui
             >
               <div className='flex justify-between'>
                 <div>
-                  <div className="text-xs font-bold mb-1">{monument.name}</div>
-                  <div className="flex gap-0.5 flex-wrap mb-1">
+                  <div className="text-xs font-bold mb-1">{monument.name} ({monument.workers})</div>
+                  <div className="flex gap-1 flex-wrap">
                     {Array(monument.workers).fill(0).map(function (_, j) {
                       return (
                         <div
                           key={j}
-                          className={'w-3.5 h-3.5 border border-gray-400 rounded ' + (
+                          className={'w-4 h-4 border border-gray-400 rounded ' + (
                             j < m.progress ? 'bg-purple-600' : 'bg-white'
                           )}
                         />
@@ -48,7 +48,7 @@ export default function MonumentsGrid({ playerMonuments, onBuildMonument, canBui
                     })}
                   </div>
                   {monument.effect && (
-                    <div className="text-xs text-gray-600 italic mb-1">
+                    <div className="text-xs text-gray-600 italic mt-1">
                       {monument.effect}
                     </div>
                   )}

@@ -868,6 +868,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
             selectedGoodsForPurchase={selectedGoodsForPurchase}
             onDiscardGood={handleDiscardGood}
             onToggleGoodForPurchase={handleToggleGoodForPurchase}
+            variantId={variantId}
           />
         </div>
 
