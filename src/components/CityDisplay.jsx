@@ -11,15 +11,12 @@ export default function CityDisplay({ cities, onBuildCity, canBuild, pendingWork
       <h3 className="text-sm font-bold mb-2 text-gray-800">Cités</h3>
       <div className="flex gap-1.5">
         {allCities.map(function (city, i) {
-          const height = city.requiredWorkers === 0 ? 'h-16' :
-            city.requiredWorkers === 3 ? 'h-16' :
-              city.requiredWorkers === 4 ? 'h-16' :
-                city.requiredWorkers === 5 ? 'h-20' : 'h-20';
+          const height = city.requiredWorkers <= 4 ? 'h-16' : 'h-20';
 
           const isClickable = canBuild && !city.built && (pendingWorkers >= 1 || city.progress > 0);
-          let containerClass = 'flex-1';
+          let containerClass = '';
           if (isClickable) {
-            containerClass += ' cursor-pointer';
+            containerClass = 'cursor-pointer';
           }
 
           return (
