@@ -797,6 +797,7 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
               pendingFoodOrWorkers={pendingFoodOrWorkers}
               selectedGoodsForPurchase={selectedGoodsForPurchase}
               calculateSelectedValue={calculateSelectedValue}
+              diceResults={diceResults}
             />
           </div>
 
