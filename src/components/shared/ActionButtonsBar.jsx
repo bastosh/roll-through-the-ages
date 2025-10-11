@@ -49,7 +49,7 @@ export default function ActionButtonsBar({
             disabled={isRolling}
             className="h-12 sm:h-16 w-full sm:w-32 bg-purple-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
           >
-            👑 Relancer
+            Relancer
           </button>
         </div>
       );
@@ -63,7 +63,7 @@ export default function ActionButtonsBar({
             disabled={isRolling}
             className="h-12 sm:h-16 w-full sm:w-32 bg-purple-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer whitespace-nowrap"
           >
-            👑 Leadership
+            Leadership
           </button>
         )}
         {canReroll && (
