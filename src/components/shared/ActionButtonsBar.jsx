@@ -32,8 +32,12 @@ export default function ActionButtonsBar({
     const hasLeadership = currentPlayer.developments.indexOf('leadership') !== -1;
     const canReroll = rollCount < 2 && diceResults && lockedDice.length < diceResults.length;
     const canUseLeadership = hasLeadership && !leadershipUsed && rollCount >= 2;
-    const isLastRoll = rollCount === 2 || (diceResults && lockedDice.length >= diceResults.length);
-    const willAutoValidate = isLastRoll && !canUseLeadership;
+
+  // Après un relance leadership, il faut forcer l'affichage du bouton Valider
+  const isLastRoll = rollCount === 2 || (diceResults && lockedDice.length >= diceResults.length);
+  // On ne fait plus d'auto-validation, on laisse toujours le bouton Valider visible si on n'est pas en mode leadership
+  const showValidateButton = diceResults && !leadershipMode;
+
 
     if (leadershipMode) {
       return (
@@ -75,7 +79,7 @@ export default function ActionButtonsBar({
             Relancer
           </button>
         )}
-        {diceResults && !willAutoValidate && (
+        {showValidateButton && (
           <button
             onClick={onKeep}
             disabled={isRolling}

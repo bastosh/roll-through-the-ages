@@ -119,7 +119,9 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
     // Only allow if exactly 1 die is unlocked
     if (unlockedCount === 1) {
       rollDice(false, rollCount);
+      // On sort du mode leadership, ce qui permet à nouveau l'affichage du bouton Valider
       setLeadershipMode(false);
+      // On ne valide pas automatiquement, l'utilisateur doit cliquer sur Valider (handleKeep)
     }
   }
 
