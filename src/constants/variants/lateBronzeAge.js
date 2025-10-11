@@ -12,7 +12,7 @@ export const LATE_BRONZE_AGE_CONFIG = {
   },
 
   // Solo mode: skulls can be rerolled
-  soloSkullsLocked: false,
+  soloSkullsLocked: true,
 
   // Monument restrictions - all monuments available for all player counts
   monumentRestrictions: {

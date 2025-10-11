@@ -28,7 +28,6 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
               {variant.endGameConditions.allMonumentsBuilt && (
                 <p>• Ou construisez tous les monuments collectivement</p>
               )}
-              <p>• Le joueur avec le plus de points gagne</p>
             </>
           )}
         </div>
@@ -39,8 +38,7 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-amber-700 mb-2">📜 Règles spécifiques</h3>
           <div className="bg-blue-50 rounded p-3 space-y-1 text-sm">
-            <p>• {variant.soloSkullsLocked ? '☠️ Les crânes sont verrouillés' : '☠️ Les crânes peuvent être relancés'}</p>
-            <p>• Durée : 10 tours maximum</p>
+            <p>• {variant.soloSkullsLocked ? '☠️ Les crânes ne peuvent pas être relancés (sauf Leadership)' : '☠️ Les crânes peuvent toujours être relancés'}</p>
           </div>
         </div>
       )}

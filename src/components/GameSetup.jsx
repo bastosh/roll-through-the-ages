@@ -14,6 +14,8 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
   const [playerHistory, setPlayerHistory] = useState([]);
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [editedName, setEditedName] = useState('');
+  // Option pour Bronze Age 2024 : fin à 5 ou 6 développements
+  const [bronze2024DevCount, setBronze2024DevCount] = useState(5);
 
   useEffect(function() {
     setScoreHistory(getScoreHistory());
@@ -60,7 +62,8 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
       addPlayer(filteredNames[i]);
     }
 
-    onStart(filteredNames, selectedVariant, isSoloMode);
+    // Passe l'option bronze2024DevCount si la variante 2024 est sélectionnée
+    onStart(filteredNames, selectedVariant, isSoloMode, selectedVariant === 'bronze_age_2024' ? bronze2024DevCount : undefined);
   }
 
   function handleResetGame() {
@@ -268,6 +271,29 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
                   );
                 })}
               </div>
+              {/* Option spécifique Bronze Age 2024 */}
+              {selectedVariant === 'bronze_age_2024' && (
+                <div className="mt-4">
+                  <label className="block text-md font-semibold mb-2 text-gray-700">
+                    Fin de partie :
+                  </label>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => setBronze2024DevCount(5)}
+                      className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (bronze2024DevCount === 5 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')}
+                    >
+                      5 développements achetés
+                    </button>
+                    <button
+                      onClick={() => setBronze2024DevCount(6)}
+                      className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (bronze2024DevCount === 6 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')}
+                    >
+                      6 développements achetés
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Choisissez à combien de développements la partie se termine.</p>
+                </div>
+              )}
             </div>
 
             <div>

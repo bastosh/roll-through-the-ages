@@ -18,11 +18,22 @@ import DiceBar from './DiceBar';
 import GameHeader from './GameHeader';
 import GameEndScreen from './GameEndScreen';
 
-export default function Game({ playerNames, variantId, isSoloMode, savedGameState }) {
+export default function Game({ playerNames, variantId, isSoloMode, bronze2024DevCount = 5, savedGameState }) {
   // Load variant configuration
   const variantConfig = useMemo(function() {
-    return getVariantById(variantId);
-  }, [variantId]);
+    const base = getVariantById(variantId);
+    // Si Bronze Age 2024, on adapte le nombre de développements selon le choix
+    if (variantId === 'bronze_age_2024') {
+      return {
+        ...base,
+        endGameConditions: {
+          ...base.endGameConditions,
+          developmentCount: bronze2024DevCount
+        }
+      };
+    }
+    return base;
+  }, [variantId, bronze2024DevCount]);
 
   const MONUMENTS = variantConfig.monuments;
   const DEVELOPMENTS = variantConfig.developments;

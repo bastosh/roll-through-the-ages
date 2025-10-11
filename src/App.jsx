@@ -7,6 +7,7 @@ export default function App() {
   const [playerNames, setPlayerNames] = useState([]);
   const [variantId, setVariantId] = useState('bronze_age');
   const [isSoloMode, setIsSoloMode] = useState(false);
+  const [bronze2024DevCount, setBronze2024DevCount] = useState(5);
   const [savedGameState, setSavedGameState] = useState(null);
 
   // Check for saved game on mount
@@ -31,10 +32,15 @@ export default function App() {
     }
   }, []);
 
-  function handleStart(names, selectedVariantId, soloMode) {
+  function handleStart(names, selectedVariantId, soloMode, devCount) {
     setPlayerNames(names);
     setVariantId(selectedVariantId);
     setIsSoloMode(soloMode);
+    if (selectedVariantId === 'bronze_age_2024' && devCount) {
+      setBronze2024DevCount(devCount);
+    } else {
+      setBronze2024DevCount(5);
+    }
     setGameStarted(true);
     setSavedGameState(null);
   }
@@ -73,6 +79,7 @@ export default function App() {
       playerNames={playerNames}
       variantId={variantId}
       isSoloMode={isSoloMode}
+      bronze2024DevCount={bronze2024DevCount}
       savedGameState={savedGameState}
     />
   );

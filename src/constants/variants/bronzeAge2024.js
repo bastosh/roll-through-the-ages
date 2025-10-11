@@ -7,8 +7,8 @@ export const BRONZE_AGE_2024_CONFIG = {
 
   // End game conditions - option for 6 developments
   endGameConditions: {
-    developmentCount: 6,
-    allMonumentsBuilt: false
+    developmentCount: 5,
+    allMonumentsBuilt: true
   },
 
   // Solo mode: skulls cannot be rerolled
