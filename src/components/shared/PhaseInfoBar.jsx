@@ -21,8 +21,7 @@ export default function PhaseInfoBar({
   foodOrWorkerChoices = [],
   pendingFoodOrWorkers = 0,
   selectedGoodsForPurchase = null,
-  calculateSelectedValue = null,
-  diceResults = null
+  calculateSelectedValue = null
 }) {
   const hasEngineering = currentPlayer.developments.indexOf('engineering') !== -1;
   const hasGranaries = currentPlayer.developments.indexOf('granaries') !== -1;
@@ -35,43 +34,11 @@ export default function PhaseInfoBar({
   const hasFamine = foodShortage > 0;
   const totalValue = goodsValue + pendingCoins;
 
-  if (phase === 'roll' || phase === 'choose_food_or_workers' || phase === 'feed') {
-    // Détection des catastrophes
-    let skulls = 0;
-    if (diceResults && Array.isArray(diceResults)) {
-      for (let i = 0; i < diceResults.length; i++) {
-        if (diceResults[i] && diceResults[i].skulls) {
-          skulls += diceResults[i].skulls;
-        }
-      }
-    }
-
-    let disaster = null;
-    if (skulls === 2) {
-      disaster = { icon: '💀💀', label: 'Sécheresse', effect: 'Vous perdez 2 points' };
-    } else if (skulls === 3) {
-      disaster = { icon: '💀💀💀', label: 'Épidémie', effect: 'Vos adversaires perdent 3 points' };
-    } else if (skulls === 4) {
-      disaster = { icon: '💀💀💀💀', label: 'Invasion', effect: 'Vous perdez 4 points' };
-    } else if (skulls >= 5) {
-      disaster = { icon: '💀💀💀💀💀+', label: 'Révolte', effect: 'Vous perdez toutes vos ressources' };
-    }
-
+  if (phase === 'roll') {
     return (
-      <div className="flex flex-row items-center gap-4">
-        <div className="flex flex-col justify-center min-w-[120px]">
-          <div className="text-sm font-semibold text-amber-800 leading-tight">Phase de lancer</div>
-          <div className="text-xs text-gray-600 leading-tight">Cliquez sur les dés pour les verrouiller/déverrouiller</div>
-        </div>
-        {disaster && (
-          <div className="px-2 py-1 rounded bg-red-100 border border-red-400 flex flex-col min-w-[120px]">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">{disaster.icon}</span>
-              <span className="font-bold text-red-700">{disaster.label}</span>
-            </div>
-            <span className="text-xs text-red-700 mt-1">{disaster.effect}</span>
-          </div>
-        )}
+      <div className="flex flex-col gap-1">
+        <div className="text-sm font-semibold text-amber-800">Phase de lancer</div>
+        <div className="text-xs text-gray-600">Cliquez sur les dés pour les verrouiller/déverrouiller</div>
       </div>
     );
   }
