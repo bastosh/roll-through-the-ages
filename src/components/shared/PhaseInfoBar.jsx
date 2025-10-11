@@ -20,8 +20,8 @@ export default function PhaseInfoBar({
   hasCaravans,
   foodOrWorkerChoices = [],
   pendingFoodOrWorkers = 0,
-  selectedGoodsForPurchase = null,
-  calculateSelectedValue = null
+  calculateSelectedValue = null,
+  rollCount = 0
 }) {
   const hasEngineering = currentPlayer.developments.indexOf('engineering') !== -1;
   const hasGranaries = currentPlayer.developments.indexOf('granaries') !== -1;
@@ -37,7 +37,10 @@ export default function PhaseInfoBar({
   if (phase === 'roll') {
     return (
       <div className="flex flex-col gap-1">
-        <div className="text-sm font-semibold text-amber-800">Phase de lancer</div>
+        <div className="flex items-center gap-3">
+          <div className="text-sm font-semibold text-amber-800">Phase de lancer</div>
+          <div className="text-xs text-gray-700 font-bold bg-amber-100 rounded px-2 py-0.5">Lancer {rollCount + 1}/3</div>
+        </div>
         <div className="text-xs text-gray-600">Cliquez sur les dés pour les verrouiller/déverrouiller</div>
       </div>
     );

@@ -4,7 +4,7 @@ import { addGoods, handleDisasters } from '../gameUtils';
  * Process dice results and update player state
  * @returns {Object} Updated state including next phase
  */
-export function processRollResults(results, player, currentPlayerIndex, allPlayers) {
+export function processRollResults(results, currentPlayerIndex, allPlayers) {
   const newPlayers = [...allPlayers];
   const currentPlayer = newPlayers[currentPlayerIndex];
 

@@ -117,7 +117,6 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
   // Use build phase hook
   const buildPhaseHook = useBuildPhase();
   const {
-    buildPhaseInitialState,
     stoneToTradeForWorkers,
     initializeBuildPhase,
     buildCity,
@@ -135,7 +134,6 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
   const {
     selectedDevelopmentToBuy,
     selectedGoodsForPurchase,
-    coinsForPurchase,
     originalGoodsPositions,
     lastPurchasedDevelopment,
     foodToTradeForCoins,
@@ -213,7 +211,6 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
   function processResults(results) {
     const result = processRollResults(
       results,
-      players[currentPlayerIndex],
       currentPlayerIndex,
       players
     );
@@ -797,6 +794,7 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
               pendingFoodOrWorkers={pendingFoodOrWorkers}
               selectedGoodsForPurchase={selectedGoodsForPurchase}
               calculateSelectedValue={calculateSelectedValue}
+              rollCount={rollCount}
             />
           </div>
 
