@@ -40,14 +40,14 @@ export default function ActionButtonsBar({
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <button
             onClick={onCancelLeadership}
-            className="h-12 sm:h-16 px-3 sm:px-4 bg-gray-500 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-600 cursor-pointer"
+            className="h-12 sm:h-16 w-full sm:w-32 bg-gray-500 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-600 cursor-pointer"
           >
             Annuler
           </button>
           <button
             onClick={onLeadershipReroll}
             disabled={isRolling}
-            className="h-12 sm:h-16 px-3 sm:px-4 bg-purple-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
+            className="h-12 sm:h-16 w-full sm:w-32 bg-purple-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
           >
             👑 Relancer
           </button>
@@ -61,7 +61,7 @@ export default function ActionButtonsBar({
           <button
             onClick={onUseLeadership}
             disabled={isRolling}
-            className="h-12 sm:h-16 px-3 sm:px-4 bg-purple-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer whitespace-nowrap"
+            className="h-12 sm:h-16 w-full sm:w-32 bg-purple-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer whitespace-nowrap"
           >
             👑 Leadership
           </button>
@@ -70,7 +70,7 @@ export default function ActionButtonsBar({
           <button
             onClick={onReroll}
             disabled={isRolling}
-            className="h-12 sm:h-16 px-3 sm:px-4 bg-blue-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
+            className="h-12 sm:h-16 w-full sm:w-32 bg-blue-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
           >
             Relancer
           </button>
@@ -79,7 +79,7 @@ export default function ActionButtonsBar({
           <button
             onClick={onKeep}
             disabled={isRolling}
-            className="h-12 sm:h-16 px-4 sm:px-6 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
+            className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
           >
             Valider
           </button>
@@ -94,7 +94,7 @@ export default function ActionButtonsBar({
       <button
         onClick={onValidateFoodOrWorkers}
         disabled={!allChoicesMade}
-        className="h-12 sm:h-16 px-4 sm:px-6 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
+        className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
       >
         Valider
       </button>
@@ -105,7 +105,7 @@ export default function ActionButtonsBar({
     return (
       <button
         onClick={onFeed}
-        className="h-12 sm:h-16 px-4 sm:px-6 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 cursor-pointer"
+        className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 cursor-pointer"
       >
         OK
       </button>
@@ -118,14 +118,14 @@ export default function ActionButtonsBar({
       <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
         <button
           onClick={onResetBuild}
-          className="h-12 sm:h-16 px-3 sm:px-4 bg-gray-500 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-600 cursor-pointer"
+          className="h-12 sm:h-16 w-full sm:w-32 bg-gray-500 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-600 cursor-pointer"
         >
           Annuler
         </button>
         <button
           onClick={onSkipBuild}
           disabled={hasWorkersRemaining}
-          className="h-12 sm:h-16 px-4 sm:px-6 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer"
+          className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer"
         >
           Valider
         </button>
@@ -141,14 +141,14 @@ export default function ActionButtonsBar({
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <button
             onClick={onCancelSelection}
-            className="h-12 sm:h-16 px-3 sm:px-4 bg-gray-500 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-600 cursor-pointer"
+            className="h-12 sm:h-16 w-full sm:w-32 bg-gray-500 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-600 cursor-pointer"
           >
             Annuler
           </button>
           <button
             onClick={onConfirmPurchase}
             disabled={!canPurchase}
-            className="h-12 sm:h-16 px-4 sm:px-6 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer"
+            className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer"
           >
             Confirmer
           </button>
@@ -161,14 +161,14 @@ export default function ActionButtonsBar({
         {hasPurchased && (
           <button
             onClick={onResetBuy}
-            className="h-12 sm:h-16 px-3 sm:px-4 bg-gray-500 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-600 cursor-pointer"
+            className="h-12 sm:h-16 w-full sm:w-32 bg-gray-500 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-600 cursor-pointer"
           >
             Annuler
           </button>
         )}
         <button
           onClick={onSkipBuy}
-          className="h-12 sm:h-16 px-4 sm:px-6 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 cursor-pointer"
+          className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 cursor-pointer"
         >
           {hasPurchased ? 'Valider' : 'Passer'}
         </button>
@@ -181,7 +181,7 @@ export default function ActionButtonsBar({
       <button
         onClick={onContinueDiscard}
         disabled={!canContinueDiscard}
-        className="h-12 sm:h-16 px-4 sm:px-6 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer"
+        className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer"
       >
         Terminer
       </button>
