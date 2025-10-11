@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { getVariantById } from '../constants/variants';
 
 export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
   const variant = getVariantById(variantId);
+  const [monumentsOpen, setMonumentsOpen] = useState(false);
+  const [developmentsOpen, setDevelopmentsOpen] = useState(false);
 
   if (!variant) return null;
 
@@ -42,59 +45,71 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
         </div>
       )}
 
-      {/* Monuments disponibles */}
+      {/* Monuments disponibles - Accordéon */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-amber-700 mb-2">
-          🏛️ Monuments ({availableMonuments.length}/{variant.monuments.length})
-        </h3>
-        <div className="space-y-2">
-          {availableMonuments.map(function(monument) {
-            return (
-              <div key={monument.id} className="bg-gray-50 rounded p-2 text-sm flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="font-semibold text-gray-800">{monument.name}</div>
-                  {monument.effect && (
-                    <div className="text-xs text-gray-600 mt-1">{monument.effect}</div>
-                  )}
-                </div>
-                <div className="text-right ml-2">
-                  <div className="text-xs text-gray-600">⚒️ {monument.workers}</div>
-                  <div className="text-xs font-bold text-amber-700">
-                    {monument.points[0]}/{monument.points[1]} pts
+        <button
+          onClick={() => setMonumentsOpen(!monumentsOpen)}
+          className="w-full flex items-center justify-between text-lg font-semibold text-amber-700 mb-2 p-3 bg-amber-50 rounded-lg hover:bg-amber-100 transition cursor-pointer"
+        >
+          <span>🏛️ Monuments ({availableMonuments.length}/{variant.monuments.length})</span>
+          <span className="text-2xl">{monumentsOpen ? '▼' : '▶'}</span>
+        </button>
+        {monumentsOpen && (
+          <div className="space-y-2 mt-2">
+            {availableMonuments.map(function(monument) {
+              return (
+                <div key={monument.id} className="bg-gray-50 rounded p-2 text-sm flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="font-semibold text-gray-800">{monument.name}</div>
+                    {monument.effect && (
+                      <div className="text-xs text-gray-600 mt-1">{monument.effect}</div>
+                    )}
+                  </div>
+                  <div className="text-right ml-2">
+                    <div className="text-xs text-gray-600">⚒️ {monument.workers}</div>
+                    <div className="text-xs font-bold text-amber-700">
+                      {monument.points[0]}/{monument.points[1]} pts
+                    </div>
                   </div>
                 </div>
+              );
+            })}
+            {excludedMonuments.length > 0 && (
+              <div className="mt-2 text-xs text-gray-500 italic">
+                {excludedMonuments.length} monument(s) non disponible(s) avec {playerCount} joueur(s)
               </div>
-            );
-          })}
-        </div>
-        {excludedMonuments.length > 0 && (
-          <div className="mt-2 text-xs text-gray-500 italic">
-            {excludedMonuments.length} monument(s) non disponible(s) avec {playerCount} joueur(s)
+            )}
           </div>
         )}
       </div>
 
-      {/* Développements disponibles */}
+      {/* Développements disponibles - Accordéon */}
       <div>
-        <h3 className="text-lg font-semibold text-amber-700 mb-2">
-          🔬 Développements ({variant.developments.length})
-        </h3>
-        <div className="space-y-2">
-          {variant.developments.map(function(dev) {
-            return (
-              <div key={dev.id} className="bg-gray-50 rounded p-2 text-sm flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="font-semibold text-gray-800">{dev.name}</div>
-                  <div className="text-xs text-gray-600 mt-1">{dev.effect}</div>
+        <button
+          onClick={() => setDevelopmentsOpen(!developmentsOpen)}
+          className="w-full flex items-center justify-between text-lg font-semibold text-amber-700 mb-2 p-3 bg-amber-50 rounded-lg hover:bg-amber-100 transition cursor-pointer"
+        >
+          <span>🔬 Développements ({variant.developments.length})</span>
+          <span className="text-2xl">{developmentsOpen ? '▼' : '▶'}</span>
+        </button>
+        {developmentsOpen && (
+          <div className="space-y-2 mt-2">
+            {variant.developments.map(function(dev) {
+              return (
+                <div key={dev.id} className="bg-gray-50 rounded p-2 text-sm flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="font-semibold text-gray-800">{dev.name}</div>
+                    <div className="text-xs text-gray-600 mt-1">{dev.effect}</div>
+                  </div>
+                  <div className="text-right ml-2">
+                    <div className="text-xs text-gray-600">💰 {dev.cost}</div>
+                    <div className="text-xs font-bold text-amber-700">{dev.points} pts</div>
+                  </div>
                 </div>
-                <div className="text-right ml-2">
-                  <div className="text-xs text-gray-600">💰 {dev.cost}</div>
-                  <div className="text-xs font-bold text-amber-700">{dev.points} pts</div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
