@@ -742,38 +742,17 @@ export default function Game({ playerNames, variantId, isSoloMode, savedGameStat
       />
 
       <div className="lg:h-full flex flex-col">
-        <div className="bg-white rounded-lg shadow-lg py-2 px-2 sm:px-4 mb-4 flex-shrink-0">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <h1 className="text-lg sm:text-2xl font-bold text-amber-800">
-              Roll Through the Ages{players.length > 1 ? ' - Manche ' + round : ''}
-            </h1>
-            <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
-              {import.meta.env.VITE_ENABLE_TEST_MODE === 'true' && (
-                <button
-                  onClick={handleToggleTestMode}
-                  className={'px-2 sm:px-4 py-1 sm:py-2 rounded-lg font-bold text-xs sm:text-sm transition cursor-pointer ' + (
-                    testMode
-                      ? 'bg-red-600 text-white hover:bg-red-700'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  )}
-                >
-                  {testMode ? '🧪 Mode Test ON' : '🧪 Mode Test'}
-                </button>
-              )}
-              {isSoloMode && (
-                <div className="text-sm sm:text-xl font-bold text-amber-700 bg-amber-100 px-2 sm:px-4 py-1 sm:py-2 rounded-lg">
-                  Tour {soloTurn}/10
-                </div>
-              )}
-                <div className="text-sm sm:text-xl font-bold text-amber-700 bg-amber-100 px-2 sm:px-4 py-1 sm:py-2 rounded-lg">
-                { 'Score : ' + currentPlayer.score }
-              </div>
-              <div className="text-sm sm:text-lg font-semibold text-gray-700">
-                {players.length > 1 ? 'Tour de ' + currentPlayer.name : currentPlayer.name}
-              </div>
-            </div>
-          </div>
-        </div>
+        <GameHeader
+          playerName={currentPlayer.name}
+          playerScore={currentPlayer.score}
+          round={round}
+          soloTurn={soloTurn}
+          isSoloMode={isSoloMode}
+          isMultiplayer={players.length > 1}
+          testMode={testMode}
+          showTestMode={import.meta.env.VITE_ENABLE_TEST_MODE === 'true'}
+          onToggleTestMode={handleToggleTestMode}
+        />
 
         {/* Dice Display - Compact bar with phase info and action buttons */}
         <div className="flex-shrink-0 bg-white rounded-lg shadow-lg px-2 sm:px-4 py-3 mb-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 min-h-24">
