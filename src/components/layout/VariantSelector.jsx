@@ -1,0 +1,93 @@
+import { VARIANTS } from '../../constants/variants';
+
+export default function VariantSelector({
+  selectedVariant,
+  playerCount,
+  isSoloMode,
+  bronze2024DevCount,
+  onSelectVariant,
+  onSetBronze2024DevCount,
+  onSetIsSoloMode
+}) {
+  return (
+    <div className="space-y-6">
+      {/* Variante du jeu */}
+      <div>
+        <label className="block text-lg font-semibold mb-3 text-gray-700">
+          Variante du jeu
+        </label>
+        <div className="flex gap-4 flex-wrap">
+          {VARIANTS.map(function(variant) {
+            return (
+              <button
+                key={variant.id}
+                onClick={() => onSelectVariant(variant.id)}
+                className={'flex-1 min-w-[200px] py-3 rounded-lg font-semibold transition cursor-pointer ' + (
+                  selectedVariant === variant.id
+                    ? 'bg-amber-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                )}
+              >
+                {variant.displayName}
+              </button>
+            );
+          })}
+        </div>
+        {/* Option spécifique Bronze Age 2024, seulement pour 2 joueurs */}
+        {selectedVariant === 'bronze_age_2024' && playerCount === 2 && (
+          <div className="mt-4">
+            <label className="block text-md font-semibold mb-2 text-gray-700">
+              Fin de partie :
+            </label>
+            <div className="flex gap-4">
+              <button
+                onClick={() => onSetBronze2024DevCount(5)}
+                className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (bronze2024DevCount === 5 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')}
+              >
+                5 développements achetés
+              </button>
+              <button
+                onClick={() => onSetBronze2024DevCount(6)}
+                className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (bronze2024DevCount === 6 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')}
+              >
+                6 développements achetés
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Choisissez à combien de développements la partie se termine.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Mode de jeu pour solo */}
+      {playerCount === 1 && (
+        <div>
+          <label className="block text-lg font-semibold mb-3 text-gray-700">
+            Mode de jeu
+          </label>
+          <div className="flex gap-4">
+            <button
+              onClick={() => onSetIsSoloMode(true)}
+              className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (
+                isSoloMode
+                  ? 'bg-amber-600 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              )}
+            >
+              Mode solo (10 tours)
+            </button>
+            <button
+              onClick={() => onSetIsSoloMode(false)}
+              className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (
+                !isSoloMode
+                  ? 'bg-amber-600 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              )}
+            >
+              Partie libre
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
