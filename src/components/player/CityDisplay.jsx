@@ -54,8 +54,8 @@ export default function CityDisplay({ cities, onBuildCity, onUnbuildCity, canBui
               onContextMenu={canRemoveWorker ? handleContextMenu : undefined}
             >
               <div className={'border-2 rounded-lg flex flex-col items-center justify-start p-1.5 transition-colors ' + height + ' ' + (
-                city.built ? 'bg-green-100 dark:bg-green-900/30 border-green-600 dark:border-green-700' : 'bg-gray-50 dark:bg-dark-elevated border-gray-300 dark:border-dark-border'
-              ) + ((canAddWorker || canRemoveWorker) ? ' hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:border-blue-500 dark:hover:border-blue-600' : '')}>
+                city.built ? 'bg-purple-100 dark:bg-purple-900/30 border-purple-600 dark:border-purple-700' : 'bg-gray-50 dark:bg-dark-elevated border-gray-300 dark:border-dark-border'
+              ) + ((canAddWorker || canRemoveWorker) ? ' hover:bg-purple-100 dark:hover:bg-purple-900/40 hover:border-purple-500 dark:hover:border-purple-600' : '')}>
                 {city.requiredWorkers > 0 && (
                   <div className="grid grid-cols-2 gap-1">
                     {Array(city.requiredWorkers).fill(0).map(function (_, j) {
@@ -64,7 +64,7 @@ export default function CityDisplay({ cities, onBuildCity, onUnbuildCity, canBui
                         <div
                           key={j}
                           className={'w-4 h-4 border border-gray-400 dark:border-dark-border rounded transition-colors ' + (
-                            j < city.progress ? 'bg-blue-600 dark:bg-blue-700' : 'bg-white dark:bg-dark-surface'
+                            j < city.progress ? 'bg-purple-600 dark:bg-purple-700' : 'bg-white dark:bg-dark-surface'
                           ) + (isLastOdd ? ' col-span-2 mx-auto' : '')}
                         />
                       );
