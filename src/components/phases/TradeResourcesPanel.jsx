@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { GOODS_TYPES, GOODS_NAMES, GOODS_COLORS } from '../../constants/gameData';
 
 /**
@@ -11,6 +12,7 @@ export default function TradeResourcesPanel({
   onReset,
   onSkip
 }) {
+  const { t } = useTranslation();
   const [fromType, setFromType] = useState('');
   const [toType, setToType] = useState('');
 
@@ -64,9 +66,9 @@ export default function TradeResourcesPanel({
                   }`}
                   onClick={() => !isDisabled && setFromType(type)}
                   disabled={isDisabled}
-                  title={GOODS_NAMES[type]}
+                  title={t(GOODS_NAMES[type])}
                 >
-                  <div className="text-xs font-medium text-center truncate">{GOODS_NAMES[type]}</div>
+                  <div className="text-xs font-medium text-center truncate">{t(GOODS_NAMES[type])}</div>
                   <div className="text-xs text-gray-600 text-center mt-0.5">×{count}</div>
                 </button>
               );
@@ -98,9 +100,9 @@ export default function TradeResourcesPanel({
                   }`}
                   onClick={() => !isDisabled && setToType(type)}
                   disabled={isDisabled}
-                  title={GOODS_NAMES[type]}
+                  title={t(GOODS_NAMES[type])}
                 >
-                  <div className="text-xs font-medium text-center truncate">{GOODS_NAMES[type]}</div>
+                  <div className="text-xs font-medium text-center truncate">{t(GOODS_NAMES[type])}</div>
                   <div className="text-xs text-gray-600 text-center mt-0.5">×{count}</div>
                 </button>
               );

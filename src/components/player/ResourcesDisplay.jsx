@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { GOODS_TYPES, GOODS_NAMES, GOODS_COLORS, GOODS_VALUES } from '../../constants/gameData';
 import { getGoodsValue, getTotalGoodsCount } from '../../utils/gameUtils';
 
@@ -13,6 +14,7 @@ export default function ResourcesDisplay({
   onDiscardGood = null,
   onToggleGoodForPurchase = null
 }) {
+  const { t } = useTranslation();
   const displayGoodsPositions = tempGoodsPositions || goodsPositions;
   const totalGoods = getTotalGoodsCount(displayGoodsPositions);
   const goodsValue = getGoodsValue(displayGoodsPositions);
@@ -60,11 +62,11 @@ export default function ResourcesDisplay({
     <div className="flex-shrink-0 mt-2">
         <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between mb-1 gap-1'>
           <div className="text-xs sm:text-sm text-gray-700 font-semibold">
-            Biens ({totalGoods}/6)
+            {t('game.goodsOf', { current: totalGoods, max: 6 })}
           </div>
           {/* Valeur totale des biens */}
           <div className="text-xs sm:text-sm text-gray-700 font-semibold">
-            Valeur: {goodsValue}
+            {t('game.value')}: {goodsValue}
           </div>
         </div>
 
@@ -97,7 +99,7 @@ export default function ResourcesDisplay({
                 className={'flex items-start gap-1.5 ' + rowClass}
                 onClick={handleClick}
               >
-                <div className="text-xs w-16 text-gray-600 pt-0.5">{GOODS_NAMES[type]}</div>
+                <div className="text-xs w-16 text-gray-600 pt-0.5">{t(GOODS_NAMES[type])}</div>
                 <div className="flex-1 flex gap-1">
                   {/* Afficher toutes les cases existantes pour ce type */}
                   {GOODS_VALUES[type].map(function (val, idx) {
@@ -164,7 +166,7 @@ export default function ResourcesDisplay({
 
         {/* Ligne de la nourriture */}
         <div className="flex items-start gap-1.5 pt-2 border-t border-gray-300 mt-1">
-          <div className="text-xs w-16 text-gray-600 pt-0.5">Nourriture</div>
+          <div className="text-xs w-16 text-gray-600 pt-0.5 capitalize">{t('common.food')}</div>
           <div className="flex-1 flex gap-1">
             {Array(maxFood).fill(0).map(function (_, idx) {
               const value = idx + 1;

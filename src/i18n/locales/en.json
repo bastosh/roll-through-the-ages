@@ -20,7 +20,9 @@
     "registeredPlayers": "Registered Players",
     "noRegisteredPlayers": "No registered players",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "cities": "Cities",
+    "developments": "Developments"
   },
 
   "credits": {
@@ -163,6 +165,48 @@
     "smithing_invasion": "Smithing and Invasion"
   },
 
+  "phaseInfo": {
+    "rollPhase": "Roll Phase",
+    "rollNumber": "Roll {{number}}/3",
+    "clickToLockUnlock": "Click dice to lock/unlock them",
+    "chooseFoodOrWorkers": "Choose food or workers",
+    "clickDiceToChoose": "Click dice to make your choice",
+    "famineWarning": "⚠️ Famine! You will lose {{count}} point{{plural}}",
+    "citiesFed": "✓ Cities fed (remaining: {{remaining}})",
+    "feedCities": "Feed cities",
+    "famineWarningFeed": "⚠️ Famine! You will lose {{count}} point{{plural}}",
+    "citiesFedSuccess": "✅ Cities successfully fed (remaining: {{remaining}})",
+    "buildPhase": "Build phase",
+    "useAllWorkers": "⚠️ Use all your workers ({{count}} remaining)",
+    "clickCitiesMonuments": "Click on cities and monuments",
+    "engineering": "Engineering",
+    "stone": "Stone:",
+    "buyDevelopment": "Buy a development",
+    "buyDevelopmentName": "Buy: {{name}}",
+    "clickResourcesToAdd": "Click on resources to add them",
+    "developmentPurchased": "✓ {{name}} purchased",
+    "clickDevelopmentToBuy": "Click on a development to buy it",
+    "cost": "Cost:",
+    "committed": "Committed:",
+    "granaries": "Granaries",
+    "smithingInvasionTitle": "⚔️ Smithing Invasion",
+    "smithingInvasionDescription": "Choose how many Spearheads to spend to increase damage",
+    "endOfTurn": "End of turn",
+    "caravansKeepAll": "✓ Caravans: you can keep all your resources",
+    "discardResources": "⚠️ Discard {{count}} resource{{plural}} (limit: 6)",
+    "respectLimit": "✓ You respect the 6 resource limit"
+  },
+
+  "disasterEffects": {
+    "noLossIrrigation": "No loss (Irrigation)",
+    "youLosePoints": "You lose {{count}} points",
+    "opponentsWithoutMedicine": "Opponents without Medicine lose 3 points",
+    "youInvadeOpponents": "You invade your opponents! (Smithing)",
+    "protectedByWall": "Protected by the Great Wall.",
+    "opponentsWithoutReligion": "Opponents without Religion lose all their goods",
+    "youLoseAllGoods": "You lose all your goods"
+  },
+
   "dice": {
     "food": "Food",
     "workers": "Workers",
@@ -186,7 +230,14 @@
     "show": "Show",
     "skip": "Skip",
     "build": "Build",
-    "buy": "Buy"
+    "buy": "Buy",
+    "cancel": "Cancel",
+    "reroll": "Reroll",
+    "rollDice": "Roll Dice",
+    "confirm": "Confirm",
+    "finish": "Finish",
+    "preservation": "Preservation",
+    "preservationTooltip": "Spend 1 Pottery to double your food (max 15)"
   },
 
   "disasters": {
@@ -202,9 +253,11 @@
     "yourTurn": "Your turn",
     "waitingFor": "Waiting for {{player}}",
     "gameEnd": "Game Over",
+    "gameOver": "🏆 Game Over!",
     "winner": "Winner",
     "finalScores": "Final Scores",
     "backToSetup": "Back to Setup",
+    "backToHome": "Back to Home",
     "newGame": "New Game",
     "phaseRoll": "Roll Phase",
     "rollCount": "Roll {{current}}/{{total}}",
@@ -227,6 +280,31 @@
     "cannotUnlock": "Cannot unlock",
     "useLeadership": "Use Leadership",
     "leadershipReroll": "Reroll with Leadership",
-    "skipLeadership": "Don't use"
+    "skipLeadership": "Don't use",
+    "testMode": "Test Mode",
+    "testModeOn": "🧪 Test Mode ON",
+    "testModeOff": "🧪 Test Mode",
+    "turn": "Turn",
+    "turnOf": "Turn of",
+    "score": "Score",
+    "boats": "Boats",
+    "boatCost": "Cost: 1 Wood & 1 Cloth per boat.",
+    "requiresShipping": "Requires Shipping development.",
+    "clickToCancel": "Click to cancel ({{count}} pending)",
+    "clickToBuild": "Click to build ({{count}} possible)",
+    "startMyTurn": "Start my turn",
+    "lastTurn": "Last turn!",
+    "goods": "Goods",
+    "goodsOf": "Goods ({{current}}/{{max}})",
+    "value": "Value"
+  },
+
+  "gameEnd": {
+    "developmentsScore": "Developments",
+    "monumentsScore": "Monuments",
+    "bonusScore": "Bonus",
+    "disastersScore": "Disasters",
+    "totalScore": "Total",
+    "remainingResources": "Remaining resources"
   }
 }

@@ -1,4 +1,7 @@
+import { useTranslation } from 'react-i18next';
+
 export default function CityDisplay({ cities, onBuildCity, canBuild, pendingWorkers }) {
+  const { t } = useTranslation();
   const allCities = [
     { built: true, progress: 3, requiredWorkers: 3, number: 1 },
     { built: true, progress: 3, requiredWorkers: 3, number: 2 },
@@ -8,7 +11,7 @@ export default function CityDisplay({ cities, onBuildCity, canBuild, pendingWork
 
   return (
     <div className="flex-shrink-0">
-      <h3 className="text-sm font-bold mb-2 text-gray-800">Cités</h3>
+      <h3 className="text-sm font-bold mb-2 text-gray-800">{t('common.cities')}</h3>
       <div className="flex gap-1.5">
         {allCities.map(function (city, i) {
           const height = city.requiredWorkers <= 4 ? 'h-16' : 'h-20';

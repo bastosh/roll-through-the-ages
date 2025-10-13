@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { GOODS_NAMES } from '../../constants/gameData';
 
 /**
@@ -13,6 +14,7 @@ export default function SmithingInvasionPanel({
   onConfirm,
   onSkip
 }) {
+  const { t } = useTranslation();
   const maxSpearheads = currentPlayer.goodsPositions.spearheads || 0;
   const baseDamage = 4;
   const bonusDamage = spearheadsToSpend * 2;
@@ -47,7 +49,7 @@ export default function SmithingInvasionPanel({
           ⚔️ Invasion (Forge)
         </h3>
         <div className="text-sm text-gray-700 bg-white px-3 py-1 rounded-full border border-orange-200">
-          <span className="font-semibold text-orange-600">{maxSpearheads}</span> {GOODS_NAMES.spearheads} disponible{maxSpearheads > 1 ? 's' : ''}
+          <span className="font-semibold text-orange-600">{maxSpearheads}</span> {t(GOODS_NAMES.spearheads)} disponible{maxSpearheads > 1 ? 's' : ''}
         </div>
       </div>
 
@@ -57,7 +59,7 @@ export default function SmithingInvasionPanel({
           Grâce à votre <strong>Forge</strong>, vous retournez l'invasion contre vos adversaires !
         </p>
         <p>
-          Vous pouvez dépenser des <strong>{GOODS_NAMES.spearheads}</strong> pour augmenter les dégâts infligés :
+          Vous pouvez dépenser des <strong>{t(GOODS_NAMES.spearheads)}</strong> pour augmenter les dégâts infligés :
         </p>
         <ul className="list-disc list-inside mt-1 ml-2">
           <li>Dégâts de base : <strong className="text-red-600">4 points</strong></li>
@@ -69,7 +71,7 @@ export default function SmithingInvasionPanel({
       {maxSpearheads > 0 && (
         <div className="bg-white rounded-lg p-3 mb-3">
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Nombre de {GOODS_NAMES.spearheads} à dépenser :
+            Nombre de {t(GOODS_NAMES.spearheads)} à dépenser :
           </label>
           <div className="flex items-center gap-3">
             <button

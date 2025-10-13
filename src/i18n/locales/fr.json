@@ -20,7 +20,9 @@
     "registeredPlayers": "Joueurs enregistrés",
     "noRegisteredPlayers": "Aucun joueur enregistré",
     "edit": "Modifier",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "cities": "Cités",
+    "developments": "Développements"
   },
 
   "credits": {
@@ -163,6 +165,48 @@
     "smithing_invasion": "Forge et Invasion"
   },
 
+  "phaseInfo": {
+    "rollPhase": "Phase de lancer",
+    "rollNumber": "Lancer {{number}}/3",
+    "clickToLockUnlock": "Cliquez sur les dés pour les verrouiller/déverrouiller",
+    "chooseFoodOrWorkers": "Choisir nourriture ou ouvriers",
+    "clickDiceToChoose": "Cliquez sur les dés pour faire votre choix",
+    "famineWarning": "⚠️ Famine ! Vous perdrez {{count}} point{{plural}}",
+    "citiesFed": "✓ Cités nourries (reste: {{remaining}})",
+    "feedCities": "Nourrir les cités",
+    "famineWarningFeed": "⚠️ Famine ! Vous perdrez {{count}} point{{plural}}",
+    "citiesFedSuccess": "✅ Cités nourries avec succès (reste: {{remaining}})",
+    "buildPhase": "Phase de construction",
+    "useAllWorkers": "⚠️ Utilisez tous vos ouvriers ({{count}} restants)",
+    "clickCitiesMonuments": "Cliquez sur les cités et monuments",
+    "engineering": "Ingénierie",
+    "stone": "Pierre:",
+    "buyDevelopment": "Acheter un développement",
+    "buyDevelopmentName": "Acheter: {{name}}",
+    "clickResourcesToAdd": "Cliquez sur les ressources pour les ajouter",
+    "developmentPurchased": "✓ {{name}} acheté",
+    "clickDevelopmentToBuy": "Cliquez sur un développement pour l'acheter",
+    "cost": "Coût:",
+    "committed": "Engagé:",
+    "granaries": "Greniers",
+    "smithingInvasionTitle": "⚔️ Invasion de la Forge",
+    "smithingInvasionDescription": "Choisissez combien de Lances dépenser pour augmenter les dégâts",
+    "endOfTurn": "Fin du tour",
+    "caravansKeepAll": "✓ Caravanes: vous pouvez garder toutes vos ressources",
+    "discardResources": "⚠️ Défaussez {{count}} ressource{{plural}} (limite: 6)",
+    "respectLimit": "✓ Vous respectez la limite de 6 ressources"
+  },
+
+  "disasterEffects": {
+    "noLossIrrigation": "Aucune perte (Irrigation)",
+    "youLosePoints": "Vous perdez {{count}} points",
+    "opponentsWithoutMedicine": "Vos adversaires sans Médecine perdent 3 points",
+    "youInvadeOpponents": "Vous envahissez vos adversaires ! (Forge)",
+    "protectedByWall": "Protégé par la Grande Muraille.",
+    "opponentsWithoutReligion": "Vos adversaires sans Religion perdent tous leurs biens",
+    "youLoseAllGoods": "Vous perdez tous vos biens"
+  },
+
   "dice": {
     "food": "Nourriture",
     "workers": "Ouvriers",
@@ -186,7 +230,14 @@
     "show": "Afficher",
     "skip": "Passer",
     "build": "Construire",
-    "buy": "Acheter"
+    "buy": "Acheter",
+    "cancel": "Annuler",
+    "reroll": "Relancer",
+    "rollDice": "Lancer les dés",
+    "confirm": "Confirmer",
+    "finish": "Terminer",
+    "preservation": "Conservation",
+    "preservationTooltip": "Dépenser 1 Poterie pour doubler votre nourriture (max 15)"
   },
 
   "disasters": {
@@ -202,9 +253,11 @@
     "yourTurn": "C'est votre tour",
     "waitingFor": "En attente de {{player}}",
     "gameEnd": "Fin de partie",
+    "gameOver": "🏆 Partie terminée !",
     "winner": "Gagnant",
     "finalScores": "Scores finaux",
     "backToSetup": "Retour à la configuration",
+    "backToHome": "Revenir à l'accueil",
     "newGame": "Nouvelle partie",
     "phaseRoll": "Phase de lancer",
     "rollCount": "Lancer {{current}}/{{total}}",
@@ -227,6 +280,31 @@
     "cannotUnlock": "Ne peut pas être déverrouillé",
     "useLeadership": "Utiliser Leadership",
     "leadershipReroll": "Relancer avec Leadership",
-    "skipLeadership": "Ne pas utiliser"
+    "skipLeadership": "Ne pas utiliser",
+    "testMode": "Mode Test",
+    "testModeOn": "🧪 Mode Test ON",
+    "testModeOff": "🧪 Mode Test",
+    "turn": "Tour",
+    "turnOf": "Tour de",
+    "score": "Score",
+    "boats": "Bateaux",
+    "boatCost": "Coût : 1 Bois & 1 Tissu par bateau.",
+    "requiresShipping": "Nécessite le développement Navigation.",
+    "clickToCancel": "Cliquez pour annuler ({{count}} en cours)",
+    "clickToBuild": "Cliquez pour construire ({{count}} possible{{plural}})",
+    "startMyTurn": "Commencer mon tour",
+    "lastTurn": "Dernier tour !",
+    "goods": "Biens",
+    "goodsOf": "Biens ({{current}}/{{max}})",
+    "value": "Valeur"
+  },
+
+  "gameEnd": {
+    "developmentsScore": "Développements",
+    "monumentsScore": "Monuments",
+    "bonusScore": "Bonus",
+    "disastersScore": "Catastrophes",
+    "totalScore": "Total",
+    "remainingResources": "Ressources restantes"
   }
 }

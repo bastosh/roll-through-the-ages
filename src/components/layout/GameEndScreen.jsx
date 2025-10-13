@@ -1,9 +1,12 @@
+import { useTranslation } from 'react-i18next';
 import { getTotalGoodsCount } from '../../utils/gameUtils';
 
 /**
  * Composant pour l'écran de fin de partie avec les scores
  */
 export default function GameEndScreen({ players, DEVELOPMENTS, MONUMENTS }) {
+  const { t } = useTranslation();
+
   // Calculate score breakdown and resources for each player
   const playersWithDetails = players.map(function(player) {
     let developmentScore = 0;
@@ -101,7 +104,7 @@ export default function GameEndScreen({ players, DEVELOPMENTS, MONUMENTS }) {
     <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-200 p-8">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl p-8">
         <h1 className="text-4xl font-bold text-center mb-8 text-amber-800">
-          🏆 Partie terminée !
+          {t('game.gameOver')}
         </h1>
 
         {sortedPlayers.map(function(playerDetail, i) {
@@ -126,28 +129,28 @@ export default function GameEndScreen({ players, DEVELOPMENTS, MONUMENTS }) {
                 <table className="w-full text-base">
                   <tbody>
                     <tr className="border-b border-gray-200">
-                      <td className="py-2 text-gray-700">Développements</td>
+                      <td className="py-2 text-gray-700">{t('gameEnd.developmentsScore')}</td>
                       <td className="py-2 text-right font-semibold text-gray-900">{playerDetail.developmentScore}</td>
                     </tr>
                     <tr className="border-b border-gray-200">
-                      <td className="py-2 text-gray-700">Monuments</td>
+                      <td className="py-2 text-gray-700">{t('gameEnd.monumentsScore')}</td>
                       <td className="py-2 text-right font-semibold text-gray-900">+ {playerDetail.monumentScore}</td>
                     </tr>
                     <tr className="border-b border-gray-200">
-                      <td className="py-2 text-gray-700">Bonus</td>
+                      <td className="py-2 text-gray-700">{t('gameEnd.bonusScore')}</td>
                       <td className="py-2 text-right font-semibold text-gray-900">+ {playerDetail.bonusScore}</td>
                     </tr>
                     <tr className="border-b border-gray-200">
-                      <td className="py-2 text-gray-700">Catastrophes</td>
+                      <td className="py-2 text-gray-700">{t('gameEnd.disastersScore')}</td>
                       <td className="py-2 text-right font-semibold text-red-600">- {playerDetail.disasterScore}</td>
                     </tr>
                     <tr className="border-t-2 border-gray-400">
-                      <td className="py-2 text-gray-900 font-bold">Total</td>
+                      <td className="py-2 text-gray-900 font-bold">{t('gameEnd.totalScore')}</td>
                       <td className="py-2 text-right font-bold text-amber-700 text-lg">= {playerDetail.totalScore}</td>
                     </tr>
                     {showResources && (
                       <tr className="border-t border-gray-200">
-                        <td className="py-2 text-amber-700 font-semibold">Ressources restantes</td>
+                        <td className="py-2 text-amber-700 font-semibold">{t('gameEnd.remainingResources')}</td>
                         <td className="py-2 text-right font-semibold text-amber-700">{playerDetail.totalResourcesCount}</td>
                       </tr>
                     )}
@@ -162,7 +165,7 @@ export default function GameEndScreen({ players, DEVELOPMENTS, MONUMENTS }) {
           onClick={() => window.location.reload()}
           className="w-full bg-amber-600 text-white py-4 rounded-lg font-bold text-xl hover:bg-amber-700 transition mt-8 cursor-pointer"
         >
-          Nouvelle partie
+          {t('game.backToHome')}
         </button>
       </div>
     </div>

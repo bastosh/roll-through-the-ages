@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 export default function ActionButtonsBar({
   phase,
   diceResults,
@@ -30,6 +32,8 @@ export default function ActionButtonsBar({
   onUsePreservation,
   onRollInitial
 }) {
+  const { t } = useTranslation();
+
   if (phase === 'roll') {
     const hasLeadership = currentPlayer.developments.indexOf('leadership') !== -1;
     const hasPreservation = currentPlayer.developments.indexOf('preservation') !== -1;
@@ -52,13 +56,13 @@ export default function ActionButtonsBar({
             onClick={onCancelLeadership}
             className="h-12 sm:h-16 w-full sm:w-32 bg-gray-500 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-600 cursor-pointer"
           >
-            Annuler
+            {t('actions.cancel')}
           </button>
           <button
             onClick={onLeadershipReroll}
             className="h-12 sm:h-16 w-full sm:w-32 bg-purple-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-700 transition cursor-pointer"
           >
-            Relancer
+            {t('actions.reroll')}
           </button>
         </div>
       );
@@ -70,9 +74,9 @@ export default function ActionButtonsBar({
           <button
             onClick={onUsePreservation}
             className="h-12 sm:h-16 w-full sm:w-36 bg-amber-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-amber-700 cursor-pointer whitespace-nowrap"
-            title="Dépenser 1 Poterie pour doubler votre nourriture (max 15)"
+            title={t('actions.preservationTooltip')}
           >
-            Conservation
+            {t('actions.preservation')}
           </button>
         )}
         {!diceResults && !canUsePreservation && onRollInitial && (
@@ -80,7 +84,7 @@ export default function ActionButtonsBar({
             onClick={onRollInitial}
             className="h-12 sm:h-16 w-full sm:w-36 bg-blue-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-blue-700 transition cursor-pointer"
           >
-            Lancer les dés
+            {t('actions.rollDice')}
           </button>
         )}
         {!diceResults && canUsePreservation && onRollInitial && (
@@ -88,7 +92,7 @@ export default function ActionButtonsBar({
             onClick={onRollInitial}
             className="h-12 sm:h-16 w-full sm:w-32 bg-gray-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-700 transition cursor-pointer"
           >
-            Passer
+            {t('actions.skip')}
           </button>
         )}
         {canUseLeadership && (
@@ -96,7 +100,7 @@ export default function ActionButtonsBar({
             onClick={onUseLeadership}
             className="h-12 sm:h-16 w-full sm:w-32 bg-purple-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-700 transition cursor-pointer whitespace-nowrap"
           >
-            Leadership
+            {t('developments.leadership')}
           </button>
         )}
         {canReroll && (
@@ -104,7 +108,7 @@ export default function ActionButtonsBar({
             onClick={onReroll}
             className="h-12 sm:h-16 w-full sm:w-32 bg-blue-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-blue-700 transition cursor-pointer"
           >
-            Relancer
+            {t('actions.reroll')}
           </button>
         )}
         {showValidateButton && (
@@ -112,7 +116,7 @@ export default function ActionButtonsBar({
             onClick={onKeep}
             className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 transition cursor-pointer"
           >
-            Valider
+            {t('actions.validate')}
           </button>
         )}
       </div>
@@ -127,7 +131,7 @@ export default function ActionButtonsBar({
         disabled={!allChoicesMade}
         className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
       >
-        Valider
+        {t('actions.validate')}
       </button>
     );
   }
@@ -138,7 +142,7 @@ export default function ActionButtonsBar({
         onClick={onFeed}
         className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 cursor-pointer"
       >
-        OK
+        {t('common.ok')}
       </button>
     );
   }
@@ -151,14 +155,14 @@ export default function ActionButtonsBar({
           onClick={onResetBuild}
           className="h-12 sm:h-16 w-full sm:w-32 bg-gray-500 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-600 cursor-pointer"
         >
-          Annuler
+          {t('actions.cancel')}
         </button>
         <button
           onClick={onSkipBuild}
           disabled={hasWorkersRemaining}
           className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer"
         >
-          Valider
+          {t('actions.validate')}
         </button>
       </div>
     );
@@ -174,14 +178,14 @@ export default function ActionButtonsBar({
             onClick={onCancelSelection}
             className="h-12 sm:h-16 w-full sm:w-32 bg-gray-500 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-600 cursor-pointer"
           >
-            Annuler
+            {t('actions.cancel')}
           </button>
           <button
             onClick={onConfirmPurchase}
             disabled={!canPurchase}
             className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer"
           >
-            Confirmer
+            {t('actions.confirm')}
           </button>
         </div>
       );
@@ -194,14 +198,14 @@ export default function ActionButtonsBar({
             onClick={onResetBuy}
             className="h-12 sm:h-16 w-full sm:w-32 bg-gray-500 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-600 cursor-pointer"
           >
-            Annuler
+            {t('actions.cancel')}
           </button>
         )}
         <button
           onClick={onSkipBuy}
           className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 cursor-pointer"
         >
-          {hasPurchased ? 'Valider' : 'Passer'}
+          {hasPurchased ? t('actions.validate') : t('actions.skip')}
         </button>
       </div>
     );
@@ -214,7 +218,7 @@ export default function ActionButtonsBar({
         disabled={!canContinueDiscard}
         className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer"
       >
-        Terminer
+        {t('actions.finish')}
       </button>
     );
   }

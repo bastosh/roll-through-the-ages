@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 /**
  * Affiche les bateaux construits par un joueur (max 5).
  * @param {number} builtBoats - Nombre de bateaux construits (0-5)
@@ -17,6 +19,7 @@ const BoatDisplay = ({
   onBuildBoat = null,
   onUnbuildBoat = null
 }) => {
+  const { t } = useTranslation();
   const totalBoats = builtBoats + pendingBoats;
   const boats = Array.from({ length: 5 }, (_, i) => {
     if (i < builtBoats) return 'built';
@@ -40,7 +43,7 @@ const BoatDisplay = ({
 
   return (
     <div className="flex flex-col items-end ml-6 min-w-[180px]">
-      <div className="text-sm font-bold mb-1 text-gray-800">Bateaux</div>
+      <div className="text-sm font-bold mb-1 text-gray-800">{t('game.boats')}</div>
       <div
         className={`flex flex-row gap-1 mb-1 bg-gray-50 border-2 rounded-lg px-4 py-3 ${
           canInteract
@@ -65,19 +68,19 @@ const BoatDisplay = ({
       <div className="text-xs text-right text-gray-700">
         {!hasShipping ? (
           <>
-            <span className="text-red-600 font-semibold">Nécessite le développement Navigation.</span><br />
-            <span>Coût : 1 Bois & 1 Tissu par bateau.</span>
+            <span className="text-red-600 font-semibold">{t('game.requiresShipping')}</span><br />
+            <span>{t('game.boatCost')}</span>
           </>
         ) : (
           <>
-            <span>Coût : 1 Bois & 1 Tissu par bateau.</span>
+            <span>{t('game.boatCost')}</span>
             {canInteract && (
               <>
                 <br />
                 <span className="text-amber-600 font-semibold">
                   {pendingBoats > 0
-                    ? `Cliquez pour annuler (${pendingBoats} en cours)`
-                    : `Cliquez pour construire (${maxBoats} possible${maxBoats > 1 ? 's' : ''})`
+                    ? t('game.clickToCancel', { count: pendingBoats })
+                    : t('game.clickToBuild', { count: maxBoats, plural: maxBoats > 1 ? 's' : '' })
                   }
                 </span>
               </>

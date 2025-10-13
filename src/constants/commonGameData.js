@@ -3,11 +3,11 @@
 export const GOODS_TYPES = ['wood', 'stone', 'pottery', 'cloth', 'spearheads'];
 
 export const GOODS_NAMES = {
-  wood: 'Bois',
-  stone: 'Pierre',
-  pottery: 'Poterie',
-  cloth: 'Tissu',
-  spearheads: 'Lances'
+  wood: 'goods.wood',
+  stone: 'goods.stone',
+  pottery: 'goods.pottery',
+  cloth: 'goods.cloth',
+  spearheads: 'goods.spearheads'
 };
 
 export const GOODS_COLORS = {

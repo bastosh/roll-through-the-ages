@@ -1,7 +1,10 @@
+import { useTranslation } from 'react-i18next';
+
 export default function DevelopmentsList({ playerDevelopments, onBuyDevelopment, canBuy, playerGoodsValue, pendingCoins, selectedDevelopmentId, developments }) {
+  const { t } = useTranslation();
   return (
     <div className="flex-shrink-0">
-      <h3 className="text-base font-bold mb-3 text-gray-800">Développements</h3>
+      <h3 className="text-base font-bold mb-3 text-gray-800">{t('common.developments')}</h3>
       <div className="space-y-1">
         {developments.map(function (dev) {
           const isOwned = playerDevelopments.indexOf(dev.id) !== -1;

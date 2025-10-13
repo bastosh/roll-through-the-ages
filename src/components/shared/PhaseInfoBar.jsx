@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { handleDisasters } from '../../utils/gameUtils';
 import DisasterInfo from './DisasterInfo';
 export default function PhaseInfoBar({
@@ -25,6 +26,7 @@ export default function PhaseInfoBar({
   calculateSelectedValue = null,
   rollCount = 0
 }) {
+  const { t } = useTranslation();
   const hasEngineering = currentPlayer.developments.indexOf('engineering') !== -1;
   const hasGranaries = currentPlayer.developments.indexOf('granaries') !== -1;
   const totalStoneAvailable = currentPlayer.goodsPositions.stone + stoneToTradeForWorkers;
@@ -60,36 +62,36 @@ export default function PhaseInfoBar({
         handleDisasters(fakePlayers, 0, skulls);
         if (skulls === 2) {
           effect = fakePlayers[0].developments.indexOf('irrigation') !== -1
-            ? 'Aucune perte (Irrigation)'
+            ? t('disasterEffects.noLossIrrigation')
             : fakePlayers[0].disasters > currentPlayer.disasters
-              ? 'Vous perdez 2 points'
+              ? t('disasterEffects.youLosePoints', { count: 2 })
               : '';
         } else if (skulls === 3) {
-          effect = 'Vos adversaires sans Médecine perdent 3 points';
+          effect = t('disasterEffects.opponentsWithoutMedicine');
         } else if (skulls === 4) {
           const hasSmithing = fakePlayers[0].developments.indexOf('smithing') !== -1;
           const hasGreatWall = fakePlayers[0].monuments && fakePlayers[0].monuments.some(m => m.id === 'great_wall' && m.completed);
 
           if (hasSmithing) {
-            effect = 'Vous envahissez vos adversaires ! (Forge)';
+            effect = t('disasterEffects.youInvadeOpponents');
           } else if (hasGreatWall) {
-            effect = 'Protégé par la Grande Muraille.';
+            effect = t('disasterEffects.protectedByWall');
           } else {
-            effect = fakePlayers[0].disasters > currentPlayer.disasters ? 'Vous perdez 4 points' : '';
+            effect = fakePlayers[0].disasters > currentPlayer.disasters ? t('disasterEffects.youLosePoints', { count: 4 }) : '';
           }
         } else if (skulls >= 5) {
           effect = fakePlayers[0].developments.indexOf('religion') !== -1
-            ? 'Vos adversaires sans Religion perdent tous leurs biens'
-            : 'Vous perdez tous vos biens';
+            ? t('disasterEffects.opponentsWithoutReligion')
+            : t('disasterEffects.youLoseAllGoods');
         }
       } catch {
         effect = '';
       }
       let label = '';
-      if (skulls === 2) label = 'Sécheresse';
-      else if (skulls === 3) label = 'Peste';
-      else if (skulls === 4) label = 'Invasion';
-      else if (skulls >= 5) label = 'Révolte';
+      if (skulls === 2) label = t('disasters.drought');
+      else if (skulls === 3) label = t('disasters.pestilence');
+      else if (skulls === 4) label = t('disasters.invasion');
+      else if (skulls >= 5) label = t('disasters.revolt');
       disasterInfo = { icon: '💀'.repeat(skulls), label, effect };
     }
 
@@ -98,10 +100,10 @@ export default function PhaseInfoBar({
       <div className="flex flex-row items-center gap-8">
         <div className="flex flex-col justify-center min-w-[120px]">
           <div className="flex items-center gap-3">
-            <div className="text-sm font-semibold text-amber-800">Phase de lancer</div>
-            <div className="text-xs text-gray-700 font-bold bg-amber-100 rounded px-2 py-0.5">Lancer {rollCount + 1}/3</div>
+            <div className="text-sm font-semibold text-amber-800">{t('phaseInfo.rollPhase')}</div>
+            <div className="text-xs text-gray-700 font-bold bg-amber-100 rounded px-2 py-0.5">{t('phaseInfo.rollNumber', { number: rollCount + 1 })}</div>
           </div>
-          <div className="text-xs text-gray-600 leading-tight">Cliquez sur les dés pour les verrouiller/déverrouiller</div>
+          <div className="text-xs text-gray-600 leading-tight">{t('phaseInfo.clickToLockUnlock')}</div>
         </div>
         {disasterInfo && (
           <DisasterInfo skulls={skulls} label={disasterInfo.label} effect={disasterInfo.effect} />
@@ -133,14 +135,14 @@ export default function PhaseInfoBar({
     return (
       <div className="flex items-center gap-8">
         <div className="flex flex-col gap-1">
-          <div className="text-sm font-semibold text-amber-800">Choisir nourriture ou ouvriers</div>
+          <div className="text-sm font-semibold text-amber-800">{t('phaseInfo.chooseFoodOrWorkers')}</div>
           <div className="text-xs text-gray-600">
             {foodOrWorkerChoices.some(c => c === 'none') ? (
-              <span>Cliquez sur les dés pour faire votre choix</span>
+              <span>{t('phaseInfo.clickDiceToChoose')}</span>
             ) : willHaveFamine ? (
-              <span className="text-red-600 font-semibold">⚠️ Famine ! Vous perdrez {faminePoints} point{faminePoints > 1 ? 's' : ''}</span>
+              <span className="text-red-600 font-semibold">{t('phaseInfo.famineWarning', { count: faminePoints, plural: faminePoints > 1 ? 's' : '' })}</span>
             ) : (
-              <span className="text-green-600 font-semibold">✓ Cités nourries (reste: {futureFoodAfterFeeding})</span>
+              <span className="text-green-600 font-semibold">{t('phaseInfo.citiesFed', { remaining: futureFoodAfterFeeding })}</span>
             )}
           </div>
         </div>
@@ -166,12 +168,12 @@ export default function PhaseInfoBar({
     return (
       <div className="flex items-center gap-8">
         <div className="flex flex-col gap-1">
-          <div className="text-sm font-semibold text-amber-800">Nourrir les cités</div>
+          <div className="text-sm font-semibold text-amber-800">{t('phaseInfo.feedCities')}</div>
           <div className="text-xs text-gray-600">
             {hasFamine ? (
-              <span className="text-red-600 font-semibold">⚠️ Famine ! Vous perdrez {foodShortage} point{foodShortage > 1 ? 's' : ''}</span>
+              <span className="text-red-600 font-semibold">{t('phaseInfo.famineWarningFeed', { count: foodShortage, plural: foodShortage > 1 ? 's' : '' })}</span>
             ) : (
-              <span className="text-green-600 font-semibold">✅ Cités nourries avec succès (reste: {foodRemaining})</span>
+              <span className="text-green-600 font-semibold">{t('phaseInfo.citiesFedSuccess', { remaining: foodRemaining })}</span>
             )}
           </div>
         </div>
@@ -191,12 +193,12 @@ export default function PhaseInfoBar({
     return (
       <div className="flex items-center gap-8">
         <div className="flex flex-col gap-1">
-          <div className="text-sm font-semibold text-amber-800">Phase de construction</div>
+          <div className="text-sm font-semibold text-amber-800">{t('phaseInfo.buildPhase')}</div>
           <div className="text-xs text-gray-600">
             {pendingWorkers > 0 ? (
-              <span className="text-amber-600 font-semibold">⚠️ Utilisez tous vos ouvriers ({pendingWorkers} restants)</span>
+              <span className="text-amber-600 font-semibold">{t('phaseInfo.useAllWorkers', { count: pendingWorkers })}</span>
             ) : (
-              <span>Cliquez sur les cités et monuments</span>
+              <span>{t('phaseInfo.clickCitiesMonuments')}</span>
             )}
           </div>
         </div>
@@ -205,8 +207,8 @@ export default function PhaseInfoBar({
         </div>
         {hasEngineering && (
           <div className="flex items-center gap-4 bg-blue-50 border border-blue-400 rounded px-5 py-2">
-            <div className="text-base font-semibold text-blue-700">🏗️ Ingénierie</div>
-            <div className="text-sm text-gray-600">Pierre:</div>
+            <div className="text-base font-semibold text-blue-700">🏗️ {t('phaseInfo.engineering')}</div>
+            <div className="text-sm text-gray-600">{t('phaseInfo.stone')}</div>
             <button
               onClick={() => onTradeStone(Math.max(0, stoneToTradeForWorkers - 1))}
               disabled={stoneToTradeForWorkers <= 0}
@@ -241,25 +243,25 @@ export default function PhaseInfoBar({
       <div className="flex items-center gap-8">
         <div className="flex flex-col gap-1">
           <div className="text-sm font-semibold text-amber-800">
-            {selectedDevelopment ? `Acheter: ${selectedDevelopment.name}` : 'Acheter un développement'}
+            {selectedDevelopment ? t('phaseInfo.buyDevelopmentName', { name: selectedDevelopment.name }) : t('phaseInfo.buyDevelopment')}
           </div>
           <div className="text-xs text-gray-600">
             {selectedDevelopment ? (
-              <span>Cliquez sur les ressources pour les ajouter</span>
+              <span>{t('phaseInfo.clickResourcesToAdd')}</span>
             ) : hasPurchased && lastPurchasedDevelopment ? (
-              <span className="text-green-600 font-semibold">✓ {lastPurchasedDevelopment.name} acheté</span>
+              <span className="text-green-600 font-semibold">{t('phaseInfo.developmentPurchased', { name: lastPurchasedDevelopment.name })}</span>
             ) : (
-              <span>Cliquez sur un développement pour l'acheter</span>
+              <span>{t('phaseInfo.clickDevelopmentToBuy')}</span>
             )}
           </div>
         </div>
 
         {selectedDevelopment ? (
           <div className="flex items-center gap-3 bg-gray-50 border border-gray-400 rounded px-3 py-1">
-            <div className="text-gray-600">Coût:</div>
+            <div className="text-gray-600">{t('phaseInfo.cost')}</div>
             <div className="text-lg font-bold text-gray-800">{selectedDevelopment.cost} 💰</div>
             <div className="text-gray-400">|</div>
-            <div className="text-gray-600">Engagé:</div>
+            <div className="text-gray-600">{t('phaseInfo.committed')}</div>
             <div className={`text-lg font-bold ${canAfford ? 'text-green-600' : 'text-red-600'}`}>
               {selectedValue} 💰
             </div>
@@ -272,8 +274,8 @@ export default function PhaseInfoBar({
 
         {hasGranaries && !selectedDevelopment && (
           <div className="flex items-center gap-4 bg-green-50 border border-green-400 rounded px-5 py-2">
-            <div className="text-base font-semibold text-green-700">🌾 Greniers</div>
-            <div className="text-sm text-gray-600">Nourriture:</div>
+            <div className="text-base font-semibold text-green-700">🌾 {t('phaseInfo.granaries')}</div>
+            <div className="text-sm text-gray-600">{t('common.food')}:</div>
             <button
               onClick={() => onTradeFood(Math.max(0, foodToTradeForCoins - 1))}
               disabled={foodToTradeForCoins <= 0}
@@ -303,25 +305,26 @@ export default function PhaseInfoBar({
   if (phase === 'smithing_invasion') {
     return (
       <div className="flex flex-col gap-1">
-        <div className="text-sm font-semibold text-orange-800">⚔️ Invasion de la Forge</div>
+        <div className="text-sm font-semibold text-orange-800">{t('phaseInfo.smithingInvasionTitle')}</div>
         <div className="text-xs text-gray-600">
-          <span className="text-orange-600 font-semibold">Choisissez combien de Lances dépenser pour augmenter les dégâts</span>
+          <span className="text-orange-600 font-semibold">{t('phaseInfo.smithingInvasionDescription')}</span>
         </div>
       </div>
     );
   }
 
   if (phase === 'discard') {
+    const discardCount = totalGoodsCount - 6;
     return (
       <div className="flex flex-col gap-1">
-        <div className="text-sm font-semibold text-amber-800">Fin du tour</div>
+        <div className="text-sm font-semibold text-amber-800">{t('phaseInfo.endOfTurn')}</div>
         <div className="text-xs text-gray-600">
           {hasCaravans ? (
-            <span className="text-green-600 font-semibold">✓ Caravanes: vous pouvez garder toutes vos ressources</span>
+            <span className="text-green-600 font-semibold">{t('phaseInfo.caravansKeepAll')}</span>
           ) : needsToDiscard ? (
-            <span className="text-red-600 font-semibold">⚠️ Défaussez {totalGoodsCount - 6} ressource(s) (limite: 6)</span>
+            <span className="text-red-600 font-semibold">{t('phaseInfo.discardResources', { count: discardCount, plural: discardCount > 1 ? 's' : '' })}</span>
           ) : (
-            <span className="text-green-600 font-semibold">✓ Vous respectez la limite de 6 ressources</span>
+            <span className="text-green-600 font-semibold">{t('phaseInfo.respectLimit')}</span>
           )}
         </div>
       </div>
