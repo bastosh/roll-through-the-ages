@@ -14,7 +14,8 @@ export default function DiceBar({
   isSoloMode,
   variantConfig,
   onToggleLock,
-  onToggleFoodOrWorker
+  onToggleFoodOrWorker,
+  canUsePreservation
 }) {
   if (!diceResults && phase !== 'roll' && phase !== 'choose_food_or_workers') {
     return null;
@@ -68,6 +69,10 @@ export default function DiceBar({
             />
           );
         })
+      ) : canUsePreservation ? (
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-semibold text-gray-700">Utilisez Conservation ou passez pour lancer les dés</span>
+        </div>
       ) : (
         <div className="flex items-center gap-3">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>

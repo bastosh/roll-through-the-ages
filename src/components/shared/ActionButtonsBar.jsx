@@ -26,10 +26,16 @@ export default function ActionButtonsBar({
   onConfirmPurchase,
   calculateSelectedValue,
   canContinueDiscard,
-  onContinueDiscard
+  onContinueDiscard,
+  preservationUsed,
+  onUsePreservation,
+  onRollInitial
 }) {
   if (phase === 'roll') {
     const hasLeadership = currentPlayer.developments.indexOf('leadership') !== -1;
+    const hasPreservation = currentPlayer.developments.indexOf('preservation') !== -1;
+    const hasPottery = currentPlayer.goodsPositions && currentPlayer.goodsPositions.pottery > 0;
+    const canUsePreservation = hasPreservation && hasPottery && !preservationUsed && !diceResults;
     const canReroll = rollCount < 2 && diceResults && lockedDice.length < diceResults.length;
     const canUseLeadership = hasLeadership && !leadershipUsed && rollCount >= 2;
 
@@ -61,6 +67,33 @@ export default function ActionButtonsBar({
 
     return (
       <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        {canUsePreservation && (
+          <button
+            onClick={onUsePreservation}
+            className="h-12 sm:h-16 w-full sm:w-36 bg-amber-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-amber-700 cursor-pointer whitespace-nowrap"
+            title="Dépenser 1 Poterie pour doubler votre nourriture (max 15)"
+          >
+            Conservation
+          </button>
+        )}
+        {!diceResults && !canUsePreservation && onRollInitial && (
+          <button
+            onClick={onRollInitial}
+            disabled={isRolling}
+            className="h-12 sm:h-16 w-full sm:w-36 bg-blue-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
+          >
+            Lancer les dés
+          </button>
+        )}
+        {!diceResults && canUsePreservation && onRollInitial && (
+          <button
+            onClick={onRollInitial}
+            disabled={isRolling}
+            className="h-12 sm:h-16 w-full sm:w-32 bg-gray-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
+          >
+            Passer
+          </button>
+        )}
         {canUseLeadership && (
           <button
             onClick={onUseLeadership}

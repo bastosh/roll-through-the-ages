@@ -88,7 +88,7 @@ export default function PhaseInfoBar({
 
   if (phase === 'roll') {
     return (
-      <div className="flex flex-row items-center gap-12">
+      <div className="flex flex-row items-center gap-8">
         <div className="flex flex-col justify-center min-w-[120px]">
           <div className="flex items-center gap-3">
             <div className="text-sm font-semibold text-amber-800">Phase de lancer</div>
@@ -124,7 +124,7 @@ export default function PhaseInfoBar({
     const faminePoints = Math.abs(Math.min(0, futureFoodAfterFeeding));
 
     return (
-      <div className="flex items-center gap-12">
+      <div className="flex items-center gap-8">
         <div className="flex flex-col gap-1">
           <div className="text-sm font-semibold text-amber-800">Choisir nourriture ou ouvriers</div>
           <div className="text-xs text-gray-600">
@@ -157,7 +157,7 @@ export default function PhaseInfoBar({
 
   if (phase === 'feed') {
     return (
-      <div className="flex items-center gap-12">
+      <div className="flex items-center gap-8">
         <div className="flex flex-col gap-1">
           <div className="text-sm font-semibold text-amber-800">Nourrir les cités</div>
           <div className="text-xs text-gray-600">
@@ -182,7 +182,7 @@ export default function PhaseInfoBar({
 
   if (phase === 'build') {
     return (
-      <div className="flex items-center gap-12">
+      <div className="flex items-center gap-8">
         <div className="flex flex-col gap-1">
           <div className="text-sm font-semibold text-amber-800">Phase de construction</div>
           <div className="text-xs text-gray-600">
@@ -231,7 +231,7 @@ export default function PhaseInfoBar({
     const canAfford = selectedDevelopment ? selectedValue >= selectedDevelopment.cost : false;
 
     return (
-      <div className="flex items-center gap-12">
+      <div className="flex items-center gap-8">
         <div className="flex flex-col gap-1">
           <div className="text-sm font-semibold text-amber-800">
             {selectedDevelopment ? `Acheter: ${selectedDevelopment.name}` : 'Acheter un développement'}

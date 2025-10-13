@@ -101,6 +101,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
   const [testMode, setTestMode] = useState(false);
   const [gameEndTriggered, setGameEndTriggered] = useState(savedGameState?.gameEndTriggered ?? false);
   const [showPlayerTurnModal, setShowPlayerTurnModal] = useState(!isSoloMode && playerNames.length > 1 && !savedGameState);
+  const [preservationUsed, setPreservationUsed] = useState(savedGameState?.preservationUsed ?? false);
 
   const currentPlayer = players[currentPlayerIndex];
   let numDice = 3;
@@ -226,11 +227,51 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
   }
 
   // Auto-roll dice when entering roll phase (but not on initial load from saved state)
+  // UNLESS player has Preservation and can use it
   useEffect(function() {
     if (phase === 'roll' && !diceResults && !savedGameState) {
-      rollDice(true, 0);
+      const hasPreservation = currentPlayer.developments.indexOf('preservation') !== -1;
+      const hasPottery = currentPlayer.goodsPositions.pottery > 0;
+      const canUsePreservation = hasPreservation && hasPottery && !preservationUsed;
+
+      // Only auto-roll if player cannot use Preservation
+      if (!canUsePreservation) {
+        rollDice(true, 0);
+      }
     }
   }, [phase]);
+
+  function handleUsePreservation() {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+
+    // Vérifier que le joueur a Conservation et de la Poterie
+    const hasPreservation = player.developments.indexOf('preservation') !== -1;
+    const hasPottery = player.goodsPositions.pottery > 0;
+
+    if (!hasPreservation || !hasPottery || preservationUsed) {
+      return;
+    }
+
+    // Retirer 1 Poterie
+    player.goodsPositions.pottery--;
+
+    // Doubler la nourriture (max 15)
+    const newFood = Math.min(player.food * 2, 15);
+    player.food = newFood;
+
+    setPlayers(newPlayers);
+    setPreservationUsed(true);
+
+    // Lancer les dés après avoir utilisé Conservation
+    setTimeout(() => {
+      rollDice(true, 0);
+    }, 100);
+  }
+
+  function handleRollInitial() {
+    rollDice(true, 0);
+  }
 
   function handleKeep() {
     processResults(diceResults);
@@ -662,6 +703,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     setPhase('roll');
     resetForNewTurn();
     setPendingCoins(0);
+    setPreservationUsed(false);
     // Reset any ongoing trade states from hooks
     resetTrade();
     resetStone();
@@ -702,6 +744,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         pendingCoins: pendingCoins,
         gameEndTriggered: gameEndTriggered,
         leadershipUsed: leadershipUsed,
+        preservationUsed: preservationUsed,
         playerNames: playerNames,
         variantId: variantId,
         isSoloMode: isSoloMode,
@@ -728,6 +771,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     pendingCoins,
     gameEndTriggered,
     leadershipUsed,
+    preservationUsed,
     gameEnded,
     playerNames,
     variantId,
@@ -843,6 +887,12 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
             variantConfig={variantConfig}
             onToggleLock={toggleLock}
             onToggleFoodOrWorker={handleToggleFoodOrWorkerDie}
+            canUsePreservation={
+              currentPlayer.developments.indexOf('preservation') !== -1 &&
+              currentPlayer.goodsPositions.pottery > 0 &&
+              !preservationUsed &&
+              !diceResults
+            }
           />
 
           {/* Phase info bar - always visible */}
@@ -907,6 +957,9 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
               calculateSelectedValue={calculateSelectedValue}
               canContinueDiscard={!tempGoodsPositions || !currentPlayer.developments.includes('caravans') && getTotalGoodsCount(tempGoodsPositions) <= 6 || currentPlayer.developments.includes('caravans')}
               onContinueDiscard={handleContinueDiscard}
+              preservationUsed={preservationUsed}
+              onUsePreservation={handleUsePreservation}
+              onRollInitial={handleRollInitial}
             />
           </div>
         </div>
