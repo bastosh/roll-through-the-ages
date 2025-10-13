@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { DICE_FACES } from '../constants/gameData';
 
 export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer, onAutoValidate, savedState) {
@@ -10,7 +10,33 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
   const [leadershipUsed, setLeadershipUsed] = useState(savedState?.leadershipUsed ?? false);
   const [leadershipMode, setLeadershipMode] = useState(false);
 
+  // Ref to store timeout IDs so we can clear them if needed
+  const rollTimeoutRef = useRef(null);
+  const autoValidateTimeoutRef = useRef(null);
+
+  // Clean up timeouts on unmount
+  useEffect(function() {
+    return function() {
+      if (rollTimeoutRef.current) {
+        clearTimeout(rollTimeoutRef.current);
+      }
+      if (autoValidateTimeoutRef.current) {
+        clearTimeout(autoValidateTimeoutRef.current);
+      }
+    };
+  }, []);
+
   function rollDice(initial, currentRollCount) {
+    // Clear any existing timeout to avoid race conditions
+    if (rollTimeoutRef.current) {
+      clearTimeout(rollTimeoutRef.current);
+      rollTimeoutRef.current = null;
+    }
+    if (autoValidateTimeoutRef.current) {
+      clearTimeout(autoValidateTimeoutRef.current);
+      autoValidateTimeoutRef.current = null;
+    }
+
     setIsRolling(true);
     let diceToRoll = [];
 
@@ -29,7 +55,9 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
     // Set which dice are currently rolling for individual animations
     setRollingDice(diceToRoll);
 
-    setTimeout(function() {
+    rollTimeoutRef.current = setTimeout(function() {
+      rollTimeoutRef.current = null;
+
       const newResults = [...diceResults || []];
       for (let i = 0; i < diceToRoll.length; i++) {
         const idx = diceToRoll[i];
@@ -65,7 +93,8 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
 
       if ((noMoreRerolls || allDiceLocked) && !leadershipMode && !canUseLeadership) {
         // Auto-validate after a short delay
-        setTimeout(function() {
+        autoValidateTimeoutRef.current = setTimeout(function() {
+          autoValidateTimeoutRef.current = null;
           onAutoValidate(newResults);
         }, 300);
       }
