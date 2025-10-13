@@ -1,11 +1,12 @@
-export default function MonumentsGrid({ playerMonuments, onBuildMonument, canBuild, pendingWorkers, allPlayers, currentPlayerIndex, monuments }) {
+export default function MonumentsGrid({ playerMonuments, onBuildMonument, onUnbuildMonument, canBuild, pendingWorkers, allPlayers, currentPlayerIndex, monuments }) {
   return (
     <div className="flex-shrink-0">
       <h3 className="text-sm font-bold mb-2 text-gray-800">Monuments</h3>
       <div className="grid grid-cols-2 gap-2">
         {playerMonuments.map(function (m) {
           const monument = monuments.find(mon => mon.id === m.id);
-          const isClickable = canBuild && !m.completed && (pendingWorkers >= 1 || m.progress > 0);
+          const canAddWorker = canBuild && !m.completed && pendingWorkers >= 1;
+          const canRemoveWorker = canBuild && !m.completed && m.progress > 0;
 
           // Vérifier si quelqu'un d'autre a terminé ce monument en premier
           let someoneElseCompletedFirst = false;
@@ -24,13 +25,36 @@ export default function MonumentsGrid({ playerMonuments, onBuildMonument, canBui
             }
           }
 
+          const handleClick = (e) => {
+            // Clic droit pour retirer un ouvrier
+            if (e.button === 2 || e.ctrlKey || e.metaKey) {
+              e.preventDefault();
+              if (canRemoveWorker && onUnbuildMonument) {
+                onUnbuildMonument(m.id);
+              }
+            } else {
+              // Clic gauche pour ajouter un ouvrier
+              if (canAddWorker && onBuildMonument) {
+                onBuildMonument(m.id);
+              }
+            }
+          };
+
+          const handleContextMenu = (e) => {
+            if (canRemoveWorker) {
+              e.preventDefault();
+              handleClick(e);
+            }
+          };
+
           return (
             <div
               key={m.id}
               className={'border-2 rounded-lg p-2 ' + (
                 m.completed ? 'bg-purple-100 border-purple-600' : 'bg-gray-50 border-gray-300'
-              ) + (isClickable ? ' hover:bg-purple-100 hover:border-purple-500 cursor-pointer' : '')}
-              onClick={isClickable ? () => onBuildMonument(m.id) : undefined}
+              ) + ((canAddWorker || canRemoveWorker) ? ' hover:bg-purple-100 hover:border-purple-500 cursor-pointer' : '')}
+              onClick={(canAddWorker || canRemoveWorker) ? handleClick : undefined}
+              onContextMenu={canRemoveWorker ? handleContextMenu : undefined}
             >
               <div className='flex justify-between'>
                 <div>

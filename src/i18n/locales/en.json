@@ -322,6 +322,7 @@
     "requiresShipping": "Requires Shipping development.",
     "clickToCancel": "Click to cancel ({{count}} pending)",
     "clickToBuild": "Click to build ({{count}} possible)",
+    "rightClickToCancel": "Right-click to cancel ({{count}} pending)",
     "startMyTurn": "Start my turn",
     "lastTurn": "Last turn!",
     "goods": "Goods",

@@ -44,41 +44,59 @@ export function buildMonument(player, monumentId, pendingWorkers, MONUMENTS, all
   }
 
   let newPendingWorkers = pendingWorkers;
-  let triggerEndGame = false;
+  let monumentCompleted = false;
 
-  if (monument && !monument.completed) {
-    if (monument.progress > 0 && pendingWorkers === 0) {
-      // Remove a worker from monument
-      monument.progress--;
-      newPendingWorkers++;
-    } else if (pendingWorkers >= 1) {
-      // Add a worker to monument
-      monument.progress++;
-      if (monument.progress >= monumentDef.workers) {
-        monument.completed = true;
+  if (monument && !monument.completed && pendingWorkers >= 1) {
+    // Add a worker to monument
+    monument.progress++;
+    if (monument.progress >= monumentDef.workers) {
+      monument.completed = true;
+      monumentCompleted = true;
 
-        // Check if anyone else has completed this monument
-        let anyoneElseCompleted = false;
-        for (let i = 0; i < allPlayers.length; i++) {
-          if (i !== currentPlayerIndex) {
-            for (let j = 0; j < allPlayers[i].monuments.length; j++) {
-              if (allPlayers[i].monuments[j].id === monumentId && allPlayers[i].monuments[j].completed) {
-                anyoneElseCompleted = true;
-                break;
-              }
+      // Check if anyone else has completed this monument
+      let anyoneElseCompleted = false;
+      for (let i = 0; i < allPlayers.length; i++) {
+        if (i !== currentPlayerIndex) {
+          for (let j = 0; j < allPlayers[i].monuments.length; j++) {
+            if (allPlayers[i].monuments[j].id === monumentId && allPlayers[i].monuments[j].completed) {
+              anyoneElseCompleted = true;
+              break;
             }
           }
         }
-
-        if (!anyoneElseCompleted) {
-          monument.firstToComplete = true;
-        }
       }
-      newPendingWorkers--;
+
+      if (!anyoneElseCompleted) {
+        monument.firstToComplete = true;
+      }
+    }
+    newPendingWorkers--;
+  }
+
+  return { player, newPendingWorkers, monumentCompleted };
+}
+
+/**
+ * Unbuild a monument (remove a worker)
+ */
+export function unbuildMonument(player, monumentId, pendingWorkers) {
+  let monument = null;
+  for (let i = 0; i < player.monuments.length; i++) {
+    if (player.monuments[i].id === monumentId) {
+      monument = player.monuments[i];
+      break;
     }
   }
 
-  return { player, newPendingWorkers, triggerEndGame };
+  let newPendingWorkers = pendingWorkers;
+
+  if (monument && !monument.completed && monument.progress > 0) {
+    // Remove a worker from monument
+    monument.progress--;
+    newPendingWorkers++;
+  }
+
+  return { player, newPendingWorkers };
 }
 
 /**

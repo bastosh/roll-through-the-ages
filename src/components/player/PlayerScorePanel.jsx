@@ -15,6 +15,7 @@ export default function PlayerScorePanel({
   pendingCoins,
   onBuildCity,
   onBuildMonument,
+  onUnbuildMonument,
   canBuild,
   pendingWorkers,
   selectedDevelopmentId,
@@ -77,6 +78,7 @@ export default function PlayerScorePanel({
           <MonumentsGrid
             playerMonuments={player.monuments}
             onBuildMonument={onBuildMonument}
+            onUnbuildMonument={onUnbuildMonument}
             canBuild={canBuild}
             pendingWorkers={pendingWorkers}
             allPlayers={allPlayers}

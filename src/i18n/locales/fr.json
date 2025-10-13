@@ -322,6 +322,7 @@
     "requiresShipping": "Nécessite le développement Navigation.",
     "clickToCancel": "Cliquez pour annuler ({{count}} en cours)",
     "clickToBuild": "Cliquez pour construire ({{count}} possible{{plural}})",
+    "rightClickToCancel": "Clic-droit pour annuler ({{count}} en cours)",
     "startMyTurn": "Commencer mon tour",
     "lastTurn": "Dernier tour !",
     "goods": "Biens",

@@ -27,19 +27,32 @@ const BoatDisplay = ({
     return 'empty';
   });
 
-  const handleBoatClick = () => {
+  const handleBoatClick = (e) => {
     if (!canBuild || !hasShipping) return;
 
-    if (pendingBoats > 0 && onUnbuildBoat) {
-      // Si on a des bateaux en construction, cliquer annule la construction
-      onUnbuildBoat();
-    } else if (maxBoats > 0 && onBuildBoat) {
-      // Sinon, si on peut construire, on construit un bateau
-      onBuildBoat();
+    // Clic droit pour annuler la construction d'un bateau
+    if (e.button === 2 || e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      if (pendingBoats > 0 && onUnbuildBoat) {
+        onUnbuildBoat();
+      }
+    } else {
+      // Clic gauche pour construire un bateau
+      if (maxBoats > 0 && onBuildBoat) {
+        onBuildBoat();
+      }
+    }
+  };
+
+  const handleContextMenu = (e) => {
+    if (canBuild && hasShipping && pendingBoats > 0) {
+      e.preventDefault();
+      handleBoatClick(e);
     }
   };
 
   const canInteract = canBuild && hasShipping && maxBoats > 0;
+  const canUnbuild = canBuild && hasShipping && pendingBoats > 0;
 
   return (
     <div className="flex flex-col items-end ml-6 min-w-[180px]">
@@ -51,6 +64,7 @@ const BoatDisplay = ({
             : 'border-gray-300'
         }`}
         onClick={handleBoatClick}
+        onContextMenu={handleContextMenu}
       >
         {boats.map((status, idx) => (
           <div
@@ -74,15 +88,20 @@ const BoatDisplay = ({
         ) : (
           <>
             <span>{t('game.boatCost')}</span>
-            {canInteract && (
+            {(canInteract || canUnbuild) && (
               <>
                 <br />
-                <span className="text-amber-600 font-semibold">
-                  {pendingBoats > 0
-                    ? t('game.clickToCancel', { count: pendingBoats })
-                    : t('game.clickToBuild', { count: maxBoats, plural: maxBoats > 1 ? 's' : '' })
-                  }
-                </span>
+                {canInteract && (
+                  <span className="text-green-600 font-semibold">
+                    {t('game.clickToBuild', { count: maxBoats, plural: maxBoats > 1 ? 's' : '' })}
+                  </span>
+                )}
+                {canInteract && canUnbuild && <br />}
+                {canUnbuild && (
+                  <span className="text-red-600 font-semibold">
+                    {t('game.rightClickToCancel', { count: pendingBoats })}
+                  </span>
+                )}
               </>
             )}
           </>

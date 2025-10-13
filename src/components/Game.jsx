@@ -138,6 +138,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     initializeBuildPhase,
     buildCity,
     buildMonument,
+    unbuildMonument,
     checkAllMonumentsBuilt,
     resetBuild,
     canSkipBuild,
@@ -435,6 +436,15 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         }
       }
     }
+  }
+
+  function handleUnbuildMonument(monumentId) {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+
+    const result = unbuildMonument(player, monumentId, pendingWorkers);
+    setPendingWorkers(result.newPendingWorkers);
+    setPlayers(newPlayers);
   }
 
   function handleResetBuild() {
@@ -1030,6 +1040,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
             pendingCoins={pendingCoins}
             onBuildCity={handleBuildCity}
             onBuildMonument={handleBuildMonument}
+            onUnbuildMonument={handleUnbuildMonument}
             canBuild={phase === 'build'}
             pendingWorkers={pendingWorkers}
             selectedDevelopmentId={selectedDevelopmentToBuy ? selectedDevelopmentToBuy.id : null}
