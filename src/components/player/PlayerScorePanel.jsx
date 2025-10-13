@@ -114,6 +114,7 @@ export default function PlayerScorePanel({
             food={player.food}
             previewFood={previewFood}
             previewGoodsCount={previewGoodsCount}
+            developments={player.developments}
             interactionMode={interactionMode}
             tempGoodsPositions={tempGoodsPositions}
             selectedGoodsForPurchase={selectedGoodsForPurchase}

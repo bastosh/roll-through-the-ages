@@ -23,6 +23,7 @@ export function addGoods(player, count) {
   // puis on recommence en bas
 
   let resourceIndex = 0; // Commence par le bois (index 0)
+  let quarryingBonusApplied = false; // Suivi du bonus Carrière (max 1 par phase)
 
   for (let i = 0; i < count; i++) {
     // Trouver la prochaine ressource qui n'est pas au maximum
@@ -35,10 +36,11 @@ export function addGoods(player, count) {
         // On peut avancer ce marqueur
         player.goodsPositions[type]++;
 
-        // Bonus Carrière : si on ajoute de la pierre, on ajoute une pierre supplémentaire
-        if (type === 'stone' && player.developments.indexOf('quarrying') !== -1) {
+        // Bonus Carrière : si on ajoute de la pierre ET que le bonus n'a pas encore été appliqué
+        if (type === 'stone' && !quarryingBonusApplied && player.developments.indexOf('quarrying') !== -1) {
           if (player.goodsPositions.stone < GOODS_VALUES.stone.length - 1) {
             player.goodsPositions.stone++;
+            quarryingBonusApplied = true;
           }
         }
 

@@ -6,6 +6,7 @@ export default function ResourcesDisplay({
   food,
   previewFood,
   previewGoodsCount,
+  developments = [],
   interactionMode = null,
   tempGoodsPositions = null,
   selectedGoodsForPurchase = null,
@@ -23,6 +24,8 @@ export default function ResourcesDisplay({
   // Calculate preview goods positions (simulate adding goods)
   let previewGoodsPositions = { ...displayGoodsPositions };
   if (previewGoodsCount > 0) {
+    const hasQuarrying = developments.indexOf('quarrying') !== -1;
+    let quarryingBonusApplied = false; // Suivi du bonus Carrière (max 1 par phase)
     let resourceIndex = 0;
     for (let i = 0; i < previewGoodsCount; i++) {
       let attempts = 0;
@@ -32,6 +35,15 @@ export default function ResourcesDisplay({
 
         if (previewGoodsPositions[type] < maxPos) {
           previewGoodsPositions[type]++;
+
+          // Bonus Carrière : si on ajoute de la pierre ET que le bonus n'a pas encore été appliqué
+          if (type === 'stone' && !quarryingBonusApplied && hasQuarrying) {
+            if (previewGoodsPositions.stone < GOODS_VALUES.stone.length - 1) {
+              previewGoodsPositions.stone++;
+              quarryingBonusApplied = true;
+            }
+          }
+
           resourceIndex = (resourceIndex + 1) % GOODS_TYPES.length;
           break;
         }
