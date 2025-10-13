@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import DisasterWarning from '../shared/DisasterWarning';
+import { getDiceText as getTranslatedDiceText } from '../../utils/diceTextHelpers';
 
 function getDiceIcon(result, hasAgriculture, hasMasonry) {
   if (!result) return '?';
@@ -34,37 +36,6 @@ function getDiceIcon(result, hasAgriculture, hasMasonry) {
   return mainIcon;
 }
 
-function getDiceText(result, hasAgriculture, hasMasonry, hasCoinage) {
-  if (!result) return '';
-  let text = result.value.toString();
-  if (result.type === 'food') {
-    const foodValue = result.value + (hasAgriculture ? 1 : 0);
-    text = foodValue + ' nourriture';
-    if (hasAgriculture) text += ' (agriculture)';
-  }
-  if (result.type === 'goods') text = result.value + ' bien' + (result.value > 1 ? 's' : '');
-  if (result.type === 'workers') {
-    const workersValue = result.value + (hasMasonry ? 1 : 0);
-    text = workersValue + ' ouvrier' + (workersValue > 1 ? 's' : '');
-    if (hasMasonry) text += ' (maçonnerie)';
-  }
-  if (result.type === 'food_or_workers') {
-    const foodValue = result.value + (hasAgriculture ? 1 : 0);
-    const workersValue = result.value + (hasMasonry ? 1 : 0);
-    text = foodValue + ' nourriture OU ' + workersValue + ' ouvriers';
-    const bonuses = [];
-    if (hasAgriculture) bonuses.push('agriculture');
-    if (hasMasonry) bonuses.push('maçonnerie');
-    if (bonuses.length > 0) text += ' (' + bonuses.join(', ') + ')';
-  }
-  if (result.type === 'coins') {
-    const coinValue = result.value + (hasCoinage ? 5 : 0);
-    text = coinValue + ' pièces';
-    if (hasCoinage) text += ' (monnaie)';
-  }
-  return text;
-}
-
 export default function DiceRollPhase({
   diceResults,
   rollCount,
@@ -82,6 +53,7 @@ export default function DiceRollPhase({
   skullsCanBeToggled,
   isRollPhase = true
 }) {
+  const { t } = useTranslation();
   const canReroll = rollCount < 2 && lockedDice.length < diceResults.length;
   const hasAgriculture = currentPlayer.developments.indexOf('agriculture') !== -1;
   const hasMasonry = currentPlayer.developments.indexOf('masonry') !== -1;
@@ -100,14 +72,14 @@ export default function DiceRollPhase({
   return (
     <div className="h-full flex flex-col">
       {/* Titre en haut */}
-      <h3 className="text-xl font-bold mb-4 text-amber-800">Lancer de dés</h3>
+      <h3 className="text-xl font-bold mb-4 text-amber-800">{t('game.phaseRoll')}</h3>
 
       {/* Contenu principal centré */}
       <div className="flex-1 flex flex-col justify-center">
         <div className="mb-4 text-center">
-          <p className="text-lg text-gray-600">Lancer {rollCount + 1}/3</p>
+          <p className="text-lg text-gray-600">{t('game.rollCount', { current: rollCount + 1, total: 3 })}</p>
           <p className="text-sm text-gray-500 mt-1">
-            Cliquez sur un dé pour le verrouiller/déverrouiller
+            {t('game.clickToLockUnlock')}
           </p>
         </div>
 
@@ -149,7 +121,7 @@ export default function DiceRollPhase({
                   <>
                     <div className="text-4xl mb-1">{getDiceIcon(result, hasAgriculture, hasMasonry)}</div>
                     <div className="text-xs text-gray-600 text-center px-1">
-                      {getDiceText(result, hasAgriculture, hasMasonry, hasCoinage)}
+                      {getTranslatedDiceText(result, hasAgriculture, hasMasonry, hasCoinage, t)}
                     </div>
                   </>
                 )}
@@ -163,10 +135,10 @@ export default function DiceRollPhase({
           <div className="space-y-3">
             <div className="bg-purple-50 border-2 border-purple-400 rounded-lg p-3">
               <div className="text-center text-purple-700 font-bold mb-2">
-                👑 Mode Leadership
+                👑 {t('game.useLeadership')}
               </div>
               <p className="text-sm text-gray-600 text-center">
-                Déverrouillez exactement 1 dé pour le relancer
+                {t('game.clickToLockUnlock')}
               </p>
             </div>
             <button
@@ -174,13 +146,13 @@ export default function DiceRollPhase({
               disabled={isRolling}
               className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 disabled:bg-gray-400 transition cursor-pointer disabled:cursor-not-allowed"
             >
-              Relancer le dé sélectionné
+              {t('game.leadershipReroll')}
             </button>
             <button
               onClick={onCancelLeadership}
               className="w-full bg-gray-500 text-white py-3 rounded-lg font-bold hover:bg-gray-600 cursor-pointer"
             >
-              Annuler
+              {t('common.cancel')}
             </button>
           </div>
         ) : (
@@ -191,7 +163,7 @@ export default function DiceRollPhase({
                 disabled={isRolling}
                 className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-400 transition cursor-pointer disabled:cursor-not-allowed"
               >
-                Relancer les dés non verrouillés
+                {t('game.reroll')}
               </button>
             )}
             {canUseLeadership && (
@@ -200,7 +172,7 @@ export default function DiceRollPhase({
                 disabled={isRolling}
                 className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 disabled:bg-gray-400 transition cursor-pointer disabled:cursor-not-allowed"
               >
-                👑 Utiliser Leadership (relancer 1 dé)
+                👑 {t('game.useLeadership')}
               </button>
             )}
           </div>
@@ -217,7 +189,7 @@ export default function DiceRollPhase({
               disabled={isRolling}
               className="h-24 rounded-lg font-bold text-xl text-white transition flex items-center justify-center bg-green-600 hover:bg-green-700 disabled:bg-gray-400 cursor-pointer disabled:cursor-not-allowed"
             >
-              Valider
+              {t('actions.validate')}
             </button>
           </div>
         </div>
