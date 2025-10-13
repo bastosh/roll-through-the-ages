@@ -14,6 +14,7 @@ export default function PlayerScorePanel({
   canBuy,
   pendingCoins,
   onBuildCity,
+  onUnbuildCity,
   onBuildMonument,
   onUnbuildMonument,
   canBuild,
@@ -60,6 +61,7 @@ export default function PlayerScorePanel({
             <CityDisplay
               cities={player.cities}
               onBuildCity={onBuildCity}
+              onUnbuildCity={onUnbuildCity}
               canBuild={canBuild}
               pendingWorkers={pendingWorkers}
             />

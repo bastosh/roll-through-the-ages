@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-export default function CityDisplay({ cities, onBuildCity, canBuild, pendingWorkers }) {
+export default function CityDisplay({ cities, onBuildCity, onUnbuildCity, canBuild, pendingWorkers }) {
   const { t } = useTranslation();
   const allCities = [
     { built: true, progress: 3, requiredWorkers: 3, number: 1 },
@@ -16,9 +16,33 @@ export default function CityDisplay({ cities, onBuildCity, canBuild, pendingWork
         {allCities.map(function (city, i) {
           const height = city.requiredWorkers <= 4 ? 'h-16' : 'h-20';
 
-          const isClickable = canBuild && !city.built && (pendingWorkers >= 1 || city.progress > 0);
+          const canAddWorker = canBuild && !city.built && pendingWorkers >= 1;
+          const canRemoveWorker = canBuild && !city.built && city.progress > 0;
+
+          const handleClick = (e) => {
+            // Clic droit pour retirer un ouvrier
+            if (e.button === 2 || e.ctrlKey || e.metaKey) {
+              e.preventDefault();
+              if (canRemoveWorker && onUnbuildCity) {
+                onUnbuildCity(city.index);
+              }
+            } else {
+              // Clic gauche pour ajouter un ouvrier
+              if (canAddWorker && onBuildCity) {
+                onBuildCity(city.index);
+              }
+            }
+          };
+
+          const handleContextMenu = (e) => {
+            if (canRemoveWorker) {
+              e.preventDefault();
+              handleClick(e);
+            }
+          };
+
           let containerClass = '';
-          if (isClickable) {
+          if (canAddWorker || canRemoveWorker) {
             containerClass = 'cursor-pointer';
           }
 
@@ -26,11 +50,12 @@ export default function CityDisplay({ cities, onBuildCity, canBuild, pendingWork
             <div
               key={i}
               className={containerClass}
-              onClick={isClickable ? () => onBuildCity(city.index) : undefined}
+              onClick={(canAddWorker || canRemoveWorker) ? handleClick : undefined}
+              onContextMenu={canRemoveWorker ? handleContextMenu : undefined}
             >
               <div className={'border-2 rounded-lg flex flex-col items-center justify-start p-1.5 ' + height + ' ' + (
                 city.built ? 'bg-green-100 border-green-600' : 'bg-gray-50 border-gray-300'
-              ) + (isClickable ? ' hover:bg-blue-100 hover:border-blue-500' : '')}>
+              ) + ((canAddWorker || canRemoveWorker) ? ' hover:bg-blue-100 hover:border-blue-500' : '')}>
                 {city.requiredWorkers > 0 && (
                   <div className="grid grid-cols-2 gap-1">
                     {Array(city.requiredWorkers).fill(0).map(function (_, j) {

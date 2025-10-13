@@ -29,27 +29,35 @@ export function useBuildPhase() {
     const goodsPositions = { ...player.goodsPositions };
     const builtBoats = player.builtBoats || 0;
     const pendingBoats = player.pendingBoats || 0;
+    const initialStoneTraded = stoneToTradeForWorkers;
 
-    setBuildPhaseInitialState({ cities, monuments, goodsPositions, builtBoats, pendingBoats });
+    setBuildPhaseInitialState({ cities, monuments, goodsPositions, builtBoats, pendingBoats, stoneTraded: initialStoneTraded });
   }
 
   function buildCity(player, cityIndex, pendingWorkers) {
     const city = player.cities[cityIndex];
     let newPendingWorkers = pendingWorkers;
 
-    if (!city.built) {
-      if (city.progress > 0 && pendingWorkers === 0) {
-        // Remove a worker from city
-        city.progress--;
-        newPendingWorkers++;
-      } else if (pendingWorkers >= 1) {
-        // Add a worker to city
-        city.progress++;
-        if (city.progress >= city.requiredWorkers) {
-          city.built = true;
-        }
-        newPendingWorkers--;
+    if (!city.built && pendingWorkers >= 1) {
+      // Add a worker to city
+      city.progress++;
+      if (city.progress >= city.requiredWorkers) {
+        city.built = true;
       }
+      newPendingWorkers--;
+    }
+
+    return newPendingWorkers;
+  }
+
+  function unbuildCity(player, cityIndex, pendingWorkers) {
+    const city = player.cities[cityIndex];
+    let newPendingWorkers = pendingWorkers;
+
+    if (!city.built && city.progress > 0) {
+      // Remove a worker from city
+      city.progress--;
+      newPendingWorkers++;
     }
 
     return newPendingWorkers;
@@ -188,6 +196,19 @@ export function useBuildPhase() {
     player.builtBoats = buildPhaseInitialState.builtBoats;
     player.pendingBoats = buildPhaseInitialState.pendingBoats;
 
+    // Restore stone trade and adjust pending workers
+    const stoneToRestore = stoneToTradeForWorkers - (buildPhaseInitialState.stoneTraded || 0);
+    if (stoneToRestore > 0) {
+      // We traded more stone than initially, need to restore it
+      player.goodsPositions.stone += stoneToRestore;
+      workersToReturn -= stoneToRestore * 3;
+    } else if (stoneToRestore < 0) {
+      // We traded less stone than initially, need to remove it
+      player.goodsPositions.stone += stoneToRestore;
+      workersToReturn -= stoneToRestore * 3;
+    }
+    setStoneToTradeForWorkers(buildPhaseInitialState.stoneTraded || 0);
+
     return pendingWorkers + workersToReturn;
   }
 
@@ -287,6 +308,7 @@ export function useBuildPhase() {
     stoneToTradeForWorkers,
     initializeBuildPhase,
     buildCity,
+    unbuildCity,
     buildMonument,
     unbuildMonument,
     checkAllMonumentsBuilt,
