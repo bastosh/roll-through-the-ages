@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { VARIANTS } from '../../constants/variants';
 
 export default function VariantSelector({
@@ -9,12 +10,14 @@ export default function VariantSelector({
   onSetBronze2024DevCount,
   onSetIsSoloMode
 }) {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-6">
       {/* Variante du jeu */}
       <div>
         <label className="block text-lg font-semibold mb-3 text-gray-700">
-          Variante du jeu
+          {t('setup.variant')}
         </label>
         <div className="flex gap-4 flex-wrap">
           {VARIANTS.map(function(variant) {
@@ -37,23 +40,23 @@ export default function VariantSelector({
         {selectedVariant === 'bronze_age_2024' && playerCount === 2 && (
           <div className="mt-4">
             <label className="block text-md font-semibold mb-2 text-gray-700">
-              Fin de partie :
+              {t('setup.gameEndCondition')}
             </label>
             <div className="flex gap-4">
               <button
                 onClick={() => onSetBronze2024DevCount(5)}
                 className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (bronze2024DevCount === 5 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')}
               >
-                5 développements achetés
+                {t('setup.developmentsPurchased', { count: 5 })}
               </button>
               <button
                 onClick={() => onSetBronze2024DevCount(6)}
                 className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (bronze2024DevCount === 6 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')}
               >
-                6 développements achetés
+                {t('setup.developmentsPurchased', { count: 6 })}
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Choisissez à combien de développements la partie se termine.</p>
+            <p className="text-xs text-gray-500 mt-1">{t('setup.chooseEndCondition')}</p>
           </div>
         )}
       </div>
@@ -62,7 +65,7 @@ export default function VariantSelector({
       {playerCount === 1 && (
         <div>
           <label className="block text-lg font-semibold mb-3 text-gray-700">
-            Mode de jeu
+            {t('setup.gameMode')}
           </label>
           <div className="flex gap-4">
             <button
@@ -73,7 +76,7 @@ export default function VariantSelector({
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               )}
             >
-              Mode solo (10 tours)
+              {t('setup.soloMode10Turns')}
             </button>
             <button
               onClick={() => onSetIsSoloMode(false)}
@@ -83,7 +86,7 @@ export default function VariantSelector({
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               )}
             >
-              Partie libre
+              {t('setup.freePlay')}
             </button>
           </div>
         </div>

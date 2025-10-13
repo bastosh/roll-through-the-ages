@@ -1,8 +1,12 @@
+import { useTranslation } from 'react-i18next';
+
 export default function PlayerCountSelector({ playerCount, onUpdatePlayerCount }) {
+  const { t } = useTranslation();
+
   return (
     <div>
       <label className="block text-lg font-semibold mb-3 text-gray-700">
-        Nombre de joueurs
+        {t('setup.playerCount')}
       </label>
       <div className="flex gap-4">
         {[1, 2].map(function(num) {
@@ -16,7 +20,7 @@ export default function PlayerCountSelector({ playerCount, onUpdatePlayerCount }
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               )}
             >
-              {num} {num === 1 ? 'joueur' : 'joueurs'}
+              {num} {num === 1 ? t('setup.onePlayer') : t('setup.multiplePlayers')}
             </button>
           );
         })}

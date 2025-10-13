@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function PlayerHistoryList({ playerHistory, onDeletePlayer, onUpdatePlayer }) {
+  const { t } = useTranslation();
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [editedName, setEditedName] = useState('');
 
@@ -23,7 +25,7 @@ export default function PlayerHistoryList({ playerHistory, onDeletePlayer, onUpd
   }
 
   if (playerHistory.length === 0) {
-    return <p className="text-gray-500 text-sm">Aucun joueur enregistré</p>;
+    return <p className="text-gray-500 text-sm">{t('common.noRegisteredPlayers')}</p>;
   }
 
   return (
@@ -62,13 +64,13 @@ export default function PlayerHistoryList({ playerHistory, onDeletePlayer, onUpd
                   onClick={() => handleStartEdit(player.name)}
                   className="px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 cursor-pointer"
                 >
-                  Modifier
+                  {t('common.edit')}
                 </button>
                 <button
                   onClick={() => onDeletePlayer(player.name)}
                   className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 cursor-pointer"
                 >
-                  Supprimer
+                  {t('common.delete')}
                 </button>
               </>
             )}

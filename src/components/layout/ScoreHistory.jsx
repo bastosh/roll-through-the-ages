@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import { VARIANTS } from '../../constants/variants';
 import { formatDate } from '../../utils/scoreHistory';
 
 function ScoreModeSection({ title, scores }) {
+  const { t } = useTranslation();
   if (!scores || scores.length === 0) return null;
 
   return (
@@ -21,7 +23,7 @@ function ScoreModeSection({ title, scores }) {
                 <span className="font-semibold">{entry.playerName}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-amber-700">{entry.score} pts</span>
+                <span className="font-bold text-amber-700">{entry.score} {t('setup.pointsShort')}</span>
                 <span className="text-xs text-gray-500">{formatDate(entry.date)}</span>
               </div>
             </div>
@@ -33,6 +35,7 @@ function ScoreModeSection({ title, scores }) {
 }
 
 export default function ScoreHistory({ scoreHistory, selectedVariant }) {
+  const { t } = useTranslation();
   const variantScores = scoreHistory[selectedVariant];
   if (!variantScores) return null;
 
@@ -46,16 +49,16 @@ export default function ScoreHistory({ scoreHistory, selectedVariant }) {
   return (
     <div className="bg-white rounded-xl shadow-2xl p-6">
       <h2 className="text-2xl font-bold mb-4 text-amber-800 text-center">
-        🏆 Meilleurs scores - {selectedVariantConfig ? selectedVariantConfig.displayName : ''}
+        🏆 {t('setup.bestScores')} - {selectedVariantConfig ? selectedVariantConfig.displayName : ''}
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ScoreModeSection
-          title="Mode Solo"
+          title={t('setup.soloModeLabel')}
           scores={variantScores.solo}
         />
         <ScoreModeSection
-          title="Mode Multijoueur"
+          title={t('setup.multiplayerMode')}
           scores={variantScores.multi}
         />
       </div>

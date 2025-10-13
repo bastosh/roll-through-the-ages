@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 export default function PlayerNameInputs({
   playerCount,
   playerNames,
@@ -5,10 +7,12 @@ export default function PlayerNameInputs({
   onUpdatePlayerName,
   onSelectPlayerFromHistory
 }) {
+  const { t } = useTranslation();
+
   return (
     <div>
       <label className="block text-lg font-semibold mb-3 text-gray-700">
-        {playerCount === 1 ? 'Nom du joueur' : 'Noms des joueurs'}
+        {playerCount === 1 ? t('setup.playerNameSingular') : t('setup.playerNames')}
       </label>
       {playerNames.map(function(name, i) {
         return (
@@ -18,7 +22,7 @@ export default function PlayerNameInputs({
               value={name}
               onChange={(e) => onUpdatePlayerName(i, e.target.value)}
               className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none"
-              placeholder={'Joueur ' + (i + 1)}
+              placeholder={t('setup.playerNamePlaceholder', { number: i + 1 })}
               list={'player-history-' + i}
             />
             {playerHistory.length > 0 && (
