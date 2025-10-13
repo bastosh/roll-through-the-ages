@@ -3,6 +3,7 @@ import { getScoreHistory, clearScoreHistory } from '../../utils/scoreHistory';
 import { getPlayerHistory, addPlayer, removePlayer, clearPlayerHistory } from '../../utils/playerHistory';
 import { VARIANTS } from '../../constants/variants';
 import VariantDetails from '../info/VariantDetails';
+import Credits from '../info/Credits';
 import ConfigModal from './ConfigModal';
 import SavedGameBanner from './SavedGameBanner';
 import PlayerCountSelector from './PlayerCountSelector';
@@ -19,6 +20,7 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
   const [scoreHistory, setScoreHistory] = useState({});
   const [playerHistory, setPlayerHistory] = useState([]);
   const [bronze2024DevCount, setBronze2024DevCount] = useState(5);
+  const [showCredits, setShowCredits] = useState(false);
 
   useEffect(function() {
     setScoreHistory(getScoreHistory());
@@ -107,6 +109,15 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
         ⚙️
       </button>
 
+      {/* Credits Button */}
+      <button
+        onClick={() => setShowCredits(!showCredits)}
+        className="fixed h-12 w-12 top-4 right-20 bg-gray-600 text-white p-3 rounded-lg shadow-lg hover:bg-gray-700 transition cursor-pointer"
+        title="Crédits"
+      >
+        ℹ️
+      </button>
+
       <ConfigModal
         isOpen={showConfig}
         onClose={() => setShowConfig(false)}
@@ -114,6 +125,11 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
         playerHistory={playerHistory}
         onDeletePlayer={handleDeletePlayer}
         onUpdatePlayer={handleUpdatePlayer}
+      />
+
+      <Credits
+        isOpen={showCredits}
+        onClose={() => setShowCredits(false)}
       />
 
       <div className="max-w-7xl mx-auto">
