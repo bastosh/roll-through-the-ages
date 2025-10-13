@@ -89,21 +89,54 @@
   "variants": {
     "bronze_age": "The Bronze Age",
     "bronze_age_2024": "The Bronze Age (2024)",
-    "late_bronze_age": "The Late Bronze Age"
+    "late_bronze_age": "The Late Bronze Age",
+    "ancient_empires": "Ancient Empires"
   },
 
   "monuments": {
     "step_pyramid": "Step Pyramid",
-    "stone_circle": "Stonehenge",
+    "stone_circle": "Stone Circle",
     "temple": "Temple",
     "obelisk": "Obelisk",
     "hanging_gardens": "Hanging Gardens",
     "great_wall": "Great Wall",
-    "great_pyramid": "Great Pyramid"
+    "great_pyramid": "Great Pyramid",
+    "menhir": "Menhir",
+    "stonehenge_1": "Stonehenge 1",
+    "stonehenge_2": "Stonehenge 2",
+    "ishtar_gate": "Ishtar Gate",
+    "delphi_oracle": "Delphi Oracle",
+    "colossus": "Colossus",
+    "heavenly_gate": "Heavenly Gate",
+    "forbidden_city": "Forbidden City",
+    "sphinx": "Sphinx"
   },
 
   "monumentEffects": {
-    "great_wall": "Invasions no longer affect you"
+    "great_wall": "Invasions no longer affect you",
+    "delphi_oracle": "Delphi Oracle: special effect",
+    "great_pyramid": "Great Pyramid: special effect",
+    "sphinx": "Sphinx: special effect"
+  },
+
+  "cultures": {
+    "celtic": "Celtic",
+    "babylonian": "Babylonian",
+    "greek": "Greek",
+    "chinese": "Chinese",
+    "egyptian": "Egyptian"
+  },
+
+  "productionBuildings": {
+    "market": "Market",
+    "mine": "Mine",
+    "village": "Village"
+  },
+
+  "buildingBonuses": {
+    "1 good": "+1 good",
+    "1 coin": "+1 coin",
+    "1 food": "+1 food"
   },
 
   "developments": {
@@ -120,10 +153,15 @@
     "engineering": "Engineering",
     "architecture": "Architecture",
     "empire": "Empire",
+    "ancientEmpire": "Empire",
     "preservation": "Preservation",
     "smithing": "Smithing",
     "shipping": "Shipping",
-    "commerce": "Commerce"
+    "commerce": "Commerce",
+    "forestry": "Forestry",
+    "slavery": "Slavery",
+    "economy": "Economy",
+    "kingdom": "Kingdom"
   },
 
   "developmentEffects": {
@@ -143,7 +181,12 @@
     "preservation": "Spend 1 Pottery to double your food",
     "smithing": "Invasion: -4 pts to opponents. Spend Spearheads for -2 pts/spearhead",
     "shipping": "Build boats (1 Wood + 1 Cloth). Trade resources",
-    "commerce": "8 points + 1 point per good at game end"
+    "commerce": "1 bonus point per good at game end",
+    "forestry": "+1 wood if you collect wood",
+    "slavery": "+5 coins per Workers die",
+    "economy": "2 bonus points per production building",
+    "kingdom": "1 bonus point per city",
+    "ancientEmpire": "9 bonus points per completed culture"
   },
 
   "goods": {

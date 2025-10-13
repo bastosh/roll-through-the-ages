@@ -3,11 +3,13 @@
 import { BRONZE_AGE_CONFIG } from './bronzeAge';
 import { BRONZE_AGE_2024_CONFIG } from './bronzeAge2024';
 import { LATE_BRONZE_AGE_CONFIG } from './lateBronzeAge';
+import { ANCIENT_EMPIRES_CONFIG } from './ancientEmpires';
 
 export const VARIANTS = [
   BRONZE_AGE_CONFIG,
   BRONZE_AGE_2024_CONFIG,
-  LATE_BRONZE_AGE_CONFIG
+  LATE_BRONZE_AGE_CONFIG,
+  ANCIENT_EMPIRES_CONFIG
 ];
 
 export function getVariantById(variantId) {
@@ -20,4 +22,4 @@ export function getVariantById(variantId) {
 }
 
 // Export individual variants for direct access
-export { BRONZE_AGE_CONFIG, BRONZE_AGE_2024_CONFIG, LATE_BRONZE_AGE_CONFIG };
+export { BRONZE_AGE_CONFIG, BRONZE_AGE_2024_CONFIG, LATE_BRONZE_AGE_CONFIG, ANCIENT_EMPIRES_CONFIG };

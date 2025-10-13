@@ -7,6 +7,10 @@ import ResourcesDisplay from './ResourcesDisplay';
 import BoatDisplay from './BoatDisplay';
 import TradeResourcesPanel from '../phases/TradeResourcesPanel';
 import SmithingInvasionPanel from '../phases/SmithingInvasionPanel';
+import MetropolisDisplay from './MetropolisDisplay';
+import MonumentsByCulture from './MonumentsByCulture';
+import ProductionBuildingsList from './ProductionBuildingsList';
+import DevelopmentsListAncient from './DevelopmentsListAncient';
 
 export default function PlayerScorePanel({
   player,
@@ -47,9 +51,16 @@ export default function PlayerScorePanel({
   onIncrementSpearheads = null,
   onDecrementSpearheads = null,
   onConfirmSmithing = null,
-  onSkipSmithing = null
+  onSkipSmithing = null,
+  // Ancient Empires props
+  variantConfig = null,
+  onBuildMetropolis = null,
+  onUnbuildMetropolis = null,
+  onBuildProduction = null,
+  onUnbuildProduction = null
 }) {
   const goodsValue = getGoodsValue(player.goodsPositions);
+  const isAncientEmpires = variantId === 'ancient_empires';
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-2 sm:p-4 lg:h-full flex flex-col lg:overflow-hidden">
@@ -57,15 +68,26 @@ export default function PlayerScorePanel({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 lg:flex-1 lg:min-h-0">
         {/* Colonne de gauche */}
         <div className="flex flex-col lg:overflow-y-auto space-y-2">
-          <div className='flex justify-between'>
-            <CityDisplay
-              cities={player.cities}
-              onBuildCity={onBuildCity}
-              onUnbuildCity={onUnbuildCity}
-              canBuild={canBuild}
-              pendingWorkers={pendingWorkers}
-            />
-            {variantId === 'late_bronze_age' && (
+          <div className='flex justify-between gap-2'>
+            <div className='flex gap-2'>
+              <CityDisplay
+                cities={player.cities}
+                onBuildCity={onBuildCity}
+                onUnbuildCity={onUnbuildCity}
+                canBuild={canBuild}
+                pendingWorkers={pendingWorkers}
+              />
+              {isAncientEmpires && player.metropolis && (
+                <MetropolisDisplay
+                  metropolis={player.metropolis}
+                  onBuildMetropolis={onBuildMetropolis}
+                  onUnbuildMetropolis={onUnbuildMetropolis}
+                  canBuild={canBuild}
+                  pendingWorkers={pendingWorkers}
+                />
+              )}
+            </div>
+            {(variantId === 'late_bronze_age' || isAncientEmpires) && (
               <BoatDisplay
                 builtBoats={player.builtBoats || 0}
                 pendingBoats={player.pendingBoats || 0}
@@ -77,16 +99,31 @@ export default function PlayerScorePanel({
               />
             )}
           </div>
-          <MonumentsGrid
-            playerMonuments={player.monuments}
-            onBuildMonument={onBuildMonument}
-            onUnbuildMonument={onUnbuildMonument}
-            canBuild={canBuild}
-            pendingWorkers={pendingWorkers}
-            allPlayers={allPlayers}
-            currentPlayerIndex={currentPlayerIndex}
-            monuments={monuments}
-          />
+
+          {isAncientEmpires && variantConfig ? (
+            <MonumentsByCulture
+              playerMonuments={player.monuments}
+              onBuildMonument={onBuildMonument}
+              onUnbuildMonument={onUnbuildMonument}
+              canBuild={canBuild}
+              pendingWorkers={pendingWorkers}
+              allPlayers={allPlayers}
+              currentPlayerIndex={currentPlayerIndex}
+              monuments={monuments}
+              cultures={variantConfig.cultures}
+            />
+          ) : (
+            <MonumentsGrid
+              playerMonuments={player.monuments}
+              onBuildMonument={onBuildMonument}
+              onUnbuildMonument={onUnbuildMonument}
+              canBuild={canBuild}
+              pendingWorkers={pendingWorkers}
+              allPlayers={allPlayers}
+              currentPlayerIndex={currentPlayerIndex}
+              monuments={monuments}
+            />
+          )}
 
           {/* Trade panel - appears during trade phase */}
           {isTradePhase && (
@@ -129,15 +166,44 @@ export default function PlayerScorePanel({
   
         {/* Colonne de droite */}
         <div className="flex flex-col justify-between gap-3 lg:overflow-y-auto">
-          <DevelopmentsList
-            playerDevelopments={player.developments}
-            onBuyDevelopment={onBuyDevelopment}
-            canBuy={canBuy}
-            playerGoodsValue={goodsValue}
-            pendingCoins={pendingCoins}
-            selectedDevelopmentId={selectedDevelopmentId}
-            developments={developments}
-          />
+          {isAncientEmpires && variantConfig && player.productions && (
+            <ProductionBuildingsList
+              playerProductions={player.productions}
+              onBuildProduction={onBuildProduction}
+              onUnbuildProduction={onUnbuildProduction}
+              canBuild={canBuild}
+              pendingWorkers={pendingWorkers}
+              productions={variantConfig.productions}
+              citiesBuiltCount={3 + player.cities.filter(c => c.built).length}
+            />
+          )}
+
+          {isAncientEmpires && variantConfig ? (
+            <DevelopmentsListAncient
+              playerDevelopments={player.developments}
+              onBuyDevelopment={onBuyDevelopment}
+              canBuy={canBuy}
+              playerGoodsValue={goodsValue}
+              pendingCoins={pendingCoins}
+              selectedDevelopmentId={selectedDevelopmentId}
+              developments={developments}
+              playerMonuments={player.monuments}
+              playerProductions={player.productions || []}
+              hasMetropolis={player.metropolis && player.metropolis.built}
+              playerCount={allPlayers ? allPlayers.length : 1}
+            />
+          ) : (
+            <DevelopmentsList
+              playerDevelopments={player.developments}
+              onBuyDevelopment={onBuyDevelopment}
+              canBuy={canBuy}
+              playerGoodsValue={goodsValue}
+              pendingCoins={pendingCoins}
+              selectedDevelopmentId={selectedDevelopmentId}
+              developments={developments}
+            />
+          )}
+
           <DisastersDisplay disasters={player.disasters} />
         </div>
       </div>

@@ -77,6 +77,24 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         cities.push({ built: false, progress: 0, requiredWorkers: cityWorkers[j] });
       }
 
+      // Initialize metropolis for Ancient Empires
+      let metropolis = null;
+      if (variantConfig.useMetropolis) {
+        metropolis = { built: false, progress: 0, requiredWorkers: 10 };
+      }
+
+      // Initialize production buildings for Ancient Empires
+      const productions = [];
+      if (variantConfig.productions) {
+        for (let j = 0; j < variantConfig.productions.length; j++) {
+          productions.push({
+            name: variantConfig.productions[j].name,
+            built: false,
+            progress: 0
+          });
+        }
+      }
+
       return {
         name: name,
         isStartPlayer: i === 0,
@@ -88,7 +106,9 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         disasters: 0,
         score: 0,
         builtBoats: 0,
-        pendingBoats: 0
+        pendingBoats: 0,
+        metropolis: metropolis,
+        productions: productions
       };
     });
   });
@@ -1080,6 +1100,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
             onDecrementSpearheads={decrementSpearheads}
             onConfirmSmithing={handleConfirmSmithing}
             onSkipSmithing={handleSkipSmithing}
+            variantConfig={variantConfig}
           />
         </div>
 

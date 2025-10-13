@@ -57,8 +57,8 @@ const BASE_DEVELOPMENTS = [
   { id: 'medicine', discount: 'none', cost: '10 per player', points: 4 },
 
   { id: 'shipping', discount: 'none', cost: 25, points: 5 },
-  { id: 'smithing', discount: 'mine', cost: 25, points: 5 },
-  { id: 'religion', discount: 'monumement', cost: 25, points: 7 },
+  { id: 'smithing', discount: 'colossus', cost: 25, points: 5 },
+  { id: 'religion', discount: 'temple', cost: 25, points: 7 },
 
   { id: 'granaries', discount: 'village', cost: 30, points: 6 },
   { id: 'masonry', discount: 'none', cost: 30, points: 6 },
@@ -70,7 +70,7 @@ const BASE_DEVELOPMENTS = [
   { id: 'commerce', prerequisite: 'metropolis', discount: 'market', cost: 40, points: 8 },
   { id: 'architecture', prerequisite: 'metropolis', discount: 'none', cost: 60, points: 8 },
   { id: 'kingdom', prerequisite: 'metropolis', discount: 'none', cost: 70, points: 10 },
-  { id: 'empire', prerequisite: 'metropolis', discount: 'none', cost: 80, points: 10 }
+  { id: 'ancientEmpire', prerequisite: 'metropolis', discount: 'none', cost: 80, points: 10 }
 ];
 
 export const ANCIENT_EMPIRES_CONFIG = {
@@ -89,6 +89,9 @@ export const ANCIENT_EMPIRES_CONFIG = {
   soloSkullsLocked: true,
 
   useMetropolis: true,
+  metropolis: METROPOLIS,
+  productions: PRODUCTION,
+  cultures: CULTURES,
 
   // Monument restrictions - all monuments available for all player counts
   monumentRestrictions: {

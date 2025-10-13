@@ -89,21 +89,54 @@
   "variants": {
     "bronze_age": "The Bronze Age",
     "bronze_age_2024": "The Bronze Age (2024)",
-    "late_bronze_age": "The Late Bronze Age"
+    "late_bronze_age": "The Late Bronze Age",
+    "ancient_empires": "Ancient Empires"
   },
 
   "monuments": {
     "step_pyramid": "Petite Pyramide",
-    "stone_circle": "Stonehenge",
+    "stone_circle": "Cercle de pierres",
     "temple": "Temple",
     "obelisk": "Obélisque",
     "hanging_gardens": "Jardins suspendus",
     "great_wall": "Grande Muraille",
-    "great_pyramid": "Grande Pyramide"
+    "great_pyramid": "Grande Pyramide",
+    "menhir": "Menhir",
+    "stonehenge_1": "Stonehenge 1",
+    "stonehenge_2": "Stonehenge 2",
+    "ishtar_gate": "Porte d'Ishtar",
+    "delphi_oracle": "Oracle de Delphes",
+    "colossus": "Colosse",
+    "heavenly_gate": "Porte Céleste",
+    "forbidden_city": "Cité Interdite",
+    "sphinx": "Sphinx"
   },
 
   "monumentEffects": {
-    "great_wall": "Les invasions ne vous affectent plus"
+    "great_wall": "Les invasions ne vous affectent plus",
+    "delphi_oracle": "Oracle de Delphes: effet spécial",
+    "great_pyramid": "Grande Pyramide: effet spécial",
+    "sphinx": "Sphinx: effet spécial"
+  },
+
+  "cultures": {
+    "celtic": "Celtes",
+    "babylonian": "Babyloniens",
+    "greek": "Grecs",
+    "chinese": "Chinois",
+    "egyptian": "Égyptiens"
+  },
+
+  "productionBuildings": {
+    "market": "Marché",
+    "mine": "Mine",
+    "village": "Village"
+  },
+
+  "buildingBonuses": {
+    "1 good": "+1 ressource",
+    "1 coin": "+1 pièce",
+    "1 food": "+1 nourriture"
   },
 
   "developments": {
@@ -120,10 +153,15 @@
     "engineering": "Ingénierie",
     "architecture": "Architecture",
     "empire": "Empire",
+    "ancientEmpire": "Empire",
     "preservation": "Conservation",
     "smithing": "Forge",
     "shipping": "Navigation",
-    "commerce": "Commerce"
+    "commerce": "Commerce",
+    "forestry": "Scierie",
+    "slavery": "Esclavage",
+    "economy": "Économie",
+    "kingdom": "Royaume"
   },
 
   "developmentEffects": {
@@ -143,7 +181,12 @@
     "preservation": "Dépensez 1 Poterie pour doubler votre nourriture",
     "smithing": "Invasion: -4 pts aux adversaires. Dépensez des Lances pour -2 pts/lance",
     "shipping": "Construisez des navires (1 Bois + 1 Tissu). Échangez des ressources",
-    "commerce": "8 points + 1 point par ressource en fin de partie"
+    "commerce": "1 point de bonus par ressource en fin de partie",
+    "forestry": "+1 bois si vous collectez bois",
+    "slavery": "+5 pièces par dé ouvriers",
+    "economy": "2 points de bonus par bâtiment de production",
+    "kingdom": "1 point de bonus par cité",
+    "ancientEmpire": "9 points de bonus par culture complétée"
   },
 
   "goods": {
