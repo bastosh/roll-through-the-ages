@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getScoreHistory, clearScoreHistory } from '../../utils/scoreHistory';
 import { getPlayerHistory, addPlayer, removePlayer, clearPlayerHistory } from '../../utils/playerHistory';
 import { VARIANTS } from '../../constants/variants';
@@ -10,8 +11,10 @@ import PlayerCountSelector from './PlayerCountSelector';
 import PlayerNameInputs from './PlayerNameInputs';
 import VariantSelector from './VariantSelector';
 import ScoreHistory from './ScoreHistory';
+import LanguageSelector from '../shared/LanguageSelector';
 
 export default function GameSetup({ onStart, savedGameState, onResume, onClearSavedGame }) {
+  const { t } = useTranslation();
   const [playerCount, setPlayerCount] = useState(1);
   const [playerNames, setPlayerNames] = useState(['']);
   const [selectedVariant, setSelectedVariant] = useState(VARIANTS[0].id);
@@ -58,7 +61,7 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
     const filteredNames = playerNames.filter(n => n && n.trim() !== '');
 
     if (filteredNames.length === 0) {
-      alert('Veuillez saisir au moins un nom de joueur');
+      alert(t('setup.atLeastOnePlayer'));
       return;
     }
 
@@ -72,7 +75,7 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
   }
 
   function handleResetGame() {
-    if (confirm('Êtes-vous sûr de vouloir réinitialiser complètement le jeu ? Toutes les données (scores, joueurs, parties sauvegardées) seront supprimées.')) {
+    if (confirm(t('setup.resetGameConfirm'))) {
       clearScoreHistory();
       clearPlayerHistory();
       if (onClearSavedGame) {
@@ -81,12 +84,12 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
       setScoreHistory({});
       setPlayerHistory([]);
       setShowConfig(false);
-      alert('Le jeu a été réinitialisé avec succès.');
+      alert(t('setup.resetSuccess'));
     }
   }
 
   function handleDeletePlayer(playerName) {
-    if (confirm('Supprimer le joueur "' + playerName + '" de l\'historique ?')) {
+    if (confirm(t('setup.deletePlayerConfirm', { name: playerName }))) {
       removePlayer(playerName);
       setPlayerHistory(getPlayerHistory());
     }
@@ -100,11 +103,14 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-200 p-8">
+      {/* Language Selector */}
+      <LanguageSelector />
+
       {/* Config Button */}
       <button
         onClick={() => setShowConfig(!showConfig)}
         className="fixed h-12 w-12 top-4 right-4 bg-gray-600 text-white p-3 rounded-lg shadow-lg hover:bg-gray-700 transition cursor-pointer"
-        title="Configuration"
+        title={t('common.configuration')}
       >
         ⚙️
       </button>
@@ -113,7 +119,7 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
       <button
         onClick={() => setShowCredits(!showCredits)}
         className="fixed h-12 w-12 top-4 right-20 bg-gray-600 text-white p-3 rounded-lg shadow-lg hover:bg-gray-700 transition cursor-pointer"
-        title="Crédits"
+        title={t('common.credits')}
       >
         ℹ️
       </button>
@@ -140,7 +146,7 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Colonne de gauche : Configuration */}
           <div className="bg-white rounded-xl shadow-2xl p-8">
-            <h2 className="text-2xl font-bold mb-6 text-amber-800">⚙️ Configuration</h2>
+            <h2 className="text-2xl font-bold mb-6 text-amber-800">⚙️ {t('common.configuration')}</h2>
 
             <SavedGameBanner
               savedGameState={savedGameState}
@@ -177,7 +183,7 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
               onClick={handleStart}
               className="w-full bg-amber-600 text-white py-4 rounded-lg font-bold text-xl hover:bg-amber-700 transition cursor-pointer"
             >
-              Commencer la partie
+              {t('setup.startGameButton')}
             </button>
           </div>
           </div>

@@ -1,0 +1,161 @@
+{
+  "common": {
+    "startGame": "Start Game",
+    "configuration": "Configuration",
+    "credits": "Credits",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "no": "No",
+    "close": "Close",
+    "player": "Player",
+    "players": "Players",
+    "round": "Round",
+    "points": "points",
+    "workers": "workers",
+    "food": "food",
+    "coins": "coins"
+  },
+
+  "setup": {
+    "title": "Roll Through the Ages",
+    "playerCount": "Number of players",
+    "playerNames": "Player names",
+    "playerNamePlaceholder": "Player {{number}} name",
+    "variant": "Variant",
+    "soloMode": "Solo mode",
+    "startGameButton": "Start Game",
+    "resumeGame": "Resume Game",
+    "clearSavedGame": "Clear Saved Game",
+    "resetGameConfirm": "Are you sure you want to completely reset the game? All data (scores, players, saved games) will be deleted.",
+    "resetSuccess": "The game has been successfully reset.",
+    "deletePlayerConfirm": "Delete player \"{{name}}\" from history?",
+    "atLeastOnePlayer": "Please enter at least one player name",
+    "scoreHistory": "Score History",
+    "playerHistory": "Player History"
+  },
+
+  "variants": {
+    "bronze_age": "The Bronze Age",
+    "bronze_age_2024": "The Bronze Age (2024)",
+    "late_bronze_age": "The Late Bronze Age"
+  },
+
+  "monuments": {
+    "step_pyramid": "Step Pyramid",
+    "stone_circle": "Stonehenge",
+    "temple": "Temple",
+    "obelisk": "Obelisk",
+    "hanging_gardens": "Hanging Gardens",
+    "great_wall": "Great Wall",
+    "great_pyramid": "Great Pyramid"
+  },
+
+  "monumentEffects": {
+    "great_wall": "Invasions no longer affect you"
+  },
+
+  "developments": {
+    "leadership": "Leadership",
+    "irrigation": "Irrigation",
+    "agriculture": "Agriculture",
+    "quarrying": "Quarrying",
+    "medicine": "Medicine",
+    "coinage": "Coinage",
+    "caravans": "Caravans",
+    "religion": "Religion",
+    "granaries": "Granaries",
+    "masonry": "Masonry",
+    "engineering": "Engineering",
+    "architecture": "Architecture",
+    "empire": "Empire",
+    "preservation": "Preservation",
+    "smithing": "Smithing",
+    "shipping": "Shipping",
+    "commerce": "Commerce"
+  },
+
+  "developmentEffects": {
+    "leadership": "Reroll 1 die (after your 3rd roll)",
+    "irrigation": "Droughts no longer affect you",
+    "agriculture": "+1 food per Food die",
+    "quarrying": "+1 stone if you collect stone",
+    "medicine": "Pestilence no longer affects you",
+    "coinage": "Coin dice are worth 12 coins",
+    "caravans": "No need to discard goods",
+    "religion": "Revolts affect your opponents",
+    "granaries": "Trade 1 food for {{count}} coins",
+    "masonry": "+1 worker per Workers die",
+    "engineering": "Trade 1 stone for 3 workers",
+    "architecture": "{{count}} bonus point(s) per monument",
+    "empire": "1 bonus point per city",
+    "preservation": "Spend 1 Pottery to double your food",
+    "smithing": "Invasion: -4 pts to opponents. Spend Spearheads for -2 pts/spearhead",
+    "shipping": "Build boats (1 Wood + 1 Cloth). Trade resources",
+    "commerce": "8 points + 1 point per good at game end"
+  },
+
+  "goods": {
+    "wood": "Wood",
+    "stone": "Stone",
+    "pottery": "Pottery",
+    "cloth": "Cloth",
+    "spearheads": "Spearheads"
+  },
+
+  "phases": {
+    "roll": "Roll Dice",
+    "choose_food_or_workers": "Choose Food or Workers",
+    "feed": "Feed Cities",
+    "build": "Build",
+    "buy": "Buy Developments",
+    "discard": "Discard Goods",
+    "trade": "Trade Resources",
+    "smithing_invasion": "Smithing and Invasion"
+  },
+
+  "dice": {
+    "food": "Food",
+    "workers": "Workers",
+    "coins": "Coins",
+    "goods": "Goods",
+    "skull": "Skull",
+    "foodOrWorkers": "Food/Workers",
+    "locked": "Locked",
+    "unlocked": "Unlocked",
+    "rollDice": "Roll Dice",
+    "rollNumber": "Roll {{number}}",
+    "rollsRemaining": "{{count}} roll(s) remaining"
+  },
+
+  "actions": {
+    "roll": "Roll",
+    "endTurn": "End Turn",
+    "continue": "Continue",
+    "validate": "Validate",
+    "hide": "Hide",
+    "show": "Show",
+    "skip": "Skip",
+    "build": "Build",
+    "buy": "Buy"
+  },
+
+  "disasters": {
+    "title": "Disasters",
+    "drought": "Drought",
+    "pestilence": "Pestilence",
+    "invasion": "Invasion",
+    "revolt": "Revolt",
+    "points": "{{count}} disaster point(s)"
+  },
+
+  "game": {
+    "yourTurn": "Your turn",
+    "waitingFor": "Waiting for {{player}}",
+    "gameEnd": "Game Over",
+    "winner": "Winner",
+    "finalScores": "Final Scores",
+    "backToSetup": "Back to Setup",
+    "newGame": "New Game"
+  }
+}

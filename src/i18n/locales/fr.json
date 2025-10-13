@@ -1,0 +1,161 @@
+{
+  "common": {
+    "startGame": "Commencer la partie",
+    "configuration": "Configuration",
+    "credits": "Crédits",
+    "ok": "OK",
+    "cancel": "Annuler",
+    "yes": "Oui",
+    "no": "Non",
+    "close": "Fermer",
+    "player": "Joueur",
+    "players": "Joueurs",
+    "round": "Manche",
+    "points": "points",
+    "workers": "ouvriers",
+    "food": "nourriture",
+    "coins": "pièces"
+  },
+
+  "setup": {
+    "title": "Roll Through the Ages",
+    "playerCount": "Nombre de joueurs",
+    "playerNames": "Noms des joueurs",
+    "playerNamePlaceholder": "Nom du joueur {{number}}",
+    "variant": "Variante",
+    "soloMode": "Mode solo",
+    "startGameButton": "Commencer la partie",
+    "resumeGame": "Reprendre la partie",
+    "clearSavedGame": "Supprimer la sauvegarde",
+    "resetGameConfirm": "Êtes-vous sûr de vouloir réinitialiser complètement le jeu ? Toutes les données (scores, joueurs, parties sauvegardées) seront supprimées.",
+    "resetSuccess": "Le jeu a été réinitialisé avec succès.",
+    "deletePlayerConfirm": "Supprimer le joueur \"{{name}}\" de l'historique ?",
+    "atLeastOnePlayer": "Veuillez saisir au moins un nom de joueur",
+    "scoreHistory": "Historique des scores",
+    "playerHistory": "Historique des joueurs"
+  },
+
+  "variants": {
+    "bronze_age": "The Bronze Age",
+    "bronze_age_2024": "The Bronze Age (2024)",
+    "late_bronze_age": "The Late Bronze Age"
+  },
+
+  "monuments": {
+    "step_pyramid": "Petite Pyramide",
+    "stone_circle": "Stonehenge",
+    "temple": "Temple",
+    "obelisk": "Obélisque",
+    "hanging_gardens": "Jardins suspendus",
+    "great_wall": "Grande Muraille",
+    "great_pyramid": "Grande Pyramide"
+  },
+
+  "monumentEffects": {
+    "great_wall": "Les invasions ne vous affectent plus"
+  },
+
+  "developments": {
+    "leadership": "Leadership",
+    "irrigation": "Irrigation",
+    "agriculture": "Agriculture",
+    "quarrying": "Carrière",
+    "medicine": "Médecine",
+    "coinage": "Monnaie",
+    "caravans": "Caravanes",
+    "religion": "Religion",
+    "granaries": "Greniers",
+    "masonry": "Maçonnerie",
+    "engineering": "Ingénierie",
+    "architecture": "Architecture",
+    "empire": "Empire",
+    "preservation": "Conservation",
+    "smithing": "Forge",
+    "shipping": "Navigation",
+    "commerce": "Commerce"
+  },
+
+  "developmentEffects": {
+    "leadership": "Relancez 1 dé (après votre 3e lancer)",
+    "irrigation": "La sécheresse ne vous affecte plus",
+    "agriculture": "+ 1 nourriture par dé Nourriture",
+    "quarrying": "+1 pierre si vous collectez de la pierre",
+    "medicine": "La peste ne vous affecte plus",
+    "coinage": "Les dés Pièce valent 12 pièces",
+    "caravans": "Plus aucune ressource à défausser",
+    "religion": "La révolte affecte vos adversaires",
+    "granaries": "Échangez 1 nourriture contre {{count}} pièces",
+    "masonry": "+1 ouvrier par dé Ouvriers",
+    "engineering": "Échangez 1 pierre contre 3 ouvriers",
+    "architecture": "{{count}} point(s) de bonus par monument",
+    "empire": "1 point de bonus par cité",
+    "preservation": "Dépensez 1 Poterie pour doubler votre nourriture",
+    "smithing": "Invasion: -4 pts aux adversaires. Dépensez des Lances pour -2 pts/lance",
+    "shipping": "Construisez des navires (1 Bois + 1 Tissu). Échangez des ressources",
+    "commerce": "8 points + 1 point par ressource en fin de partie"
+  },
+
+  "goods": {
+    "wood": "Bois",
+    "stone": "Pierre",
+    "pottery": "Poterie",
+    "cloth": "Tissu",
+    "spearheads": "Lances"
+  },
+
+  "phases": {
+    "roll": "Lancer de dés",
+    "choose_food_or_workers": "Choisir Nourriture ou Ouvriers",
+    "feed": "Nourrir les cités",
+    "build": "Construction",
+    "buy": "Achat de développements",
+    "discard": "Défausse de ressources",
+    "trade": "Échange de ressources",
+    "smithing_invasion": "Forge et Invasion"
+  },
+
+  "dice": {
+    "food": "Nourriture",
+    "workers": "Ouvriers",
+    "coins": "Pièces",
+    "goods": "Ressources",
+    "skull": "Crâne",
+    "foodOrWorkers": "Nourriture/Ouvriers",
+    "locked": "Verrouillé",
+    "unlocked": "Déverrouillé",
+    "rollDice": "Lancer les dés",
+    "rollNumber": "Lancer {{number}}",
+    "rollsRemaining": "{{count}} lancer(s) restant(s)"
+  },
+
+  "actions": {
+    "roll": "Lancer",
+    "endTurn": "Terminer le tour",
+    "continue": "Continuer",
+    "validate": "Valider",
+    "hide": "Masquer",
+    "show": "Afficher",
+    "skip": "Passer",
+    "build": "Construire",
+    "buy": "Acheter"
+  },
+
+  "disasters": {
+    "title": "Désastres",
+    "drought": "Sécheresse",
+    "pestilence": "Peste",
+    "invasion": "Invasion",
+    "revolt": "Révolte",
+    "points": "{{count}} point(s) de désastre"
+  },
+
+  "game": {
+    "yourTurn": "C'est votre tour",
+    "waitingFor": "En attente de {{player}}",
+    "gameEnd": "Fin de partie",
+    "winner": "Gagnant",
+    "finalScores": "Scores finaux",
+    "backToSetup": "Retour à la configuration",
+    "newGame": "Nouvelle partie"
+  }
+}
