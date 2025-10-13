@@ -6,7 +6,7 @@ export const GOODS_NAMES = {
   wood: 'Bois',
   stone: 'Pierre',
   pottery: 'Poterie',
-  cloth: 'Vêtements',
+  cloth: 'Tissu',
   spearheads: 'Lances'
 };
 

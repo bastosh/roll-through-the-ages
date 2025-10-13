@@ -25,7 +25,12 @@ export function useBuildPhase() {
         firstToComplete: player.monuments[i].firstToComplete
       });
     }
-    setBuildPhaseInitialState({ cities, monuments });
+    // Sauvegarder l'état initial des ressources et bateaux
+    const goodsPositions = { ...player.goodsPositions };
+    const builtBoats = player.builtBoats || 0;
+    const pendingBoats = player.pendingBoats || 0;
+
+    setBuildPhaseInitialState({ cities, monuments, goodsPositions, builtBoats, pendingBoats });
   }
 
   function buildCity(player, cityIndex, pendingWorkers) {
@@ -164,6 +169,11 @@ export function useBuildPhase() {
       }
     }
 
+    // Restore goods and boats
+    player.goodsPositions = { ...buildPhaseInitialState.goodsPositions };
+    player.builtBoats = buildPhaseInitialState.builtBoats;
+    player.pendingBoats = buildPhaseInitialState.pendingBoats;
+
     return pendingWorkers + workersToReturn;
   }
 
@@ -195,6 +205,64 @@ export function useBuildPhase() {
     setStoneToTradeForWorkers(0);
   }
 
+  /**
+   * Calcule le nombre de bateaux pouvant être construits avec les ressources disponibles
+   */
+  function calculateMaxBoats(player) {
+    // Vérifier si le joueur a le développement "shipping"
+    const hasShipping = player.developments && player.developments.indexOf('shipping') !== -1;
+    if (!hasShipping) return 0;
+
+    const wood = player.goodsPositions.wood || 0;
+    const cloth = player.goodsPositions.cloth || 0;
+    const currentBoats = player.builtBoats || 0;
+    const maxBoats = 5; // Maximum de 5 bateaux
+    const remainingSlots = maxBoats - currentBoats;
+    const maxFromResources = Math.min(wood, cloth);
+    return Math.min(maxFromResources, remainingSlots);
+  }
+
+  /**
+   * Construit des bateaux (chaque bateau coûte 1 Bois + 1 Tissu)
+   */
+  function buildBoats(player, count) {
+    if (count <= 0) return;
+
+    const maxBoats = calculateMaxBoats(player);
+    const boatsToBuild = Math.min(count, maxBoats);
+
+    if (boatsToBuild > 0) {
+      player.goodsPositions.wood -= boatsToBuild;
+      player.goodsPositions.cloth -= boatsToBuild;
+      player.pendingBoats = (player.pendingBoats || 0) + boatsToBuild;
+    }
+  }
+
+  /**
+   * Annule la construction de bateaux pendant cette phase
+   */
+  function unbuildBoats(player, count) {
+    if (count <= 0 || !player.pendingBoats) return;
+
+    const boatsToUnbuild = Math.min(count, player.pendingBoats);
+
+    if (boatsToUnbuild > 0) {
+      player.goodsPositions.wood += boatsToUnbuild;
+      player.goodsPositions.cloth += boatsToUnbuild;
+      player.pendingBoats -= boatsToUnbuild;
+    }
+  }
+
+  /**
+   * Confirme la construction des bateaux en cours
+   */
+  function confirmBoats(player) {
+    if (player.pendingBoats > 0) {
+      player.builtBoats = (player.builtBoats || 0) + player.pendingBoats;
+      player.pendingBoats = 0;
+    }
+  }
+
   function resetPhase() {
     setBuildPhaseInitialState(null);
     setStoneToTradeForWorkers(0);
@@ -211,6 +279,10 @@ export function useBuildPhase() {
     canSkipBuild,
     tradeStone,
     resetStone,
+    calculateMaxBoats,
+    buildBoats,
+    unbuildBoats,
+    confirmBoats,
     resetPhase
   };
 }

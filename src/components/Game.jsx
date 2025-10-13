@@ -8,6 +8,7 @@ import { useBuildPhase } from '../hooks/useBuildPhase';
 import { useBuyPhase } from '../hooks/useBuyPhase';
 import { useFoodOrWorkersPhase } from '../hooks/useFoodOrWorkersPhase';
 import { useDiscardPhase } from '../hooks/useDiscardPhase';
+import { useTradePhase } from '../hooks/useTradePhase';
 import { feedCities, processRollResults } from '../utils/phaseHandlers';
 import PlayerScorePanel from './PlayerScorePanel';
 import PhaseInfoBar from './shared/PhaseInfoBar';
@@ -82,7 +83,9 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         monuments: monuments,
         developments: [],
         disasters: 0,
-        score: 0
+        score: 0,
+        builtBoats: 0,
+        pendingBoats: 0
       };
     });
   });
@@ -137,6 +140,10 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     canSkipBuild,
     tradeStone,
     resetStone,
+    calculateMaxBoats,
+    buildBoats,
+    unbuildBoats,
+    confirmBoats,
     resetPhase: resetBuildPhase
   } = buildPhaseHook;
 
@@ -179,6 +186,16 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     confirmDiscard,
     resetPhase: resetDiscardPhase
   } = discardPhaseHook;
+
+  // Use trade phase hook
+  const tradePhaseHook = useTradePhase();
+  const {
+    tradesUsed,
+    initializeTradePhase,
+    tradeResource,
+    resetTrades,
+    resetPhase: resetTradePhase
+  } = tradePhaseHook;
 
   // Get Granaries exchange rate from development effect
   function getGranariesRate() {
@@ -376,9 +393,58 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
       return;
     }
 
+    // Confirm boats built during this phase
+    const newPlayers = [...players];
+    confirmBoats(newPlayers[currentPlayerIndex]);
+    setPlayers(newPlayers);
+
     setPendingWorkers(0);
     setPendingFoodOrWorkers(0);
     resetStone();
+
+    // If variant is Late Bronze Age, player has shipping development and boats, go to trade phase
+    const hasShipping = newPlayers[currentPlayerIndex].developments.indexOf('shipping') !== -1;
+    if (variantId === 'late_bronze_age' && hasShipping && newPlayers[currentPlayerIndex].builtBoats > 0) {
+      initializeTradePhase(newPlayers[currentPlayerIndex]);
+      setPhase('trade');
+    } else {
+      skipToBuyPhase();
+    }
+  }
+
+  function handleBuildBoat() {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+    buildBoats(player, 1);
+    setPlayers(newPlayers);
+  }
+
+  function handleUnbuildBoat() {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+    unbuildBoats(player, 1);
+    setPlayers(newPlayers);
+  }
+
+  function handleTradeResource(fromType, toType) {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+    const success = tradeResource(player, fromType, toType);
+    if (success) {
+      setPlayers(newPlayers);
+    }
+    return success;
+  }
+
+  function handleResetTrades() {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+    resetTrades(player);
+    setPlayers(newPlayers);
+  }
+
+  function handleSkipTrade() {
+    resetTradePhase();
     skipToBuyPhase();
   }
 
@@ -869,6 +935,14 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
             onDiscardGood={handleDiscardGood}
             onToggleGoodForPurchase={handleToggleGoodForPurchase}
             variantId={variantId}
+            maxBoats={calculateMaxBoats(currentPlayer)}
+            onBuildBoat={handleBuildBoat}
+            onUnbuildBoat={handleUnbuildBoat}
+            isTradePhase={phase === 'trade'}
+            tradesUsed={tradesUsed}
+            onTrade={handleTradeResource}
+            onResetTrades={handleResetTrades}
+            onSkipTrade={handleSkipTrade}
           />
         </div>
 

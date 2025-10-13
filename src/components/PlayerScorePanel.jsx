@@ -5,6 +5,7 @@ import MonumentsGrid from './MonumentsGrid';
 import DisastersDisplay from './DisastersDisplay';
 import ResourcesDisplay from './ResourcesDisplay';
 import BoatDisplay from './BoatDisplay';
+import TradeResourcesPanel from './TradeResourcesPanel';
 
 export default function PlayerScorePanel({
   player,
@@ -27,7 +28,16 @@ export default function PlayerScorePanel({
   selectedGoodsForPurchase = null,
   onDiscardGood = null,
   onToggleGoodForPurchase = null,
-  variantId = null
+  variantId = null,
+  maxBoats = 0,
+  onBuildBoat = null,
+  onUnbuildBoat = null,
+  // Trade phase props
+  isTradePhase = false,
+  tradesUsed = 0,
+  onTrade = null,
+  onResetTrades = null,
+  onSkipTrade = null
 }) {
   const goodsValue = getGoodsValue(player.goodsPositions);
 
@@ -37,7 +47,7 @@ export default function PlayerScorePanel({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 lg:flex-1 lg:min-h-0">
         {/* Colonne de gauche */}
         <div className="flex flex-col lg:overflow-y-auto space-y-2">
-          <div className='flex justify-between items-center'>
+          <div className='flex justify-between'>
             <CityDisplay
               cities={player.cities}
               onBuildCity={onBuildCity}
@@ -45,7 +55,15 @@ export default function PlayerScorePanel({
               pendingWorkers={pendingWorkers}
             />
             {variantId === 'late_bronze_age' && (
-              <BoatDisplay builtBoats={player.builtBoats || 0} />
+              <BoatDisplay
+                builtBoats={player.builtBoats || 0}
+                pendingBoats={player.pendingBoats || 0}
+                canBuild={canBuild}
+                maxBoats={maxBoats}
+                hasShipping={player.developments.includes('shipping')}
+                onBuildBoat={onBuildBoat}
+                onUnbuildBoat={onUnbuildBoat}
+              />
             )}
           </div>
           <MonumentsGrid
@@ -57,6 +75,18 @@ export default function PlayerScorePanel({
             currentPlayerIndex={currentPlayerIndex}
             monuments={monuments}
           />
+
+          {/* Trade panel - appears during trade phase */}
+          {isTradePhase && (
+            <TradeResourcesPanel
+              player={player}
+              tradesUsed={tradesUsed}
+              onTrade={onTrade}
+              onReset={onResetTrades}
+              onSkip={onSkipTrade}
+            />
+          )}
+
           <ResourcesDisplay
             goodsPositions={player.goodsPositions}
             food={player.food}
