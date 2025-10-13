@@ -5,21 +5,15 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
   const [diceResults, setDiceResults] = useState(savedState?.diceResults ?? null);
   const [rollCount, setRollCount] = useState(savedState?.rollCount ?? 0);
   const [lockedDice, setLockedDice] = useState(savedState?.lockedDice ?? []);
-  const [isRolling, setIsRolling] = useState(false);
-  const [rollingDice, setRollingDice] = useState([]);
   const [leadershipUsed, setLeadershipUsed] = useState(savedState?.leadershipUsed ?? false);
   const [leadershipMode, setLeadershipMode] = useState(false);
 
-  // Ref to store timeout IDs so we can clear them if needed
-  const rollTimeoutRef = useRef(null);
+  // Ref to store timeout ID for auto-validate
   const autoValidateTimeoutRef = useRef(null);
 
-  // Clean up timeouts on unmount
+  // Clean up timeout on unmount
   useEffect(function() {
     return function() {
-      if (rollTimeoutRef.current) {
-        clearTimeout(rollTimeoutRef.current);
-      }
       if (autoValidateTimeoutRef.current) {
         clearTimeout(autoValidateTimeoutRef.current);
       }
@@ -27,17 +21,12 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
   }, []);
 
   function rollDice(initial, currentRollCount) {
-    // Clear any existing timeout to avoid race conditions
-    if (rollTimeoutRef.current) {
-      clearTimeout(rollTimeoutRef.current);
-      rollTimeoutRef.current = null;
-    }
+    // Clear any existing auto-validate timeout to avoid race conditions
     if (autoValidateTimeoutRef.current) {
       clearTimeout(autoValidateTimeoutRef.current);
       autoValidateTimeoutRef.current = null;
     }
 
-    setIsRolling(true);
     let diceToRoll = [];
 
     if (initial) {
@@ -52,53 +41,45 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
       }
     }
 
-    // Set which dice are currently rolling for individual animations
-    setRollingDice(diceToRoll);
+    // Generate new results immediately
+    const newResults = [...diceResults || []];
+    for (let i = 0; i < diceToRoll.length; i++) {
+      const idx = diceToRoll[i];
+      newResults[idx] = DICE_FACES[Math.floor(Math.random() * 6)];
+    }
+    setDiceResults(newResults);
 
-    rollTimeoutRef.current = setTimeout(function() {
-      rollTimeoutRef.current = null;
-
-      const newResults = [...diceResults || []];
-      for (let i = 0; i < diceToRoll.length; i++) {
-        const idx = diceToRoll[i];
-        newResults[idx] = DICE_FACES[Math.floor(Math.random() * 6)];
-      }
-      setDiceResults(newResults);
-      setIsRolling(false);
-      setRollingDice([]);
-
-      // Skulls auto-locked unless in solo mode AND variant allows rerolling skulls
-      const shouldLockSkulls = !isSoloMode || variantConfig.soloSkullsLocked;
-      let newLockedDice = [...lockedDice];
-      if (shouldLockSkulls) {
-        for (let i = 0; i < newResults.length; i++) {
-          const result = newResults[i];
-          if (result && result.skulls > 0 && newLockedDice.indexOf(i) === -1) {
-            newLockedDice.push(i);
-          }
+    // Skulls auto-locked unless in solo mode AND variant allows rerolling skulls
+    const shouldLockSkulls = !isSoloMode || variantConfig.soloSkullsLocked;
+    let newLockedDice = [...lockedDice];
+    if (shouldLockSkulls) {
+      for (let i = 0; i < newResults.length; i++) {
+        const result = newResults[i];
+        if (result && result.skulls > 0 && newLockedDice.indexOf(i) === -1) {
+          newLockedDice.push(i);
         }
-        setLockedDice(newLockedDice);
       }
+      setLockedDice(newLockedDice);
+    }
 
-      // Auto-validate if:
-      // 1. No more rerolls available (currentRollCount will be 2 after the 3rd roll)
-      // 2. OR all dice are locked
-      // BUT only if Leadership is not available (doesn't have it OR already used it)
-      const hasLeadership = newResults.length > 0 && currentPlayer.developments.indexOf('leadership') !== -1;
-      const canUseLeadership = hasLeadership && !leadershipUsed;
-      const allDiceLocked = newLockedDice.length >= newResults.length;
+    // Auto-validate if:
+    // 1. No more rerolls available (currentRollCount will be 2 after the 3rd roll)
+    // 2. OR all dice are locked
+    // BUT only if Leadership is not available (doesn't have it OR already used it)
+    const hasLeadership = newResults.length > 0 && currentPlayer.developments.indexOf('leadership') !== -1;
+    const canUseLeadership = hasLeadership && !leadershipUsed;
+    const allDiceLocked = newLockedDice.length >= newResults.length;
 
-      // Check if we can reroll after this roll (rollCount starts at 0, after 3rd roll currentRollCount is 2)
-      const noMoreRerolls = currentRollCount >= 2;
+    // Check if we can reroll after this roll (rollCount starts at 0, after 3rd roll currentRollCount is 2)
+    const noMoreRerolls = currentRollCount >= 2;
 
-      if ((noMoreRerolls || allDiceLocked) && !leadershipMode && !canUseLeadership) {
-        // Auto-validate after a short delay
-        autoValidateTimeoutRef.current = setTimeout(function() {
-          autoValidateTimeoutRef.current = null;
-          onAutoValidate(newResults);
-        }, 300);
-      }
-    }, 600);
+    if ((noMoreRerolls || allDiceLocked) && !leadershipMode && !canUseLeadership) {
+      // Auto-validate after a short delay
+      autoValidateTimeoutRef.current = setTimeout(function() {
+        autoValidateTimeoutRef.current = null;
+        onAutoValidate(newResults);
+      }, 300);
+    }
   }
 
   function toggleLock(index) {
@@ -172,8 +153,6 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
     setDiceResults(null);
     setRollCount(0);
     setLockedDice([]);
-    setIsRolling(false);
-    setRollingDice([]);
     setLeadershipUsed(false);
     setLeadershipMode(false);
   }
@@ -183,8 +162,6 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
     diceResults,
     rollCount,
     lockedDice,
-    isRolling,
-    rollingDice,
     leadershipUsed,
     leadershipMode,
     // Actions

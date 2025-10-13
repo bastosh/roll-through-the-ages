@@ -115,8 +115,6 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     diceResults,
     rollCount,
     lockedDice,
-    isRolling,
-    rollingDice,
     leadershipUsed,
     leadershipMode,
     rollDice,
@@ -877,8 +875,6 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         <div className="flex-shrink-0 bg-white rounded-lg shadow-lg px-2 sm:px-4 py-3 mb-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 min-h-24">
           <DiceBar
             diceResults={diceResults}
-            isRolling={isRolling}
-            rollingDice={rollingDice}
             lockedDice={lockedDice}
             phase={phase}
             foodOrWorkerChoices={foodOrWorkerChoices}
@@ -933,7 +929,6 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
               diceResults={diceResults}
               rollCount={rollCount}
               lockedDice={lockedDice}
-              isRolling={isRolling}
               onReroll={handleReroll}
               onKeep={handleKeep}
               leadershipUsed={leadershipUsed}

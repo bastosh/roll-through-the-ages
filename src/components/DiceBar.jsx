@@ -5,7 +5,6 @@ import DiceDisplay from './DiceDisplay';
  */
 export default function DiceBar({
   diceResults,
-  isRolling,
   rollingDice,
   lockedDice,
   phase,
@@ -28,7 +27,6 @@ export default function DiceBar({
           const isLocked = lockedDice.indexOf(i) !== -1;
           const hasSkulls = result && result.skulls > 0;
           const canToggle = phase === 'roll' && (!hasSkulls || (leadershipMode || (isSoloMode && !variantConfig.soloSkullsLocked)));
-          const isDiceRolling = rollingDice.indexOf(i) !== -1;
 
           // Check if this is a food_or_workers die in choose phase
           let foodOrWorkerIndex = -1;
@@ -46,7 +44,7 @@ export default function DiceBar({
                 count++;
               }
             }
-            if (foodOrWorkerIndex !== -1 && foodOrWorkerIndex < foodOrWorkerChoices.length) {
+            if (foodOrWorkerIndex !== -1 && foodOrWorkerChoices && foodOrWorkerIndex < foodOrWorkerChoices.length) {
               foodOrWorkerChoice = foodOrWorkerChoices[foodOrWorkerIndex];
             }
           }
@@ -59,7 +57,6 @@ export default function DiceBar({
               result={result}
               index={i}
               isLocked={isLocked}
-              isDiceRolling={isDiceRolling}
               canToggle={canToggle}
               isClickable={isClickable}
               foodOrWorkerIndex={foodOrWorkerIndex}

@@ -5,7 +5,6 @@ export default function DiceDisplay({
   result,
   index,
   isLocked,
-  isDiceRolling,
   canToggle,
   isClickable,
   foodOrWorkerIndex,
@@ -56,19 +55,13 @@ export default function DiceDisplay({
         (isLocked && result.skulls > 0 ? 'ring-2 sm:ring-4 ring-red-500 ' :
          isLocked ? 'ring-2 sm:ring-4 ring-amber-500 ' : '')}
     >
-      {isDiceRolling ? (
-        <div className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-amber-600"></div>
-        </div>
-      ) : (
-        <img
-          src={imageSrc}
-          alt={result.type}
-          onClick={handleClick}
-          className={'w-12 h-12 sm:w-16 sm:h-16 object-contain transition rounded-lg ' +
-            (isClickable || canToggle ? 'cursor-pointer hover:opacity-80 active:opacity-60 ' : 'cursor-default ')}
-        />
-      )}
+      <img
+        src={imageSrc}
+        alt={result.type}
+        onClick={handleClick}
+        className={'w-12 h-12 sm:w-16 sm:h-16 object-contain transition rounded-lg ' +
+          (isClickable || canToggle ? 'cursor-pointer hover:opacity-80 active:opacity-60 ' : 'cursor-default ')}
+      />
     </div>
   );
 }

@@ -3,7 +3,6 @@ export default function ActionButtonsBar({
   diceResults,
   rollCount,
   lockedDice,
-  isRolling,
   onReroll,
   onKeep,
   leadershipUsed,
@@ -56,8 +55,7 @@ export default function ActionButtonsBar({
           </button>
           <button
             onClick={onLeadershipReroll}
-            disabled={isRolling}
-            className="h-12 sm:h-16 w-full sm:w-32 bg-purple-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
+            className="h-12 sm:h-16 w-full sm:w-32 bg-purple-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-700 transition cursor-pointer"
           >
             Relancer
           </button>
@@ -79,8 +77,7 @@ export default function ActionButtonsBar({
         {!diceResults && !canUsePreservation && onRollInitial && (
           <button
             onClick={onRollInitial}
-            disabled={isRolling}
-            className="h-12 sm:h-16 w-full sm:w-36 bg-blue-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
+            className="h-12 sm:h-16 w-full sm:w-36 bg-blue-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-blue-700 transition cursor-pointer"
           >
             Lancer les dés
           </button>
@@ -88,8 +85,7 @@ export default function ActionButtonsBar({
         {!diceResults && canUsePreservation && onRollInitial && (
           <button
             onClick={onRollInitial}
-            disabled={isRolling}
-            className="h-12 sm:h-16 w-full sm:w-32 bg-gray-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
+            className="h-12 sm:h-16 w-full sm:w-32 bg-gray-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-700 transition cursor-pointer"
           >
             Passer
           </button>
@@ -97,8 +93,7 @@ export default function ActionButtonsBar({
         {canUseLeadership && (
           <button
             onClick={onUseLeadership}
-            disabled={isRolling}
-            className="h-12 sm:h-16 w-full sm:w-32 bg-purple-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer whitespace-nowrap"
+            className="h-12 sm:h-16 w-full sm:w-32 bg-purple-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-purple-700 transition cursor-pointer whitespace-nowrap"
           >
             Leadership
           </button>
@@ -106,8 +101,7 @@ export default function ActionButtonsBar({
         {canReroll && (
           <button
             onClick={onReroll}
-            disabled={isRolling}
-            className="h-12 sm:h-16 w-full sm:w-32 bg-blue-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
+            className="h-12 sm:h-16 w-full sm:w-32 bg-blue-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-blue-700 transition cursor-pointer"
           >
             Relancer
           </button>
@@ -115,8 +109,7 @@ export default function ActionButtonsBar({
         {showValidateButton && (
           <button
             onClick={onKeep}
-            disabled={isRolling}
-            className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition cursor-pointer"
+            className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 transition cursor-pointer"
           >
             Valider
           </button>
