@@ -11,7 +11,7 @@ export default function DisasterInfo({ skulls, label, effect }) {
   const avoided = effect && (
     effect.toLowerCase().includes('aucune perte') ||
     effect.toLowerCase().includes('protégé') ||
-    effect.toLowerCase().includes('tous les autres')
+    effect.toLowerCase().includes('vos adversaires')
   );
   const boxClass = avoided
     ? 'px-2 py-1 rounded bg-green-100 border border-green-400 flex flex-col min-w-[120px]'

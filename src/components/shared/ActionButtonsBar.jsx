@@ -34,7 +34,8 @@ export default function ActionButtonsBar({
     const hasLeadership = currentPlayer.developments.indexOf('leadership') !== -1;
     const hasPreservation = currentPlayer.developments.indexOf('preservation') !== -1;
     const hasPottery = currentPlayer.goodsPositions && currentPlayer.goodsPositions.pottery > 0;
-    const canUsePreservation = hasPreservation && hasPottery && !preservationUsed && !diceResults;
+    const hasFood = currentPlayer.food > 0;
+    const canUsePreservation = hasPreservation && hasPottery && hasFood && !preservationUsed && !diceResults;
     const canReroll = rollCount < 2 && diceResults && lockedDice.length < diceResults.length;
     const canUseLeadership = hasLeadership && !leadershipUsed && rollCount >= 2;
 

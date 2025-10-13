@@ -54,7 +54,7 @@ export function addGoods(player, count) {
   }
 }
 
-export function handleDisasters(allPlayers, playerIdx, skulls) {
+export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend = 0) {
   const player = allPlayers[playerIdx];
 
   if (skulls === 2) {
@@ -68,15 +68,41 @@ export function handleDisasters(allPlayers, playerIdx, skulls) {
       }
     }
   } else if (skulls === 4) {
-    let hasGreatWall = false;
-    for (let i = 0; i < player.monuments.length; i++) {
-      if (player.monuments[i].id === 'great_wall' && player.monuments[i].completed) {
-        hasGreatWall = true;
-        break;
+    const hasSmithing = player.developments.indexOf('smithing') !== -1;
+
+    if (hasSmithing) {
+      // Le joueur avec la Forge envahit les adversaires
+      const baseDamage = 4;
+      const bonusDamage = spearheadsToSpend * 2;
+      const totalDamage = baseDamage + bonusDamage;
+
+      // Appliquer les dégâts aux adversaires (sauf ceux avec la Grande Muraille)
+      for (let i = 0; i < allPlayers.length; i++) {
+        if (i !== playerIdx) {
+          let hasGreatWall = false;
+          for (let j = 0; j < allPlayers[i].monuments.length; j++) {
+            if (allPlayers[i].monuments[j].id === 'great_wall' && allPlayers[i].monuments[j].completed) {
+              hasGreatWall = true;
+              break;
+            }
+          }
+          if (!hasGreatWall) {
+            allPlayers[i].disasters += totalDamage;
+          }
+        }
       }
-    }
-    if (!hasGreatWall) {
-      player.disasters += 4;
+    } else {
+      // Comportement normal : le joueur subit l'invasion (sauf s'il a la Grande Muraille)
+      let hasGreatWall = false;
+      for (let i = 0; i < player.monuments.length; i++) {
+        if (player.monuments[i].id === 'great_wall' && player.monuments[i].completed) {
+          hasGreatWall = true;
+          break;
+        }
+      }
+      if (!hasGreatWall) {
+        player.disasters += 4;
+      }
     }
   } else if (skulls >= 5) {
     if (player.developments.indexOf('religion') !== -1) {

@@ -9,7 +9,9 @@ import { useBuyPhase } from '../hooks/useBuyPhase';
 import { useFoodOrWorkersPhase } from '../hooks/useFoodOrWorkersPhase';
 import { useDiscardPhase } from '../hooks/useDiscardPhase';
 import { useTradePhase } from '../hooks/useTradePhase';
+import { useSmithingPhase } from '../hooks/useSmithingPhase';
 import { feedCities, processRollResults } from '../utils/phaseHandlers';
+import { handleDisasters } from '../utils/gameUtils';
 import PlayerScorePanel from './PlayerScorePanel';
 import PhaseInfoBar from './shared/PhaseInfoBar';
 import ActionButtonsBar from './shared/ActionButtonsBar';
@@ -18,6 +20,7 @@ import PlayerTurnModal from './PlayerTurnModal';
 import DiceBar from './DiceBar';
 import GameHeader from './GameHeader';
 import GameEndScreen from './GameEndScreen';
+import SmithingInvasionPanel from './SmithingInvasionPanel';
 
 export default function Game({ playerNames, variantId, isSoloMode, bronze2024DevCount = 5, savedGameState }) {
   // Load variant configuration
@@ -102,6 +105,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
   const [gameEndTriggered, setGameEndTriggered] = useState(savedGameState?.gameEndTriggered ?? false);
   const [showPlayerTurnModal, setShowPlayerTurnModal] = useState(!isSoloMode && playerNames.length > 1 && !savedGameState);
   const [preservationUsed, setPreservationUsed] = useState(savedGameState?.preservationUsed ?? false);
+  const [pendingSkulls, setPendingSkulls] = useState(savedGameState?.pendingSkulls ?? 0);
 
   const currentPlayer = players[currentPlayerIndex];
   let numDice = 3;
@@ -196,6 +200,16 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     resetPhase: resetTradePhase
   } = tradePhaseHook;
 
+  // Use smithing phase hook
+  const smithingPhaseHook = useSmithingPhase();
+  const {
+    spearheadsToSpend,
+    initializeSmithingPhase,
+    incrementSpearheads,
+    decrementSpearheads,
+    resetPhase: resetSmithingPhase
+  } = smithingPhaseHook;
+
   // Get Granaries exchange rate from development effect
   function getGranariesRate() {
     const granariesDev = DEVELOPMENTS.find(d => d.id === 'granaries');
@@ -230,7 +244,8 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     if (phase === 'roll' && !diceResults && !savedGameState) {
       const hasPreservation = currentPlayer.developments.indexOf('preservation') !== -1;
       const hasPottery = currentPlayer.goodsPositions.pottery > 0;
-      const canUsePreservation = hasPreservation && hasPottery && !preservationUsed;
+      const hasFood = currentPlayer.food > 0;
+      const canUsePreservation = hasPreservation && hasPottery && hasFood && !preservationUsed;
 
       // Only auto-roll if player cannot use Preservation
       if (!canUsePreservation) {
@@ -243,11 +258,12 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     const newPlayers = [...players];
     const player = newPlayers[currentPlayerIndex];
 
-    // Vérifier que le joueur a Conservation et de la Poterie
+    // Vérifier que le joueur a Conservation, de la Poterie et de la Nourriture
     const hasPreservation = player.developments.indexOf('preservation') !== -1;
     const hasPottery = player.goodsPositions.pottery > 0;
+    const hasFood = player.food > 0;
 
-    if (!hasPreservation || !hasPottery || preservationUsed) {
+    if (!hasPreservation || !hasPottery || !hasFood || preservationUsed) {
       return;
     }
 
@@ -286,9 +302,14 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     setPendingWorkers(result.pendingWorkers);
     setPendingFoodOrWorkers(result.pendingFoodOrWorkers);
     setPendingCoins(result.pendingCoins);
+    setPendingSkulls(result.skulls || 0);
 
     if (result.foodOrWorkerChoicesCount > 0) {
       initializeChoices(result.foodOrWorkerChoicesCount);
+    }
+
+    if (result.nextPhase === 'smithing_invasion') {
+      initializeSmithingPhase();
     }
 
     setPhase(result.nextPhase);
@@ -485,6 +506,46 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
   function handleSkipTrade() {
     resetTradePhase();
     skipToBuyPhase();
+  }
+
+  function handleConfirmSmithing() {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+
+    // Dépenser les Lances
+    if (spearheadsToSpend > 0) {
+      player.goodsPositions.spearheads -= spearheadsToSpend;
+    }
+
+    // Appliquer l'invasion avec les Lances dépensées
+    handleDisasters(newPlayers, currentPlayerIndex, pendingSkulls, spearheadsToSpend);
+
+    setPlayers(newPlayers);
+    resetSmithingPhase();
+
+    // Passer à la phase suivante
+    if (pendingFoodOrWorkers > 0) {
+      setPhase('choose_food_or_workers');
+    } else {
+      setPhase('feed');
+    }
+  }
+
+  function handleSkipSmithing() {
+    const newPlayers = [...players];
+
+    // Appliquer l'invasion sans Lances
+    handleDisasters(newPlayers, currentPlayerIndex, pendingSkulls, 0);
+
+    setPlayers(newPlayers);
+    resetSmithingPhase();
+
+    // Passer à la phase suivante
+    if (pendingFoodOrWorkers > 0) {
+      setPhase('choose_food_or_workers');
+    } else {
+      setPhase('feed');
+    }
   }
 
   function handleTradeStone(amount) {
@@ -886,6 +947,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
             canUsePreservation={
               currentPlayer.developments.indexOf('preservation') !== -1 &&
               currentPlayer.goodsPositions.pottery > 0 &&
+              currentPlayer.food > 0 &&
               !preservationUsed &&
               !diceResults
             }
@@ -991,6 +1053,12 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
             onTrade={handleTradeResource}
             onResetTrades={handleResetTrades}
             onSkipTrade={handleSkipTrade}
+            isSmithingInvasionPhase={phase === 'smithing_invasion'}
+            spearheadsToSpend={spearheadsToSpend}
+            onIncrementSpearheads={incrementSpearheads}
+            onDecrementSpearheads={decrementSpearheads}
+            onConfirmSmithing={handleConfirmSmithing}
+            onSkipSmithing={handleSkipSmithing}
           />
         </div>
 

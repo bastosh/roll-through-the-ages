@@ -59,11 +59,23 @@ export function processRollResults(results, currentPlayerIndex, allPlayers) {
     }
   }
 
-  // Apply disasters
-  handleDisasters(newPlayers, currentPlayerIndex, skulls);
+  // Check if Smithing (Forge) phase is needed (4 skulls + smithing development)
+  const needsSmithingPhase = skulls === 4 && currentPlayer.developments.indexOf('smithing') !== -1;
+
+  // Apply disasters (but skip invasion if Smithing phase is needed)
+  if (!needsSmithingPhase) {
+    handleDisasters(newPlayers, currentPlayerIndex, skulls);
+  }
 
   // Determine next phase
-  const nextPhase = foodOrWorkersDice > 0 ? 'choose_food_or_workers' : 'feed';
+  let nextPhase;
+  if (needsSmithingPhase) {
+    nextPhase = 'smithing_invasion';
+  } else if (foodOrWorkersDice > 0) {
+    nextPhase = 'choose_food_or_workers';
+  } else {
+    nextPhase = 'feed';
+  }
 
   return {
     players: newPlayers,
@@ -71,6 +83,7 @@ export function processRollResults(results, currentPlayerIndex, allPlayers) {
     pendingFoodOrWorkers: foodOrWorkersDice,
     pendingCoins: coins,
     nextPhase: nextPhase,
-    foodOrWorkerChoicesCount: foodOrWorkersDice
+    foodOrWorkerChoicesCount: foodOrWorkersDice,
+    skulls: skulls // Needed for smithing phase
   };
 }

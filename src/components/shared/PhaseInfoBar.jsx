@@ -65,17 +65,24 @@ export default function PhaseInfoBar({
               ? 'Vous perdez 2 points'
               : '';
         } else if (skulls === 3) {
-          effect = 'Les adversaires sans Médecine perdent 3 points';
+          effect = 'Vos adversaires sans Médecine perdent 3 points';
         } else if (skulls === 4) {
-          effect = fakePlayers[0].monuments && fakePlayers[0].monuments.some(m => m.id === 'great_wall' && m.completed)
-            ? 'Protégé par la Grande Muraille.'
-            : fakePlayers[0].disasters > currentPlayer.disasters ? 'Vous perdez 4 points' : '';
+          const hasSmithing = fakePlayers[0].developments.indexOf('smithing') !== -1;
+          const hasGreatWall = fakePlayers[0].monuments && fakePlayers[0].monuments.some(m => m.id === 'great_wall' && m.completed);
+
+          if (hasSmithing) {
+            effect = 'Vous envahissez vos adversaires ! (Forge)';
+          } else if (hasGreatWall) {
+            effect = 'Protégé par la Grande Muraille.';
+          } else {
+            effect = fakePlayers[0].disasters > currentPlayer.disasters ? 'Vous perdez 4 points' : '';
+          }
         } else if (skulls >= 5) {
           effect = fakePlayers[0].developments.indexOf('religion') !== -1
-            ? 'Tous les autres joueurs sans Religion perdent tous leurs biens'
+            ? 'Vos adversaires sans Religion perdent tous leurs biens'
             : 'Vous perdez tous vos biens';
         }
-      } catch (e) {
+      } catch {
         effect = '';
       }
       let label = '';
@@ -289,6 +296,17 @@ export default function PhaseInfoBar({
             )}
           </div>
         )}
+      </div>
+    );
+  }
+
+  if (phase === 'smithing_invasion') {
+    return (
+      <div className="flex flex-col gap-1">
+        <div className="text-sm font-semibold text-orange-800">⚔️ Invasion de la Forge</div>
+        <div className="text-xs text-gray-600">
+          <span className="text-orange-600 font-semibold">Choisissez combien de Lances dépenser pour augmenter les dégâts</span>
+        </div>
       </div>
     );
   }

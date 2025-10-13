@@ -5,7 +5,6 @@ import DiceDisplay from './DiceDisplay';
  */
 export default function DiceBar({
   diceResults,
-  rollingDice,
   lockedDice,
   phase,
   foodOrWorkerChoices,
@@ -63,6 +62,7 @@ export default function DiceBar({
               foodOrWorkerChoice={foodOrWorkerChoice}
               onToggleLock={onToggleLock}
               onToggleFoodOrWorker={onToggleFoodOrWorker}
+              leadershipMode={leadershipMode}
             />
           );
         })
@@ -70,12 +70,7 @@ export default function DiceBar({
         <div className="flex items-center gap-3">
           <span className="text-sm font-semibold text-gray-700">Utilisez Conservation ou passez pour lancer les dés</span>
         </div>
-      ) : (
-        <div className="flex items-center gap-3">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
-          <span className="text-sm font-semibold text-gray-700">Lancer en cours...</span>
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }

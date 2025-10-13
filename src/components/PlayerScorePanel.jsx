@@ -6,6 +6,7 @@ import DisastersDisplay from './DisastersDisplay';
 import ResourcesDisplay from './ResourcesDisplay';
 import BoatDisplay from './BoatDisplay';
 import TradeResourcesPanel from './TradeResourcesPanel';
+import SmithingInvasionPanel from './SmithingInvasionPanel';
 
 export default function PlayerScorePanel({
   player,
@@ -37,7 +38,14 @@ export default function PlayerScorePanel({
   tradesUsed = 0,
   onTrade = null,
   onResetTrades = null,
-  onSkipTrade = null
+  onSkipTrade = null,
+  // Smithing invasion phase props
+  isSmithingInvasionPhase = false,
+  spearheadsToSpend = 0,
+  onIncrementSpearheads = null,
+  onDecrementSpearheads = null,
+  onConfirmSmithing = null,
+  onSkipSmithing = null
 }) {
   const goodsValue = getGoodsValue(player.goodsPositions);
 
@@ -84,6 +92,20 @@ export default function PlayerScorePanel({
               onTrade={onTrade}
               onReset={onResetTrades}
               onSkip={onSkipTrade}
+            />
+          )}
+
+          {/* Smithing invasion panel - appears during smithing_invasion phase */}
+          {isSmithingInvasionPhase && (
+            <SmithingInvasionPanel
+              currentPlayer={player}
+              allPlayers={allPlayers}
+              currentPlayerIndex={currentPlayerIndex}
+              spearheadsToSpend={spearheadsToSpend}
+              onIncrementSpearheads={onIncrementSpearheads}
+              onDecrementSpearheads={onDecrementSpearheads}
+              onConfirm={onConfirmSmithing}
+              onSkip={onSkipSmithing}
             />
           )}
 

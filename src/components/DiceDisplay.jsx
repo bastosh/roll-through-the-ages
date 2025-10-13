@@ -10,7 +10,8 @@ export default function DiceDisplay({
   foodOrWorkerIndex,
   foodOrWorkerChoice,
   onToggleLock,
-  onToggleFoodOrWorker
+  onToggleFoodOrWorker,
+  leadershipMode
 }) {
   // Déterminer l'image de la face du dé
   let imageSrc = '';
@@ -48,12 +49,19 @@ export default function DiceDisplay({
     }
   }
 
+  // Afficher le ring uniquement si le dé est verrouillé
+  // En mode Leadership : verrouillé = ne sera PAS relancé, déverrouillé = sera relancé
+  // Couleur : rouge pour les crânes, ambre pour les autres
+  let ringClass = '';
+  if (isLocked) {
+    const ringColor = result.skulls > 0 ? 'ring-red-500' : 'ring-amber-500';
+    ringClass = 'ring-2 sm:ring-4 ' + ringColor;
+  }
+
   return (
     <div
       key={index}
-      className={'relative w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0 rounded-lg ' +
-        (isLocked && result.skulls > 0 ? 'ring-2 sm:ring-4 ring-red-500 ' :
-         isLocked ? 'ring-2 sm:ring-4 ring-amber-500 ' : '')}
+      className={'relative w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0 rounded-lg ' + ringClass}
     >
       <img
         src={imageSrc}

@@ -7,6 +7,7 @@ export default function DisasterHelp({ currentPlayer }) {
   const hasIrrigation = currentPlayer.developments.indexOf('irrigation') !== -1;
   const hasMedicine = currentPlayer.developments.indexOf('medicine') !== -1;
   const hasReligion = currentPlayer.developments.indexOf('religion') !== -1;
+  const hasSmithing = currentPlayer.developments.indexOf('smithing') !== -1;
 
   // Find Great Wall monument
   let hasGreatWall = false;
@@ -35,9 +36,13 @@ export default function DisasterHelp({ currentPlayer }) {
     {
       skulls: 4,
       name: 'Invasion',
-      effect: '-4 points',
-      protected: hasGreatWall,
-      protectionName: 'Grande Muraille'
+      effect: hasSmithing
+        ? 'Vous envahissez vos adversaires (-4 pts base + bonus Lance)'
+        : '-4 points',
+      protected: hasGreatWall || hasSmithing,
+      protectionName: hasSmithing
+        ? 'Forge (vous retournez l\'invasion)'
+        : 'Grande Muraille'
     },
     {
       skulls: 5,

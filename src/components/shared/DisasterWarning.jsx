@@ -27,6 +27,7 @@ export default function DisasterWarning({ totalSkulls, currentPlayer }) {
     }
   } else if (totalSkulls === 4) {
     disasterType = 'invasion';
+    const hasSmithing = currentPlayer.developments.indexOf('smithing') !== -1;
     let hasGreatWall = false;
     for (let i = 0; i < currentPlayer.monuments.length; i++) {
       if (currentPlayer.monuments[i].id === 'great_wall' && currentPlayer.monuments[i].completed) {
@@ -34,7 +35,11 @@ export default function DisasterWarning({ totalSkulls, currentPlayer }) {
         break;
       }
     }
-    if (hasGreatWall) {
+
+    if (hasSmithing) {
+      disasterMessage = 'Invasion retournée par la Forge !';
+      disasterAffected = 'Vous envahissez vos adversaires';
+    } else if (hasGreatWall) {
       disasterMessage = 'Invasion repoussée par la Grande Muraille';
       disasterAffected = 'protected';
     } else {
@@ -53,23 +58,28 @@ export default function DisasterWarning({ totalSkulls, currentPlayer }) {
     }
   }
 
+  const isSmithingInvasion = disasterType === 'invasion' && disasterAffected === 'Vous envahissez vos adversaires';
+  const isProtected = disasterAffected === 'protected';
+
   return (
     <div className={`mb-4 p-4 rounded-lg border-2 ${
-      disasterAffected === 'protected'
+      isProtected
         ? 'bg-green-50 border-green-400'
+        : isSmithingInvasion
+        ? 'bg-orange-50 border-orange-400'
         : 'bg-red-50 border-red-400'
     }`}>
       <div className="text-center">
         <div className="text-3xl mb-2">
-          {disasterAffected === 'protected' ? '🛡️' : '☠️'}
+          {isProtected ? '🛡️' : isSmithingInvasion ? '⚔️' : '☠️'}
         </div>
         <div className={`text-lg font-bold mb-1 ${
-          disasterAffected === 'protected' ? 'text-green-700' : 'text-red-700'
+          isProtected ? 'text-green-700' : isSmithingInvasion ? 'text-orange-700' : 'text-red-700'
         }`}>
           {disasterMessage}
         </div>
         <div className="text-sm text-gray-600">
-          {disasterAffected !== 'protected' && disasterAffected}
+          {!isProtected && disasterAffected}
         </div>
       </div>
     </div>
