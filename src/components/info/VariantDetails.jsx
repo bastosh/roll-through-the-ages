@@ -21,7 +21,9 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
         <h3 className="text-lg font-semibold text-amber-700 mb-2">🏆 Conditions de victoire</h3>
         <div className="bg-amber-50 rounded p-3 space-y-1 text-sm">
           {isSoloMode ? (
-            <p>• Mode solo : Jouez 10 tours et maximisez votre score</p>
+            <p>Jouez 10 tours et maximisez votre score</p>
+          ) : playerCount === 1 ? (
+            <p>Aucune condition de fin, jouez librement</p>
           ) : (
             <>
               <p>• Achetez {variant.endGameConditions.developmentCount} développements</p>
@@ -34,11 +36,23 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
       </div>
 
       {/* Règles spécifiques */}
-      {isSoloMode && (
+      {(playerCount === 1 || variantId === 'late_bronze_age') && (
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-amber-700 mb-2">📜 Règles spécifiques</h3>
-          <div className="bg-blue-50 rounded p-3 space-y-1 text-sm">
-            <p>• {variant.soloSkullsLocked ? '☠️ Les crânes ne peuvent pas être relancés (sauf Leadership)' : '☠️ Les crânes peuvent toujours être relancés'}</p>
+          <div className="bg-blue-50 rounded p-3 space-y-2 text-sm">
+            {playerCount === 1 && (
+              <p>• {variant.soloSkullsLocked ? '☠️ Les crânes ne peuvent pas être relancés (sauf Leadership)' : '☠️ Les crânes peuvent toujours être relancés'}</p>
+            )}
+            {variantId === 'late_bronze_age' && (
+              <>
+                <div className="space-y-1.5">
+                  <p>• <span className="font-semibold">Conservation</span> : Avant le lancer de dés, dépensez 1 Poterie pour doubler votre nourriture</p>
+                  <p>• <span className="font-semibold">Forge</span> : Invasion: -4 pts aux adversaires. Dépensez des Lances pour -2 pts/lance</p>
+                  <p>• <span className="font-semibold">Navigation</span> : Construisez des navires (1 Bois + 1 Tissu). Échangez des ressources</p>
+                  <p>• <span className="font-semibold">Commerce</span> : + 1 point par ressource en fin de partie</p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
