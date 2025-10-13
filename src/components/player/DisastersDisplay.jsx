@@ -1,9 +1,13 @@
+import { useTranslation } from 'react-i18next';
+
 export default function DisastersDisplay({ disasters }) {
+  const { t } = useTranslation();
+
   if (disasters === 0) return null;
 
   return (
     <div className="flex-shrink-0">
-      <h3 className="text-sm font-bold mb-2 text-gray-800">Catastrophes</h3>
+      <h3 className="text-sm font-bold mb-2 text-gray-800">{t('disasters.catastrophes')}</h3>
       <div className="bg-red-50 border-2 border-red-400 rounded-lg p-2">
         <div className="flex gap-0.5 flex-wrap mb-1">
           {Array(disasters).fill(0).map(function (_, i) {
@@ -17,7 +21,7 @@ export default function DisastersDisplay({ disasters }) {
             );
           })}
         </div>
-        <div className="text-center text-red-700 font-bold text-sm">-{disasters} points</div>
+        <div className="text-center text-red-700 font-bold text-sm">{t('disasters.disasterPoints', { count: disasters })}</div>
       </div>
     </div>
   );

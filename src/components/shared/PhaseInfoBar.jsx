@@ -58,19 +58,25 @@ export default function PhaseInfoBar({
       // Créer des copies pour ne pas modifier l'état réel
       const fakePlayers = [JSON.parse(JSON.stringify(currentPlayer))];
       let effect = '';
+      let isAvoided = false;
       try {
         handleDisasters(fakePlayers, 0, skulls);
         if (skulls === 2) {
-          effect = fakePlayers[0].developments.indexOf('irrigation') !== -1
+          const hasIrrigation = fakePlayers[0].developments.indexOf('irrigation') !== -1;
+          isAvoided = hasIrrigation;
+          effect = hasIrrigation
             ? t('disasterEffects.noLossIrrigation')
             : fakePlayers[0].disasters > currentPlayer.disasters
               ? t('disasterEffects.youLosePoints', { count: 2 })
               : '';
         } else if (skulls === 3) {
+          const hasMedicine = currentPlayer.developments.indexOf('medicine') !== -1;
+          isAvoided = hasMedicine;
           effect = t('disasterEffects.opponentsWithoutMedicine');
         } else if (skulls === 4) {
           const hasSmithing = fakePlayers[0].developments.indexOf('smithing') !== -1;
           const hasGreatWall = fakePlayers[0].monuments && fakePlayers[0].monuments.some(m => m.id === 'great_wall' && m.completed);
+          isAvoided = hasSmithing || hasGreatWall;
 
           if (hasSmithing) {
             effect = t('disasterEffects.youInvadeOpponents');
@@ -80,7 +86,9 @@ export default function PhaseInfoBar({
             effect = fakePlayers[0].disasters > currentPlayer.disasters ? t('disasterEffects.youLosePoints', { count: 4 }) : '';
           }
         } else if (skulls >= 5) {
-          effect = fakePlayers[0].developments.indexOf('religion') !== -1
+          const hasReligion = fakePlayers[0].developments.indexOf('religion') !== -1;
+          isAvoided = hasReligion;
+          effect = hasReligion
             ? t('disasterEffects.opponentsWithoutReligion')
             : t('disasterEffects.youLoseAllGoods');
         }
@@ -92,7 +100,7 @@ export default function PhaseInfoBar({
       else if (skulls === 3) label = t('disasters.pestilence');
       else if (skulls === 4) label = t('disasters.invasion');
       else if (skulls >= 5) label = t('disasters.revolt');
-      disasterInfo = { icon: '💀'.repeat(skulls), label, effect };
+      disasterInfo = { icon: '💀'.repeat(skulls), label, effect, isAvoided };
     }
 
   if (phase === 'roll') {
@@ -106,7 +114,7 @@ export default function PhaseInfoBar({
           <div className="text-xs text-gray-600 leading-tight">{t('phaseInfo.clickToLockUnlock')}</div>
         </div>
         {disasterInfo && (
-          <DisasterInfo skulls={skulls} label={disasterInfo.label} effect={disasterInfo.effect} />
+          <DisasterInfo skulls={skulls} label={disasterInfo.label} effect={disasterInfo.effect} isAvoided={disasterInfo.isAvoided} />
         )}
       </div>
     );
@@ -158,7 +166,7 @@ export default function PhaseInfoBar({
           </div>
         )}
         {disasterInfo && (
-          <DisasterInfo skulls={skulls} label={disasterInfo.label} effect={disasterInfo.effect} />
+          <DisasterInfo skulls={skulls} label={disasterInfo.label} effect={disasterInfo.effect} isAvoided={disasterInfo.isAvoided} />
         )}
       </div>
     );
@@ -183,7 +191,7 @@ export default function PhaseInfoBar({
           <div>🏛️ {foodNeeded}</div>
         </div>
         {disasterInfo && (
-          <DisasterInfo skulls={skulls} label={disasterInfo.label} effect={disasterInfo.effect} />
+          <DisasterInfo skulls={skulls} label={disasterInfo.label} effect={disasterInfo.effect} isAvoided={disasterInfo.isAvoided} />
         )}
       </div>
     );

@@ -1,4 +1,8 @@
+import { useTranslation } from 'react-i18next';
+
 export default function DisasterWarning({ totalSkulls, currentPlayer }) {
+  const { t } = useTranslation();
+
   if (totalSkulls < 2) return null;
 
   let disasterType = null;
@@ -9,21 +13,21 @@ export default function DisasterWarning({ totalSkulls, currentPlayer }) {
     disasterType = 'drought';
     const hasIrrigation = currentPlayer.developments.indexOf('irrigation') !== -1;
     if (hasIrrigation) {
-      disasterMessage = 'Sécheresse évitée grâce à l\'Irrigation';
+      disasterMessage = t('disasters.droughtAvoided');
       disasterAffected = 'protected';
     } else {
-      disasterMessage = 'Sécheresse !';
-      disasterAffected = 'Vous perdez 2 points';
+      disasterMessage = t('disasters.drought') + ' !';
+      disasterAffected = t('disasters.youLose2Points');
     }
   } else if (totalSkulls === 3) {
     disasterType = 'plague';
     const hasMedicine = currentPlayer.developments.indexOf('medicine') !== -1;
     if (hasMedicine) {
-      disasterMessage = 'Peste évitée grâce à la Médecine';
-      disasterAffected = 'Les autres joueurs perdent 3 points';
+      disasterMessage = t('disasters.plagueAvoided');
+      disasterAffected = t('disasters.othersLose3Points');
     } else {
-      disasterMessage = 'Peste !';
-      disasterAffected = 'Les autres joueurs non protégés perdent 3 points';
+      disasterMessage = t('disasters.plague') + ' !';
+      disasterAffected = t('disasters.othersLose3PointsUnprotected');
     }
   } else if (totalSkulls === 4) {
     disasterType = 'invasion';
@@ -37,28 +41,28 @@ export default function DisasterWarning({ totalSkulls, currentPlayer }) {
     }
 
     if (hasSmithing) {
-      disasterMessage = 'Invasion retournée par la Forge !';
-      disasterAffected = 'Vous envahissez vos adversaires';
+      disasterMessage = t('disasters.invasionReversed');
+      disasterAffected = t('disasters.youInvadeOpponents');
     } else if (hasGreatWall) {
-      disasterMessage = 'Invasion repoussée par la Grande Muraille';
+      disasterMessage = t('disasters.invasionBlocked');
       disasterAffected = 'protected';
     } else {
-      disasterMessage = 'Invasion !';
-      disasterAffected = 'Vous perdez 4 points';
+      disasterMessage = t('disasters.invasion') + ' !';
+      disasterAffected = t('disasters.youLose4Points');
     }
   } else if (totalSkulls >= 5) {
     disasterType = 'revolt';
     const hasReligion = currentPlayer.developments.indexOf('religion') !== -1;
     if (hasReligion) {
-      disasterMessage = 'Révolte évitée grâce à la Religion';
-      disasterAffected = 'Les autres joueurs perdent toutes leurs ressources';
+      disasterMessage = t('disasters.revoltAvoided');
+      disasterAffected = t('disasters.othersLoseAllResources');
     } else {
-      disasterMessage = 'Révolte !';
-      disasterAffected = 'Vous perdez toutes vos ressources';
+      disasterMessage = t('disasters.revolt') + ' !';
+      disasterAffected = t('disasters.youLoseAllResources');
     }
   }
 
-  const isSmithingInvasion = disasterType === 'invasion' && disasterAffected === 'Vous envahissez vos adversaires';
+  const isSmithingInvasion = disasterType === 'invasion' && disasterAffected === t('disasters.youInvadeOpponents');
   const isProtected = disasterAffected === 'protected';
 
   return (
