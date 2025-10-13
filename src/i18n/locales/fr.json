@@ -22,7 +22,8 @@
     "edit": "Modifier",
     "delete": "Supprimer",
     "cities": "Cités",
-    "developments": "Développements"
+    "developments": "Développements",
+    "productionBuildings": "Bâtiments de production"
   },
 
   "credits": {
@@ -246,8 +247,8 @@
     "opponentsWithoutMedicine": "Vos adversaires sans Médecine perdent 3 points",
     "youInvadeOpponents": "Vous envahissez vos adversaires ! (Forge)",
     "protectedByWall": "Protégé par la Grande Muraille.",
-    "opponentsWithoutReligion": "Vos adversaires sans Religion perdent tous leurs biens",
-    "youLoseAllGoods": "Vous perdez tous vos biens"
+    "opponentsWithoutReligion": "Vos adversaires sans Religion perdent toutes leurs ressources",
+    "youLoseAllGoods": "Vous perdez toutes vos ressources"
   },
 
   "dice": {
@@ -340,7 +341,7 @@
     "reroll": "Relancer",
     "foodCount": "{{count}} nourriture",
     "goodsCount": "{{count}} bien",
-    "goodsCountPlural": "{{count}} biens",
+    "goodsCountPlural": "{{count}} ressources",
     "workersCount": "{{count}} ouvrier",
     "workersCountPlural": "{{count}} ouvriers",
     "coinsCount": "{{count}} pièces",
@@ -368,8 +369,8 @@
     "rightClickToCancel": "Clic-droit pour annuler ({{count}} en cours)",
     "startMyTurn": "Commencer mon tour",
     "lastTurn": "Dernier tour !",
-    "goods": "Biens",
-    "goodsOf": "Biens ({{current}}/{{max}})",
+    "goods": "Ressources",
+    "goodsOf": "Ressources ({{current}}/{{max}})",
     "value": "Valeur"
   },
 

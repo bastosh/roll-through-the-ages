@@ -1,7 +1,7 @@
 export default function MonumentsGrid({ playerMonuments, onBuildMonument, onUnbuildMonument, canBuild, pendingWorkers, allPlayers, currentPlayerIndex, monuments }) {
   return (
     <div className="flex-shrink-0">
-      <h3 className="text-sm font-bold mb-2 text-gray-800">Monuments</h3>
+      <h3 className="text-base font-bold mb-2 text-gray-800">Monuments</h3>
       <div className="grid grid-cols-2 gap-2">
         {playerMonuments.map(function (m) {
           const monument = monuments.find(mon => mon.id === m.id);

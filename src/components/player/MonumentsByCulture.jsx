@@ -51,7 +51,7 @@ export default function MonumentsByCulture({
 
   return (
     <div className="flex-shrink-0">
-      <h3 className="text-sm font-bold mb-2 text-gray-800">Monuments</h3>
+      <h3 className="text-base font-bold mb-2 text-gray-800">Monuments</h3>
       <div className="space-y-3">
         {cultures.map(function (culture) {
           const cultureMonuments = monumentsByCulture[culture.name] || [];

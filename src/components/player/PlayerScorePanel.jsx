@@ -63,11 +63,11 @@ export default function PlayerScorePanel({
   const isAncientEmpires = variantId === 'ancient_empires';
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-2 sm:p-4 lg:h-full flex flex-col lg:overflow-hidden">
+    <div className="bg-white rounded-lg shadow-lg p-2 sm:px-4 lg:h-full flex flex-col lg:overflow-hidden">
       {/* Contenu principal en grille */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 lg:flex-1 lg:min-h-0">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 lg:flex-1 lg:min-h-0">
         {/* Colonne de gauche */}
-        <div className="flex flex-col lg:overflow-y-auto space-y-2">
+        <div className={"flex flex-col lg:overflow-y-auto " + (isAncientEmpires ? 'space-y-4' : 'space-y-2')}>
           <div className='flex justify-between gap-2'>
             <div className='flex gap-2'>
               <CityDisplay
@@ -99,6 +99,19 @@ export default function PlayerScorePanel({
               />
             )}
           </div>
+
+          {/* Production buildings for Ancient Empires - between cities and monuments */}
+          {isAncientEmpires && variantConfig && player.productions && (
+            <ProductionBuildingsList
+              playerProductions={player.productions}
+              onBuildProduction={onBuildProduction}
+              onUnbuildProduction={onUnbuildProduction}
+              canBuild={canBuild}
+              pendingWorkers={pendingWorkers}
+              productions={variantConfig.productions}
+              citiesBuiltCount={3 + player.cities.filter(c => c.built).length}
+            />
+          )}
 
           {isAncientEmpires && variantConfig ? (
             <MonumentsByCulture
@@ -150,31 +163,38 @@ export default function PlayerScorePanel({
             />
           )}
 
-          <ResourcesDisplay
-            goodsPositions={player.goodsPositions}
-            food={player.food}
-            previewFood={previewFood}
-            previewGoodsCount={previewGoodsCount}
-            developments={player.developments}
-            interactionMode={interactionMode}
-            tempGoodsPositions={tempGoodsPositions}
-            selectedGoodsForPurchase={selectedGoodsForPurchase}
-            onDiscardGood={onDiscardGood}
-            onToggleGoodForPurchase={onToggleGoodForPurchase}
-          />
+          {/* Resources display - only for non-Ancient Empires variants */}
+          {!isAncientEmpires && (
+            <ResourcesDisplay
+              goodsPositions={player.goodsPositions}
+              food={player.food}
+              previewFood={previewFood}
+              previewGoodsCount={previewGoodsCount}
+              developments={player.developments}
+              interactionMode={interactionMode}
+              tempGoodsPositions={tempGoodsPositions}
+              selectedGoodsForPurchase={selectedGoodsForPurchase}
+              onDiscardGood={onDiscardGood}
+              onToggleGoodForPurchase={onToggleGoodForPurchase}
+            />
+          )}
         </div>
   
         {/* Colonne de droite */}
         <div className="flex flex-col justify-between gap-3 lg:overflow-y-auto">
-          {isAncientEmpires && variantConfig && player.productions && (
-            <ProductionBuildingsList
-              playerProductions={player.productions}
-              onBuildProduction={onBuildProduction}
-              onUnbuildProduction={onUnbuildProduction}
-              canBuild={canBuild}
-              pendingWorkers={pendingWorkers}
-              productions={variantConfig.productions}
-              citiesBuiltCount={3 + player.cities.filter(c => c.built).length}
+          {/* Resources display - for Ancient Empires only (moved to right column) */}
+          {isAncientEmpires && (
+            <ResourcesDisplay
+              goodsPositions={player.goodsPositions}
+              food={player.food}
+              previewFood={previewFood}
+              previewGoodsCount={previewGoodsCount}
+              developments={player.developments}
+              interactionMode={interactionMode}
+              tempGoodsPositions={tempGoodsPositions}
+              selectedGoodsForPurchase={selectedGoodsForPurchase}
+              onDiscardGood={onDiscardGood}
+              onToggleGoodForPurchase={onToggleGoodForPurchase}
             />
           )}
 

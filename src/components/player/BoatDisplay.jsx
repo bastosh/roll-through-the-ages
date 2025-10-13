@@ -56,7 +56,7 @@ const BoatDisplay = ({
 
   return (
     <div className="flex flex-col items-end ml-6 min-w-[180px]">
-      <div className="text-sm font-bold mb-1 text-gray-800">{t('game.boats')}</div>
+      <div className="text-base font-bold mb-1 text-gray-800">{t('game.boats')}</div>
       <div
         className={`flex flex-row gap-1 mb-1 bg-gray-50 border-2 rounded-lg px-4 py-3 ${
           canInteract

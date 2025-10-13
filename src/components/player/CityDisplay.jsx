@@ -11,7 +11,7 @@ export default function CityDisplay({ cities, onBuildCity, onUnbuildCity, canBui
 
   return (
     <div className="flex-shrink-0">
-      <h3 className="text-sm font-bold mb-2 text-gray-800">{t('common.cities')}</h3>
+      <h3 className="text-base font-bold mb-2 text-gray-800">{t('common.cities')}</h3>
       <div className="flex gap-1.5">
         {allCities.map(function (city, i) {
           const height = city.requiredWorkers <= 4 ? 'h-16' : 'h-20';

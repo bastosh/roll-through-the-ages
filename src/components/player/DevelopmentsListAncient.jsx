@@ -145,12 +145,12 @@ export default function DevelopmentsListAncient({
                   {isOwned && <span className="text-white text-sm">✓</span>}
                 </div>
               </div>
-              <div className="flex-1 font-medium text-sm">
+              <div className="w-28 font-medium text-sm">
                 {dev.name}
               </div>
               <div className="w-12 text-center font-semibold text-amber-700 text-sm">{dev.points}🏆</div>
               {dev.effect && (
-                <div className="w-lg text-sm text-gray-600 italic">
+                <div className="flex-1 text-sm text-gray-600 italic">
                   {dev.effect}
                 </div>
               )}

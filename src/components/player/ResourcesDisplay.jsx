@@ -59,16 +59,16 @@ export default function ResourcesDisplay({
   const futureFood = Math.min(food + (previewFood || 0), 15);
 
   return (
-    <div className="flex-shrink-0 mt-2">
-        <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between mb-1 gap-1'>
-          <div className="text-xs sm:text-sm text-gray-700 font-semibold">
-            {t('game.goodsOf', { current: totalGoods, max: 6 })}
-          </div>
-          {/* Valeur totale des biens */}
-          <div className="text-xs sm:text-sm text-gray-700 font-semibold">
-            {t('game.value')}: {goodsValue}
-          </div>
+    <div className="flex-shrink-0">
+      <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between mb-1 gap-1'>
+        <div className="text-base font-bold text-gray-800">
+          {t('game.goodsOf', { current: totalGoods, max: 6 })}
         </div>
+        {/* Valeur totale des ressources */}
+        <div className="text-base font-bold text-gray-800">
+          {t('game.value')}: {goodsValue}
+        </div>
+      </div>
 
       <div className="bg-gray-50 rounded-lg p-1 sm:p-2 overflow-x-auto">
         <div className="space-y-1">

@@ -35,7 +35,7 @@ export default function MetropolisDisplay({ metropolis, onBuildMetropolis, onUnb
 
   return (
     <div className={containerClass}>
-      <h3 className="text-sm font-bold mb-2 text-gray-800">Métropole</h3>
+      <h3 className="text-base font-bold mb-2 text-gray-800">Métropole</h3>
       <div
         onClick={(canAddWorker || canRemoveWorker) ? handleClick : undefined}
         onContextMenu={canRemoveWorker ? handleContextMenu : undefined}

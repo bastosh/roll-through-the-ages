@@ -13,7 +13,7 @@ export default function ProductionBuildingsList({
 
   return (
     <div className="flex-shrink-0">
-      <h3 className="text-base font-bold mb-3 text-gray-800">Bâtiments de production</h3>
+      <h3 className="text-base font-bold mb-2 text-gray-800">{t('common.productionBuildings')}</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
         {productions.map(function (prod, index) {
           const playerProd = playerProductions[index];
