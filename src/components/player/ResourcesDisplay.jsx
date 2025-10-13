@@ -1,5 +1,5 @@
-import { GOODS_TYPES, GOODS_NAMES, GOODS_COLORS, GOODS_VALUES } from '../constants/gameData';
-import { getGoodsValue, getTotalGoodsCount } from '../utils/gameUtils';
+import { GOODS_TYPES, GOODS_NAMES, GOODS_COLORS, GOODS_VALUES } from '../../constants/gameData';
+import { getGoodsValue, getTotalGoodsCount } from '../../utils/gameUtils';
 
 export default function ResourcesDisplay({
   goodsPositions,

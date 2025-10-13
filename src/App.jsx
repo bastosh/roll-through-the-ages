@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import GameSetup from './components/GameSetup';
+import GameSetup from './components/layout/GameSetup';
 import Game from './components/Game';
 
 export default function App() {

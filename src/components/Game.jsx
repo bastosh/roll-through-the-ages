@@ -12,15 +12,15 @@ import { useTradePhase } from '../hooks/useTradePhase';
 import { useSmithingPhase } from '../hooks/useSmithingPhase';
 import { feedCities, processRollResults } from '../utils/phaseHandlers';
 import { handleDisasters } from '../utils/gameUtils';
-import PlayerScorePanel from './PlayerScorePanel';
+import PlayerScorePanel from './player/PlayerScorePanel';
 import PhaseInfoBar from './shared/PhaseInfoBar';
 import ActionButtonsBar from './shared/ActionButtonsBar';
 import DisasterHelp from './shared/DisasterHelp';
-import PlayerTurnModal from './PlayerTurnModal';
-import DiceBar from './DiceBar';
-import GameHeader from './GameHeader';
-import GameEndScreen from './GameEndScreen';
-import SmithingInvasionPanel from './SmithingInvasionPanel';
+import PlayerTurnModal from './player/PlayerTurnModal';
+import DiceBar from './dice/DiceBar';
+import GameHeader from './layout/GameHeader';
+import GameEndScreen from './layout/GameEndScreen';
+import SmithingInvasionPanel from './phases/SmithingInvasionPanel';
 
 export default function Game({ playerNames, variantId, isSoloMode, bronze2024DevCount = 5, savedGameState }) {
   // Load variant configuration

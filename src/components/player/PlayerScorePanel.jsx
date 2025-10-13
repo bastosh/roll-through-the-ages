@@ -1,12 +1,12 @@
-import { getGoodsValue } from '../utils/gameUtils';
+import { getGoodsValue } from '../../utils/gameUtils';
 import CityDisplay from './CityDisplay';
 import DevelopmentsList from './DevelopmentsList';
 import MonumentsGrid from './MonumentsGrid';
 import DisastersDisplay from './DisastersDisplay';
 import ResourcesDisplay from './ResourcesDisplay';
 import BoatDisplay from './BoatDisplay';
-import TradeResourcesPanel from './TradeResourcesPanel';
-import SmithingInvasionPanel from './SmithingInvasionPanel';
+import TradeResourcesPanel from '../phases/TradeResourcesPanel';
+import SmithingInvasionPanel from '../phases/SmithingInvasionPanel';
 
 export default function PlayerScorePanel({
   player,

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { GOODS_TYPES, GOODS_NAMES, GOODS_COLORS } from '../constants/gameData';
+import { GOODS_TYPES, GOODS_NAMES, GOODS_COLORS } from '../../constants/gameData';
 
 /**
  * Panneau pour échanger des ressources pendant la phase de commerce

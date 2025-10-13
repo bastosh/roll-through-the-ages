@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { VARIANTS } from '../constants/variants';
-import { getScoreHistory, formatDate, clearScoreHistory } from '../utils/scoreHistory';
-import { getPlayerHistory, addPlayer, removePlayer, updatePlayerName, clearPlayerHistory } from '../utils/playerHistory';
-import VariantDetails from './VariantDetails';
+import { VARIANTS } from '../../constants/variants';
+import { getScoreHistory, formatDate, clearScoreHistory } from '../../utils/scoreHistory';
+import { getPlayerHistory, addPlayer, removePlayer, updatePlayerName, clearPlayerHistory } from '../../utils/playerHistory';
+import VariantDetails from '../info/VariantDetails';
 
 export default function GameSetup({ onStart, savedGameState, onResume, onClearSavedGame }) {
   const [playerCount, setPlayerCount] = useState(1);

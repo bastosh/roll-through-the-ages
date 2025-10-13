@@ -1,4 +1,4 @@
-import { getTotalGoodsCount } from '../utils/gameUtils';
+import { getTotalGoodsCount } from '../../utils/gameUtils';
 
 /**
  * Composant pour l'écran de fin de partie avec les scores

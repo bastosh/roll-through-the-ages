@@ -1,4 +1,4 @@
-import { GOODS_NAMES } from '../constants/gameData';
+import { GOODS_NAMES } from '../../constants/gameData';
 
 /**
  * Panneau pour gérer l'invasion de la Forge (dépenser des Lances)

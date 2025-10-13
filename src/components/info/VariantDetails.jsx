@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getVariantById } from '../constants/variants';
+import { getVariantById } from '../../constants/variants';
 
 export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
   const variant = getVariantById(variantId);
