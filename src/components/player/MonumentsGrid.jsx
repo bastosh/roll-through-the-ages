@@ -1,7 +1,7 @@
 export default function MonumentsGrid({ playerMonuments, onBuildMonument, onUnbuildMonument, canBuild, pendingWorkers, allPlayers, currentPlayerIndex, monuments }) {
   return (
     <div className="flex-shrink-0">
-      <h3 className="text-base font-bold mb-2 text-gray-800">Monuments</h3>
+      <h3 className="text-base font-bold mb-2 text-gray-800 dark:text-dark-text">Monuments</h3>
       <div className="grid grid-cols-2 gap-2">
         {playerMonuments.map(function (m) {
           const monument = monuments.find(mon => mon.id === m.id);
@@ -50,29 +50,29 @@ export default function MonumentsGrid({ playerMonuments, onBuildMonument, onUnbu
           return (
             <div
               key={m.id}
-              className={'border-2 rounded-lg p-2 ' + (
-                m.completed ? 'bg-purple-100 border-purple-600' : 'bg-gray-50 border-gray-300'
-              ) + ((canAddWorker || canRemoveWorker) ? ' hover:bg-purple-100 hover:border-purple-500 cursor-pointer' : '')}
+              className={'border-2 rounded-lg p-2 transition-colors ' + (
+                m.completed ? 'bg-purple-100 dark:bg-purple-900/30 border-purple-600 dark:border-purple-700' : 'bg-gray-50 dark:bg-dark-elevated border-gray-300 dark:border-dark-border'
+              ) + ((canAddWorker || canRemoveWorker) ? ' hover:bg-purple-100 dark:hover:bg-purple-900/40 hover:border-purple-500 dark:hover:border-purple-600 cursor-pointer' : '')}
               onClick={(canAddWorker || canRemoveWorker) ? handleClick : undefined}
               onContextMenu={canRemoveWorker ? handleContextMenu : undefined}
             >
               <div className='flex justify-between'>
                 <div>
-                  <div className="text-xs font-bold mb-1">{monument.name} ({monument.workers})</div>
+                  <div className="text-xs font-bold mb-1 dark:text-dark-text">{monument.name} ({monument.workers})</div>
                   <div className="flex gap-1 flex-wrap">
                     {Array(monument.workers).fill(0).map(function (_, j) {
                       return (
                         <div
                           key={j}
-                          className={'w-4 h-4 border border-gray-400 rounded ' + (
-                            j < m.progress ? 'bg-purple-600' : 'bg-white'
+                          className={'w-4 h-4 border border-gray-400 dark:border-dark-border rounded transition-colors ' + (
+                            j < m.progress ? 'bg-purple-600 dark:bg-purple-700' : 'bg-white dark:bg-dark-surface'
                           )}
                         />
                       );
                     })}
                   </div>
                   {monument.effect && (
-                    <div className="text-xs text-gray-600 italic mt-1">
+                    <div className="text-xs text-gray-600 dark:text-dark-text-muted italic mt-1">
                       {monument.effect}
                     </div>
                   )}

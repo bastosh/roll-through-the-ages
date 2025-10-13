@@ -15,13 +15,13 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
   const availableMonuments = variant.monuments.filter(m => excludedMonuments.indexOf(m.id) === -1);
 
   return (
-    <div className="bg-white rounded-xl shadow-2xl p-8 h-full overflow-y-auto">
-      <h2 className="text-2xl font-bold mb-6 text-amber-800">📜 {t('setup.rulesTitle', { variant: variant.displayName })}</h2>
+    <div className="bg-white dark:bg-dark-surface rounded-xl shadow-2xl p-8 h-full overflow-y-auto transition-colors">
+      <h2 className="text-2xl font-bold mb-6 text-amber-800 dark:text-amber-400">📜 {t('setup.rulesTitle', { variant: variant.displayName })}</h2>
 
       {/* Conditions de victoire */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-amber-700 mb-2">🏆 {t('setup.victoryConditions')}</h3>
-        <div className="bg-amber-50 rounded p-3 space-y-1 text-sm">
+        <h3 className="text-lg font-semibold text-amber-700 dark:text-amber-500 mb-2">🏆 {t('setup.victoryConditions')}</h3>
+        <div className="bg-amber-50 dark:bg-dark-elevated rounded p-3 space-y-1 text-sm dark:text-dark-text">
           {isSoloMode ? (
             <p>{t('setup.play10Turns')}</p>
           ) : playerCount === 1 ? (
@@ -40,8 +40,8 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
       {/* Règles spécifiques */}
       {(playerCount === 1 || variantId === 'late_bronze_age') && (
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-amber-700 mb-2">📜 {t('setup.specificRules')}</h3>
-          <div className="bg-blue-50 rounded p-3 space-y-2 text-sm">
+          <h3 className="text-lg font-semibold text-amber-700 dark:text-amber-500 mb-2">📜 {t('setup.specificRules')}</h3>
+          <div className="bg-blue-50 dark:bg-dark-elevated rounded p-3 space-y-2 text-sm dark:text-dark-text">
             {playerCount === 1 && (
               <p>• ☠️ {variant.soloSkullsLocked ? t('setup.skullsCannotBeRerolled') : t('setup.skullsCanBeRerolled')}</p>
             )}
@@ -63,7 +63,7 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
       <div className="mb-6">
         <button
           onClick={() => setMonumentsOpen(!monumentsOpen)}
-          className="w-full flex items-center justify-between text-lg font-semibold text-amber-700 mb-2 p-3 bg-amber-50 rounded-lg hover:bg-amber-100 transition cursor-pointer"
+          className="w-full flex items-center justify-between text-lg font-semibold text-amber-700 dark:text-amber-500 mb-2 p-3 bg-amber-50 dark:bg-dark-elevated rounded-lg hover:bg-amber-100 dark:hover:bg-dark-border transition cursor-pointer"
         >
           <span>🏛️ {t('setup.monuments')} ({availableMonuments.length}/{variant.monuments.length})</span>
           <span className="text-2xl">{monumentsOpen ? '▼' : '▶'}</span>
@@ -72,16 +72,16 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
           <div className="space-y-2 mt-2">
             {availableMonuments.map(function(monument) {
               return (
-                <div key={monument.id} className="bg-gray-50 rounded p-2 text-sm flex justify-between items-start">
+                <div key={monument.id} className="bg-gray-50 dark:bg-dark-elevated rounded p-2 text-sm flex justify-between items-start">
                   <div className="flex-1">
-                    <div className="font-semibold text-gray-800">{monument.name}</div>
+                    <div className="font-semibold text-gray-800 dark:text-dark-text">{monument.name}</div>
                     {monument.effect && (
-                      <div className="text-xs text-gray-600 mt-1">{monument.effect}</div>
+                      <div className="text-xs text-gray-600 dark:text-dark-text-muted mt-1">{monument.effect}</div>
                     )}
                   </div>
                   <div className="text-right ml-2">
-                    <div className="text-xs text-gray-600">⚒️ {monument.workers} {t('setup.workersShort')}</div>
-                    <div className="text-xs font-bold text-amber-700">
+                    <div className="text-xs text-gray-600 dark:text-dark-text-muted">⚒️ {monument.workers} {t('setup.workersShort')}</div>
+                    <div className="text-xs font-bold text-amber-700 dark:text-amber-500">
                       {monument.points[0]}/{monument.points[1]} {t('setup.pointsShort')}
                     </div>
                   </div>
@@ -89,7 +89,7 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
               );
             })}
             {excludedMonuments.length > 0 && (
-              <div className="mt-2 text-xs text-gray-500 italic">
+              <div className="mt-2 text-xs text-gray-500 dark:text-dark-text-muted italic">
                 {excludedMonuments.length} monument(s) non disponible(s) avec {playerCount} {playerCount === 1 ? t('setup.onePlayer') : t('setup.multiplePlayers')}
               </div>
             )}
@@ -101,7 +101,7 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
       <div>
         <button
           onClick={() => setDevelopmentsOpen(!developmentsOpen)}
-          className="w-full flex items-center justify-between text-lg font-semibold text-amber-700 mb-2 p-3 bg-amber-50 rounded-lg hover:bg-amber-100 transition cursor-pointer"
+          className="w-full flex items-center justify-between text-lg font-semibold text-amber-700 dark:text-amber-500 mb-2 p-3 bg-amber-50 dark:bg-dark-elevated rounded-lg hover:bg-amber-100 dark:hover:bg-dark-border transition cursor-pointer"
         >
           <span>🔬 {t('setup.developments')} ({variant.developments.length})</span>
           <span className="text-2xl">{developmentsOpen ? '▼' : '▶'}</span>
@@ -110,14 +110,14 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
           <div className="space-y-2 mt-2">
             {variant.developments.map(function(dev) {
               return (
-                <div key={dev.id} className="bg-gray-50 rounded p-2 text-sm flex justify-between items-start">
+                <div key={dev.id} className="bg-gray-50 dark:bg-dark-elevated rounded p-2 text-sm flex justify-between items-start">
                   <div className="flex-1">
-                    <div className="font-semibold text-gray-800">{dev.name}</div>
-                    <div className="text-xs text-gray-600 mt-1">{dev.effect}</div>
+                    <div className="font-semibold text-gray-800 dark:text-dark-text">{dev.name}</div>
+                    <div className="text-xs text-gray-600 dark:text-dark-text-muted mt-1">{dev.effect}</div>
                   </div>
                   <div className="text-right ml-2">
-                    <div className="text-xs text-gray-600">💰 {dev.cost}</div>
-                    <div className="text-xs font-bold text-amber-700">{dev.points} {t('setup.pointsShort')}</div>
+                    <div className="text-xs text-gray-600 dark:text-dark-text-muted">💰 {dev.cost}</div>
+                    <div className="text-xs font-bold text-amber-700 dark:text-amber-500">{dev.points} {t('setup.pointsShort')}</div>
                   </div>
                 </div>
               );

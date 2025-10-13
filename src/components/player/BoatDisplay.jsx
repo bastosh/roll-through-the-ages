@@ -56,12 +56,12 @@ const BoatDisplay = ({
 
   return (
     <div className="flex flex-col items-end ml-6 min-w-[180px]">
-      <div className="text-base font-bold mb-1 text-gray-800">{t('game.boats')}</div>
+      <div className="text-base font-bold mb-1 text-gray-800 dark:text-dark-text">{t('game.boats')}</div>
       <div
-        className={`flex flex-row gap-1 mb-1 bg-gray-50 border-2 rounded-lg px-4 py-3 ${
+        className={`flex flex-row gap-1 mb-1 bg-gray-50 dark:bg-dark-elevated border-2 rounded-lg px-4 py-3 transition-colors ${
           canInteract
-            ? 'border-amber-400 cursor-pointer hover:bg-amber-50'
-            : 'border-gray-300'
+            ? 'border-amber-400 dark:border-amber-dark-600 cursor-pointer hover:bg-amber-50 dark:hover:bg-amber-900/30'
+            : 'border-gray-300 dark:border-dark-border'
         }`}
         onClick={handleBoatClick}
         onContextMenu={handleContextMenu}
@@ -69,20 +69,20 @@ const BoatDisplay = ({
         {boats.map((status, idx) => (
           <div
             key={idx}
-            className={`w-4 h-4 border rounded ${
+            className={`w-4 h-4 border rounded transition-colors ${
               status === 'built'
-                ? 'bg-blue-500 border-blue-700'
+                ? 'bg-blue-500 dark:bg-blue-600 border-blue-700 dark:border-blue-800'
                 : status === 'pending'
-                ? 'bg-amber-300 border-amber-500'
-                : 'bg-white border-gray-400'
+                ? 'bg-amber-300 dark:bg-amber-600 border-amber-500 dark:border-amber-700'
+                : 'bg-white dark:bg-dark-surface border-gray-400 dark:border-dark-border'
             }`}
           />
         ))}
       </div>
-      <div className="text-xs text-right text-gray-700">
+      <div className="text-xs text-right text-gray-700 dark:text-dark-text-muted">
         {!hasShipping ? (
           <>
-            <span className="text-red-600 font-semibold">{t('game.requiresShipping')}</span><br />
+            <span className="text-red-600 dark:text-red-400 font-semibold">{t('game.requiresShipping')}</span><br />
             <span>{t('game.boatCost')}</span>
           </>
         ) : (
@@ -92,13 +92,13 @@ const BoatDisplay = ({
               <>
                 <br />
                 {canInteract && (
-                  <span className="text-green-600 font-semibold">
+                  <span className="text-green-600 dark:text-green-400 font-semibold">
                     {t('game.clickToBuild', { count: maxBoats, plural: maxBoats > 1 ? 's' : '' })}
                   </span>
                 )}
                 {canInteract && canUnbuild && <br />}
                 {canUnbuild && (
-                  <span className="text-red-600 font-semibold">
+                  <span className="text-red-600 dark:text-red-400 font-semibold">
                     {t('game.rightClickToCancel', { count: pendingBoats })}
                   </span>
                 )}

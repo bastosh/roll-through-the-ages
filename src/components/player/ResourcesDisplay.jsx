@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { GOODS_TYPES, GOODS_NAMES, GOODS_COLORS, GOODS_VALUES } from '../../constants/gameData';
+import { GOODS_TYPES, GOODS_NAMES, GOODS_VALUES } from '../../constants/gameData';
 import { getGoodsValue, getTotalGoodsCount } from '../../utils/gameUtils';
 
 export default function ResourcesDisplay({
@@ -61,16 +61,16 @@ export default function ResourcesDisplay({
   return (
     <div className="flex-shrink-0">
       <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between mb-1 gap-1'>
-        <div className="text-base font-bold text-gray-800">
+        <div className="text-base font-bold text-gray-800 dark:text-dark-text">
           {t('game.goodsOf', { current: totalGoods, max: 6 })}
         </div>
         {/* Valeur totale des ressources */}
-        <div className="text-base font-bold text-gray-800">
+        <div className="text-base font-bold text-gray-800 dark:text-dark-text">
           {t('game.value')}: {goodsValue}
         </div>
       </div>
 
-      <div className="bg-gray-50 rounded-lg p-1 sm:p-2 overflow-x-auto">
+      <div className="bg-gray-50 dark:bg-dark-elevated rounded-lg p-1 sm:p-2 overflow-x-auto transition-colors">
         <div className="space-y-1">
           {[...GOODS_TYPES].reverse().map(function (type) {
             const position = displayGoodsPositions[type];
@@ -91,7 +91,7 @@ export default function ResourcesDisplay({
               }
             }
 
-            const rowClass = (canDiscard || canToggleForBuy) ? 'cursor-pointer hover:bg-gray-100 rounded px-1 -mx-1' : '';
+            const rowClass = (canDiscard || canToggleForBuy) ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-dark-elevated rounded px-1 -mx-1' : '';
 
             return (
               <div
@@ -99,7 +99,7 @@ export default function ResourcesDisplay({
                 className={'flex items-start gap-1.5 ' + rowClass}
                 onClick={handleClick}
               >
-                <div className="text-xs w-16 text-gray-600 pt-0.5">{t(GOODS_NAMES[type])}</div>
+                <div className="text-xs w-16 text-gray-800 dark:text-dark-text pt-0.5 font-semibold">{t(GOODS_NAMES[type])}</div>
                 <div className="flex-1 flex gap-1">
                   {/* Afficher toutes les cases existantes pour ce type */}
                   {GOODS_VALUES[type].map(function (val, idx) {
@@ -112,33 +112,38 @@ export default function ResourcesDisplay({
                     if (isSelected) {
                       return (
                         <div key={idx} className="flex flex-col items-center">
-                          <div className="w-14 h-7 border-2 border-gray-300 rounded bg-white" />
-                          <div className="text-xs text-gray-500 mt-0.5">{val}</div>
+                          <div className="w-14 h-7 border-2 border-gray-300 dark:border-dark-border rounded bg-white dark:bg-dark-surface transition-colors" />
+                          <div className="text-xs text-gray-600 dark:text-dark-text-muted mt-0.5">{val}</div>
                         </div>
                       );
                     }
 
-                    let bgClass = 'bg-white';
+                    let bgClass = 'bg-white dark:bg-dark-surface';
                     let borderClass = 'border-gray-300';
 
                     if (isCurrent) {
-                      bgClass = GOODS_COLORS[type];
+                      // Couleurs pleines en mode clair, versions sombres en mode sombre
+                      if (type === 'wood') bgClass = 'bg-brown-600 dark:bg-brown-700';
+                      else if (type === 'stone') bgClass = 'bg-gray-400 dark:bg-gray-600';
+                      else if (type === 'pottery') bgClass = 'bg-red-500 dark:bg-red-700';
+                      else if (type === 'cloth') bgClass = 'bg-blue-400 dark:bg-blue-600';
+                      else if (type === 'spearheads') bgClass = 'bg-orange-500 dark:bg-orange-700';
                     } else if (isPreview) {
                       // Lighter version of the color for preview
-                      if (type === 'wood') bgClass = 'bg-brown-300';
-                      else if (type === 'stone') bgClass = 'bg-gray-200';
-                      else if (type === 'pottery') bgClass = 'bg-red-200';
-                      else if (type === 'cloth') bgClass = 'bg-blue-100';
-                      else if (type === 'spearheads') bgClass = 'bg-orange-200';
+                      if (type === 'wood') bgClass = 'bg-brown-300 dark:bg-brown-800';
+                      else if (type === 'stone') bgClass = 'bg-gray-200 dark:bg-gray-700';
+                      else if (type === 'pottery') bgClass = 'bg-red-200 dark:bg-red-800';
+                      else if (type === 'cloth') bgClass = 'bg-blue-100 dark:bg-blue-800';
+                      else if (type === 'spearheads') bgClass = 'bg-orange-200 dark:bg-orange-800';
                     }
 
                     return (
                       <div key={idx} className="flex flex-col items-center">
                         <div
-                          className={'w-14 h-7 border-2 rounded ' + bgClass + ' ' + borderClass}
+                          className={'w-14 h-7 border-2 rounded transition-colors ' + bgClass + ' ' + borderClass + ' dark:border-dark-border'}
                           title={val.toString()}
                         />
-                        <div className="text-xs text-gray-500 mt-0.5">{val}</div>
+                        <div className="text-xs text-gray-600 dark:text-dark-text-muted mt-0.5">{val}</div>
                       </div>
                     );
                   })}
@@ -152,9 +157,9 @@ export default function ResourcesDisplay({
                     );
                   })}
                 </div>
-                <div className="text-xs font-bold w-8 text-right pt-0.5">
+                <div className="text-xs font-bold w-8 text-right pt-0.5 text-gray-800 dark:text-dark-text">
                   {selectedQuantity > 0 ? (
-                    <span className="text-green-600">{selectedValue}</span>
+                    <span className="text-green-600 dark:text-green-400">{selectedValue}</span>
                   ) : (
                     <span>{value}</span>
                   )}
@@ -165,30 +170,30 @@ export default function ResourcesDisplay({
         </div>
 
         {/* Ligne de la nourriture */}
-        <div className="flex items-start gap-1.5 pt-2 border-t border-gray-300 mt-1">
-          <div className="text-xs w-16 text-gray-600 pt-0.5 capitalize">{t('common.food')}</div>
+        <div className="flex items-start gap-1.5 pt-2 border-t border-gray-300 dark:border-dark-border mt-1">
+          <div className="text-xs w-16 text-gray-800 dark:text-dark-text pt-0.5 capitalize font-semibold">{t('common.food')}</div>
           <div className="flex-1 flex gap-1">
             {Array(maxFood).fill(0).map(function (_, idx) {
               const value = idx + 1;
               const isCurrent = value <= food;
               const isPreview = value > food && value <= futureFood;
 
-              let bgClass = 'bg-white';
+              let bgClass = 'bg-white dark:bg-dark-surface';
               if (isCurrent) {
-                bgClass = 'bg-yellow-400';
+                bgClass = 'bg-yellow-400 dark:bg-yellow-600';
               } else if (isPreview) {
-                bgClass = 'bg-yellow-200'; // Lighter amber for preview
+                bgClass = 'bg-yellow-200 dark:bg-yellow-700'; // Lighter amber for preview
               }
 
               return (
                 <div key={idx} className="flex flex-col items-center">
-                  <div className={'w-10 h-6 border-2 border-gray-300 rounded ' + bgClass} />
-                  <div className="text-xs text-gray-500 mt-0.5">{value}</div>
+                  <div className={'w-10 h-6 border-2 border-gray-300 dark:border-dark-border rounded transition-colors ' + bgClass} />
+                  <div className="text-xs text-gray-600 dark:text-dark-text-muted mt-0.5">{value}</div>
                 </div>
               );
             })}
           </div>
-          <div className="text-xs font-bold w-8 text-right pt-0.5">{food}</div>
+          <div className="text-xs font-bold w-8 text-right pt-0.5 text-gray-800 dark:text-dark-text">{food}</div>
         </div>
       </div>
     </div>

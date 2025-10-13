@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ThemeProvider } from './contexts/ThemeContext';
 import GameSetup from './components/layout/GameSetup';
 import Game from './components/Game';
 
@@ -65,22 +66,26 @@ export default function App() {
 
   if (!gameStarted) {
     return (
-      <GameSetup
-        onStart={handleStart}
-        savedGameState={savedGameState}
-        onResume={handleResume}
-        onClearSavedGame={handleClearSavedGame}
-      />
+      <ThemeProvider>
+        <GameSetup
+          onStart={handleStart}
+          savedGameState={savedGameState}
+          onResume={handleResume}
+          onClearSavedGame={handleClearSavedGame}
+        />
+      </ThemeProvider>
     );
   }
 
   return (
-    <Game
-      playerNames={playerNames}
-      variantId={variantId}
-      isSoloMode={isSoloMode}
-      bronze2024DevCount={bronze2024DevCount}
-      savedGameState={savedGameState}
-    />
+    <ThemeProvider>
+      <Game
+        playerNames={playerNames}
+        variantId={variantId}
+        isSoloMode={isSoloMode}
+        bronze2024DevCount={bronze2024DevCount}
+        savedGameState={savedGameState}
+      />
+    </ThemeProvider>
   );
 }

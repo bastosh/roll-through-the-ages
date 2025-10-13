@@ -78,7 +78,7 @@ export default function DevelopmentsListAncient({
 
   return (
     <div className="flex-shrink-0">
-      <h3 className="text-base font-bold mb-3 text-gray-800">{t('common.developments')}</h3>
+      <h3 className="text-base font-bold mb-3 text-gray-800 dark:text-dark-text">{t('common.developments')}</h3>
       <div className="space-y-1">
         {allDevelopments.map(function (dev, index) {
           // Afficher un séparateur avant les développements avec prérequis métropole
@@ -87,8 +87,8 @@ export default function DevelopmentsListAncient({
           if (showSeparator) {
             return (
               <div key="metropolis-separator">
-                <div className="border-t-2 border-amber-400 my-3 pt-2">
-                  <div className="text-xs font-bold text-amber-700 text-center mb-2 bg-amber-50 py-1 rounded">
+                <div className="border-t-2 border-amber-400 dark:border-amber-600 my-3 pt-2">
+                  <div className="text-xs font-bold text-amber-700 dark:text-amber-400 text-center mb-2 bg-amber-50 dark:bg-amber-900/30 py-1 rounded">
                     ⚠️ Nécessite la Métropole
                   </div>
                 </div>
@@ -113,10 +113,10 @@ export default function DevelopmentsListAncient({
           const isClickable = canBuy && !isOwned && canAfford;
           const isSelected = selectedDevelopmentId === dev.id;
 
-          let bgClass = isOwned ? 'bg-green-50' : isSelected ? 'bg-blue-200 border-2 border-blue-600' : 'bg-gray-50';
-          let className = 'flex items-center gap-2 py-2.5 px-2 rounded text-sm ' + bgClass;
+          let bgClass = isOwned ? 'bg-green-50 dark:bg-green-900/30' : isSelected ? 'bg-blue-200 dark:bg-blue-900/40 border-2 border-blue-600 dark:border-blue-700' : 'bg-gray-50 dark:bg-dark-elevated';
+          let className = 'flex items-center gap-2 py-2.5 px-2 rounded text-sm transition-colors ' + bgClass;
           if (isClickable) {
-            className += ' hover:bg-blue-100 cursor-pointer';
+            className += ' hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer';
           } else if (!isOwned && (!canAfford || !meetsPrerequisite)) {
             className += ' opacity-60';
           }
@@ -127,9 +127,9 @@ export default function DevelopmentsListAncient({
             const originalCost = typeof dev.cost === 'number' ? dev.cost : 10 * playerCount;
             costDisplay = (
               <span>
-                <span className="line-through text-gray-400">{originalCost}</span>
+                <span className="line-through text-gray-400 dark:text-gray-500">{originalCost}</span>
                 {' '}
-                <span className="text-green-600 font-bold">{actualCost}</span>
+                <span className="text-green-600 dark:text-green-400 font-bold">{actualCost}</span>
                 💰
               </span>
             );
@@ -137,20 +137,20 @@ export default function DevelopmentsListAncient({
 
           const element = (
             <div key={dev.id} className={className} onClick={isClickable ? () => onBuyDevelopment(dev.id) : undefined}>
-              <div className="w-16 text-right font-semibold text-gray-700 text-sm">{costDisplay}</div>
+              <div className="w-16 text-right font-semibold text-gray-700 dark:text-dark-text text-sm">{costDisplay}</div>
               <div className="w-6 flex justify-center">
-                <div className={'w-5 h-5 border-2 rounded flex items-center justify-center ' + (
-                  isOwned ? 'bg-green-600 border-green-700' : 'bg-white border-gray-400'
+                <div className={'w-5 h-5 border-2 rounded flex items-center justify-center transition-colors ' + (
+                  isOwned ? 'bg-green-600 dark:bg-green-700 border-green-700 dark:border-green-800' : 'bg-white dark:bg-dark-surface border-gray-400 dark:border-dark-border'
                 )}>
                   {isOwned && <span className="text-white text-sm">✓</span>}
                 </div>
               </div>
-              <div className="w-28 font-medium text-sm">
+              <div className="w-28 font-medium text-sm dark:text-dark-text">
                 {dev.name}
               </div>
-              <div className="w-12 text-center font-semibold text-amber-700 text-sm">{dev.points}🏆</div>
+              <div className="w-12 text-center font-semibold text-amber-700 dark:text-amber-500 text-sm">{dev.points}🏆</div>
               {dev.effect && (
-                <div className="flex-1 text-sm text-gray-600 italic">
+                <div className="flex-1 text-sm text-gray-600 dark:text-dark-text-muted italic">
                   {dev.effect}
                 </div>
               )}

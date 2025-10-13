@@ -11,7 +11,7 @@ export default function CityDisplay({ cities, onBuildCity, onUnbuildCity, canBui
 
   return (
     <div className="flex-shrink-0">
-      <h3 className="text-base font-bold mb-2 text-gray-800">{t('common.cities')}</h3>
+      <h3 className="text-base font-bold mb-2 text-gray-800 dark:text-dark-text">{t('common.cities')}</h3>
       <div className="flex gap-1.5">
         {allCities.map(function (city, i) {
           const height = city.requiredWorkers <= 4 ? 'h-16' : 'h-20';
@@ -53,9 +53,9 @@ export default function CityDisplay({ cities, onBuildCity, onUnbuildCity, canBui
               onClick={(canAddWorker || canRemoveWorker) ? handleClick : undefined}
               onContextMenu={canRemoveWorker ? handleContextMenu : undefined}
             >
-              <div className={'border-2 rounded-lg flex flex-col items-center justify-start p-1.5 ' + height + ' ' + (
-                city.built ? 'bg-green-100 border-green-600' : 'bg-gray-50 border-gray-300'
-              ) + ((canAddWorker || canRemoveWorker) ? ' hover:bg-blue-100 hover:border-blue-500' : '')}>
+              <div className={'border-2 rounded-lg flex flex-col items-center justify-start p-1.5 transition-colors ' + height + ' ' + (
+                city.built ? 'bg-green-100 dark:bg-green-900/30 border-green-600 dark:border-green-700' : 'bg-gray-50 dark:bg-dark-elevated border-gray-300 dark:border-dark-border'
+              ) + ((canAddWorker || canRemoveWorker) ? ' hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:border-blue-500 dark:hover:border-blue-600' : '')}>
                 {city.requiredWorkers > 0 && (
                   <div className="grid grid-cols-2 gap-1">
                     {Array(city.requiredWorkers).fill(0).map(function (_, j) {
@@ -63,8 +63,8 @@ export default function CityDisplay({ cities, onBuildCity, onUnbuildCity, canBui
                       return (
                         <div
                           key={j}
-                          className={'w-4 h-4 border border-gray-400 rounded ' + (
-                            j < city.progress ? 'bg-blue-600' : 'bg-white'
+                          className={'w-4 h-4 border border-gray-400 dark:border-dark-border rounded transition-colors ' + (
+                            j < city.progress ? 'bg-blue-600 dark:bg-blue-700' : 'bg-white dark:bg-dark-surface'
                           ) + (isLastOdd ? ' col-span-2 mx-auto' : '')}
                         />
                       );

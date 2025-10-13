@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@config "../tailwind.config.js";
+
 @theme {
   --color-brown: #795548;
   --color-brown-50: #efebe9;
@@ -12,4 +14,17 @@
   --color-brown-700: #5d4037;
   --color-brown-800: #4e342e;
   --color-brown-900: #3e2723;
+
+  /* Dark mode colors */
+  --color-dark-bg: #1a1a1a;
+  --color-dark-surface: #2d2d2d;
+  --color-dark-elevated: #3a3a3a;
+  --color-dark-border: #4a4a4a;
+  --color-dark-text: #e5e5e5;
+  --color-dark-text-muted: #a0a0a0;
+
+  /* Amber adjustments for dark mode */
+  --color-amber-dark-500: #f59e0b;
+  --color-amber-dark-600: #d97706;
+  --color-amber-dark-700: #b45309;
 }

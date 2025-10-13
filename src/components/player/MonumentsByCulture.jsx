@@ -51,7 +51,7 @@ export default function MonumentsByCulture({
 
   return (
     <div className="flex-shrink-0">
-      <h3 className="text-base font-bold mb-2 text-gray-800">Monuments</h3>
+      <h3 className="text-base font-bold mb-2 text-gray-800 dark:text-dark-text">Monuments</h3>
       <div className="space-y-3">
         {cultures.map(function (culture) {
           const cultureMonuments = monumentsByCulture[culture.name] || [];
@@ -67,34 +67,34 @@ export default function MonumentsByCulture({
           }
 
           return (
-            <div key={culture.name} className="border-2 rounded-lg p-2.5 bg-gradient-to-br from-amber-50 to-orange-50 border-amber-300 shadow-sm">
+            <div key={culture.name} className="border-2 rounded-lg p-2.5 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-300 dark:border-amber-700 shadow-sm transition-colors">
               {/* En-tête de la culture */}
-              <div className="flex justify-between items-center mb-2 pb-2 border-b-2 border-amber-200">
+              <div className="flex justify-between items-center mb-2 pb-2 border-b-2 border-amber-200 dark:border-amber-700">
                 <div className="flex items-center gap-3">
-                  <h4 className="text-sm font-bold text-amber-900 uppercase tracking-wide">{t(`cultures.${culture.name}`)}</h4>
+                  <h4 className="text-sm font-bold text-amber-900 dark:text-amber-400 uppercase tracking-wide">{t(`cultures.${culture.name}`)}</h4>
                   <div className="flex items-center gap-1">
                     {/* Checkbox premier joueur */}
                     <div className="flex items-center gap-1">
-                      <div className={'w-7 h-7 border-2 rounded flex items-center justify-center ' + (
-                        playerCultureStatus === 'first' ? 'bg-green-600 border-green-700' : 'bg-white border-gray-400'
+                      <div className={'w-7 h-7 border-2 rounded flex items-center justify-center transition-colors ' + (
+                        playerCultureStatus === 'first' ? 'bg-green-600 dark:bg-green-700 border-green-700 dark:border-green-800' : 'bg-white dark:bg-dark-surface border-gray-400 dark:border-dark-border'
                       )}>
                         {playerCultureStatus === 'first' ? (
                           <span className="text-white text-xs font-bold">{culture.bonusFirst}</span>
                         ) : (
-                          <span className="text-gray-600 text-xs font-bold">{culture.bonusFirst}</span>
+                          <span className="text-gray-600 dark:text-gray-400 text-xs font-bold">{culture.bonusFirst}</span>
                         )}
                       </div>
                     </div>
 
                     {/* Checkbox second joueur */}
                     <div className="flex items-center gap-1">
-                      <div className={'w-6 h-6 border-2 rounded flex items-center justify-center ' + (
-                        playerCultureStatus === 'second' ? 'bg-purple-600 border-purple-700' : 'bg-white border-gray-400'
+                      <div className={'w-6 h-6 border-2 rounded flex items-center justify-center transition-colors ' + (
+                        playerCultureStatus === 'second' ? 'bg-purple-600 dark:bg-purple-700 border-purple-700 dark:border-purple-800' : 'bg-white dark:bg-dark-surface border-gray-400 dark:border-dark-border'
                       )}>
                         {playerCultureStatus === 'second' ? (
                           <span className="text-white text-xs font-bold">{culture.bonusSecond}</span>
                         ) : (
-                          <span className="text-gray-600 text-xs font-bold">{culture.bonusSecond}</span>
+                          <span className="text-gray-600 dark:text-gray-400 text-xs font-bold">{culture.bonusSecond}</span>
                         )}
                       </div>
                     </div>
@@ -154,16 +154,16 @@ export default function MonumentsByCulture({
                   return (
                     <div
                       key={playerMonument.id}
-                      className={'border-2 rounded p-1.5 ' +
+                      className={'border-2 rounded p-1.5 transition-colors ' +
                         (isLastAndAlone ? 'col-start-3 ' : '') +
-                        (playerMonument.completed ? 'bg-purple-100 border-purple-600' : 'bg-white border-gray-300') +
-                        ((canAddWorker || canRemoveWorker) ? ' hover:bg-purple-100 hover:border-purple-500 cursor-pointer' : '')}
+                        (playerMonument.completed ? 'bg-purple-100 dark:bg-purple-900/30 border-purple-600 dark:border-purple-700' : 'bg-white dark:bg-dark-surface border-gray-300 dark:border-dark-border') +
+                        ((canAddWorker || canRemoveWorker) ? ' hover:bg-purple-100 dark:hover:bg-purple-900/40 hover:border-purple-500 dark:hover:border-purple-600 cursor-pointer' : '')}
                       onClick={(canAddWorker || canRemoveWorker) ? handleClick : undefined}
                       onContextMenu={canRemoveWorker ? handleContextMenu : undefined}
                     >
                       <div className='flex justify-between gap-1'>
                         <div className="flex-1 min-w-0">
-                          <div className="text-[11px] font-bold mb-1 truncate" title={monument.name}>
+                          <div className="text-[11px] font-bold mb-1 truncate dark:text-dark-text" title={monument.name}>
                             {monument.name} ({monument.workers})
                           </div>
                           <div className="flex gap-0.5 flex-wrap">
@@ -171,8 +171,8 @@ export default function MonumentsByCulture({
                               return (
                                 <div
                                   key={j}
-                                  className={'w-4 h-4 border border-gray-400 rounded ' + (
-                                    j < playerMonument.progress ? 'bg-purple-600' : 'bg-white'
+                                  className={'w-4 h-4 border border-gray-400 dark:border-dark-border rounded transition-colors ' + (
+                                    j < playerMonument.progress ? 'bg-purple-600 dark:bg-purple-700' : 'bg-white dark:bg-dark-surface'
                                   )}
                                 />
                               );
@@ -181,29 +181,29 @@ export default function MonumentsByCulture({
                         </div>
                         <div className="flex flex-col items-center justify-start gap-0.5 text-xs font-semibold">
                           {/* Points maximum (première case à cocher) */}
-                          <div className={'w-5 h-5 border-2 rounded flex items-center justify-center ' + (
-                            playerMonument.completed && playerMonument.firstToComplete ? 'bg-green-600 border-green-700' :
-                              someoneElseCompletedFirst ? 'bg-gray-300 border-gray-400' :
-                                'bg-white border-gray-400'
+                          <div className={'w-5 h-5 border-2 rounded flex items-center justify-center transition-colors ' + (
+                            playerMonument.completed && playerMonument.firstToComplete ? 'bg-green-600 dark:bg-green-700 border-green-700 dark:border-green-800' :
+                              someoneElseCompletedFirst ? 'bg-gray-300 dark:bg-gray-600 border-gray-400 dark:border-gray-500' :
+                                'bg-white dark:bg-dark-surface border-gray-400 dark:border-dark-border'
                           )}>
                             {playerMonument.completed && playerMonument.firstToComplete ? (
                               <span className="text-white text-[10px] font-bold">{monument.points[0]}</span>
                             ) : someoneElseCompletedFirst ? (
-                              <span className="text-gray-600 text-[10px] font-bold">✗</span>
+                              <span className="text-gray-600 dark:text-gray-300 text-[10px] font-bold">✗</span>
                             ) : (
-                              <span className="text-gray-600 text-[10px] font-bold">{monument.points[0]}</span>
+                              <span className="text-gray-600 dark:text-gray-400 text-[10px] font-bold">{monument.points[0]}</span>
                             )}
                           </div>
 
                           {/* Points secondaires */}
-                          <div className={'w-5 h-5 border-2 rounded flex items-center justify-center ' + (
-                            playerMonument.completed && !playerMonument.firstToComplete ? 'bg-purple-600 border-purple-700' :
-                              'bg-white border-gray-400'
+                          <div className={'w-5 h-5 border-2 rounded flex items-center justify-center transition-colors ' + (
+                            playerMonument.completed && !playerMonument.firstToComplete ? 'bg-purple-600 dark:bg-purple-700 border-purple-700 dark:border-purple-800' :
+                              'bg-white dark:bg-dark-surface border-gray-400 dark:border-dark-border'
                           )}>
                             {playerMonument.completed && !playerMonument.firstToComplete ? (
                               <span className="text-white text-[10px] font-bold">{monument.points[1]}</span>
                             ) : (
-                              <span className="text-gray-600 text-[10px] font-bold">{monument.points[1]}</span>
+                              <span className="text-gray-600 dark:text-gray-400 text-[10px] font-bold">{monument.points[1]}</span>
                             )}
                           </div>
                         </div>

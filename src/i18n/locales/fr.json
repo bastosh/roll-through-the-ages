@@ -23,7 +23,9 @@
     "delete": "Supprimer",
     "cities": "Cités",
     "developments": "Développements",
-    "productionBuildings": "Bâtiments de production"
+    "productionBuildings": "Bâtiments de production",
+    "darkMode": "Mode sombre",
+    "lightMode": "Mode clair"
   },
 
   "credits": {

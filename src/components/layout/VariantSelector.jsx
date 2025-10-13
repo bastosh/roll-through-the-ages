@@ -16,7 +16,7 @@ export default function VariantSelector({
     <div className="space-y-6">
       {/* Variante du jeu */}
       <div>
-        <label className="block text-lg font-semibold mb-3 text-gray-700">
+        <label className="block text-lg font-semibold mb-3 text-gray-700 dark:text-dark-text">
           {t('setup.variant')}
         </label>
         <div className="flex gap-4 flex-wrap">
@@ -27,8 +27,8 @@ export default function VariantSelector({
                 onClick={() => onSelectVariant(variant.id)}
                 className={'flex-1 min-w-[200px] py-3 rounded-lg font-semibold transition cursor-pointer ' + (
                   selectedVariant === variant.id
-                    ? 'bg-amber-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-amber-600 dark:bg-amber-dark-700 text-white'
+                    : 'bg-gray-200 dark:bg-dark-elevated text-gray-700 dark:text-dark-text hover:bg-gray-300 dark:hover:bg-dark-border'
                 )}
               >
                 {variant.displayName}
@@ -39,24 +39,24 @@ export default function VariantSelector({
         {/* Option spécifique Bronze Age 2024, seulement pour 2 joueurs */}
         {selectedVariant === 'bronze_age_2024' && playerCount === 2 && (
           <div className="mt-4">
-            <label className="block text-md font-semibold mb-2 text-gray-700">
+            <label className="block text-md font-semibold mb-2 text-gray-700 dark:text-dark-text">
               {t('setup.gameEndCondition')}
             </label>
             <div className="flex gap-4">
               <button
                 onClick={() => onSetBronze2024DevCount(5)}
-                className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (bronze2024DevCount === 5 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')}
+                className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (bronze2024DevCount === 5 ? 'bg-amber-600 dark:bg-amber-dark-700 text-white' : 'bg-gray-200 dark:bg-dark-elevated text-gray-700 dark:text-dark-text hover:bg-gray-300 dark:hover:bg-dark-border')}
               >
                 {t('setup.developmentsPurchased', { count: 5 })}
               </button>
               <button
                 onClick={() => onSetBronze2024DevCount(6)}
-                className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (bronze2024DevCount === 6 ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300')}
+                className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (bronze2024DevCount === 6 ? 'bg-amber-600 dark:bg-amber-dark-700 text-white' : 'bg-gray-200 dark:bg-dark-elevated text-gray-700 dark:text-dark-text hover:bg-gray-300 dark:hover:bg-dark-border')}
               >
                 {t('setup.developmentsPurchased', { count: 6 })}
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-1">{t('setup.chooseEndCondition')}</p>
+            <p className="text-xs text-gray-500 dark:text-dark-text-muted mt-1">{t('setup.chooseEndCondition')}</p>
           </div>
         )}
       </div>
@@ -64,7 +64,7 @@ export default function VariantSelector({
       {/* Mode de jeu pour solo */}
       {playerCount === 1 && (
         <div>
-          <label className="block text-lg font-semibold mb-3 text-gray-700">
+          <label className="block text-lg font-semibold mb-3 text-gray-700 dark:text-dark-text">
             {t('setup.gameMode')}
           </label>
           <div className="flex gap-4">
@@ -72,8 +72,8 @@ export default function VariantSelector({
               onClick={() => onSetIsSoloMode(true)}
               className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (
                 isSoloMode
-                  ? 'bg-amber-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-amber-600 dark:bg-amber-dark-700 text-white'
+                  : 'bg-gray-200 dark:bg-dark-elevated text-gray-700 dark:text-dark-text hover:bg-gray-300 dark:hover:bg-dark-border'
               )}
             >
               {t('setup.soloMode10Turns')}
@@ -82,8 +82,8 @@ export default function VariantSelector({
               onClick={() => onSetIsSoloMode(false)}
               className={'flex-1 py-3 rounded-lg font-semibold transition cursor-pointer ' + (
                 !isSoloMode
-                  ? 'bg-amber-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-amber-600 dark:bg-amber-dark-700 text-white'
+                  : 'bg-gray-200 dark:bg-dark-elevated text-gray-700 dark:text-dark-text hover:bg-gray-300 dark:hover:bg-dark-border'
               )}
             >
               {t('setup.freePlay')}

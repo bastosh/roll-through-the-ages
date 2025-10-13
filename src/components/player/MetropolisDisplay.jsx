@@ -35,27 +35,27 @@ export default function MetropolisDisplay({ metropolis, onBuildMetropolis, onUnb
 
   return (
     <div className={containerClass}>
-      <h3 className="text-base font-bold mb-2 text-gray-800">Métropole</h3>
+      <h3 className="text-base font-bold mb-2 text-gray-800 dark:text-dark-text">Métropole</h3>
       <div
         onClick={(canAddWorker || canRemoveWorker) ? handleClick : undefined}
         onContextMenu={canRemoveWorker ? handleContextMenu : undefined}
       >
-        <div className={'border-2 rounded-lg flex flex-col items-center justify-start p-1.5 h-28 ' + (
-          metropolis.built ? 'bg-yellow-100 border-yellow-600' : 'bg-gray-50 border-gray-300'
-        ) + ((canAddWorker || canRemoveWorker) ? ' hover:bg-yellow-100 hover:border-yellow-500' : '')}>
+        <div className={'border-2 rounded-lg flex flex-col items-center justify-start p-1.5 h-28 transition-colors ' + (
+          metropolis.built ? 'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-600 dark:border-yellow-700' : 'bg-gray-50 dark:bg-dark-elevated border-gray-300 dark:border-dark-border'
+        ) + ((canAddWorker || canRemoveWorker) ? ' hover:bg-yellow-100 dark:hover:bg-yellow-900/40 hover:border-yellow-500 dark:hover:border-yellow-600' : '')}>
           <div className="grid grid-cols-2 gap-1">
             {Array(10).fill(0).map(function (_, j) {
               return (
                 <div
                   key={j}
-                  className={'w-4 h-4 border border-gray-400 rounded ' + (
-                    j < metropolis.progress ? 'bg-yellow-600' : 'bg-white'
+                  className={'w-4 h-4 border border-gray-400 dark:border-dark-border rounded transition-colors ' + (
+                    j < metropolis.progress ? 'bg-yellow-600 dark:bg-yellow-700' : 'bg-white dark:bg-dark-surface'
                   )}
                 />
               );
             })}
           </div>
-          <div className="text-xs font-semibold mt-3 text-amber-700">4🏆</div>
+          <div className="text-xs font-semibold mt-3 text-amber-700 dark:text-amber-500">4🏆</div>
         </div>
       </div>
     </div>

@@ -12,6 +12,7 @@ import PlayerNameInputs from './PlayerNameInputs';
 import VariantSelector from './VariantSelector';
 import ScoreHistory from './ScoreHistory';
 import LanguageSelector from '../shared/LanguageSelector';
+import ThemeToggle from '../shared/ThemeToggle';
 
 export default function GameSetup({ onStart, savedGameState, onResume, onClearSavedGame }) {
   const { t } = useTranslation();
@@ -102,14 +103,17 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-200 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-200 dark:from-gray-900 dark:to-gray-800 p-8 transition-colors">
       {/* Language Selector */}
       <LanguageSelector />
+
+      {/* Theme Toggle */}
+      <ThemeToggle />
 
       {/* Config Button */}
       <button
         onClick={() => setShowConfig(!showConfig)}
-        className="fixed h-12 w-12 top-4 right-4 bg-gray-600 text-white p-3 rounded-lg shadow-lg hover:bg-gray-700 transition cursor-pointer"
+        className="fixed h-12 w-12 top-4 right-4 bg-gray-600 dark:bg-dark-surface text-white p-3 rounded-lg shadow-lg hover:bg-gray-700 dark:hover:bg-dark-elevated transition cursor-pointer"
         title={t('common.configuration')}
       >
         ⚙️
@@ -118,7 +122,7 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
       {/* Credits Button */}
       <button
         onClick={() => setShowCredits(!showCredits)}
-        className="fixed h-12 w-12 top-4 right-20 bg-gray-600 text-white p-3 rounded-lg shadow-lg hover:bg-gray-700 transition cursor-pointer"
+        className="fixed h-12 w-12 top-4 right-20 bg-gray-600 dark:bg-dark-surface text-white p-3 rounded-lg shadow-lg hover:bg-gray-700 dark:hover:bg-dark-elevated transition cursor-pointer"
         title={t('common.credits')}
       >
         ℹ️
@@ -139,14 +143,14 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
       />
 
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-8 text-amber-800 bg-white rounded-xl shadow-lg p-6">
+        <h1 className="text-4xl font-bold text-center mb-8 text-amber-800 dark:text-amber-400 bg-white dark:bg-dark-surface rounded-xl shadow-lg p-6 transition-colors">
           Roll Through the Ages
         </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Colonne de gauche : Configuration */}
-          <div className="bg-white rounded-xl shadow-2xl p-8">
-            <h2 className="text-2xl font-bold mb-6 text-amber-800">⚙️ {t('common.configuration')}</h2>
+          <div className="bg-white dark:bg-dark-surface rounded-xl shadow-2xl p-8 transition-colors">
+            <h2 className="text-2xl font-bold mb-6 text-amber-800 dark:text-amber-400">⚙️ {t('common.configuration')}</h2>
 
             <SavedGameBanner
               savedGameState={savedGameState}
@@ -181,7 +185,7 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
 
             <button
               onClick={handleStart}
-              className="w-full bg-amber-600 text-white py-4 rounded-lg font-bold text-xl hover:bg-amber-700 transition cursor-pointer"
+              className="w-full bg-amber-600 dark:bg-amber-dark-700 text-white py-4 rounded-lg font-bold text-xl hover:bg-amber-700 dark:hover:bg-amber-dark-600 transition cursor-pointer"
             >
               {t('setup.startGameButton')}
             </button>

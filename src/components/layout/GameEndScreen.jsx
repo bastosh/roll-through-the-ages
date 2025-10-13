@@ -101,9 +101,9 @@ export default function GameEndScreen({ players, DEVELOPMENTS, MONUMENTS }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-200 p-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl p-8">
-        <h1 className="text-4xl font-bold text-center mb-8 text-amber-800">
+    <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-200 dark:from-gray-900 dark:to-gray-800 p-8 transition-colors">
+      <div className="max-w-4xl mx-auto bg-white dark:bg-dark-surface rounded-xl shadow-2xl p-8 transition-colors">
+        <h1 className="text-4xl font-bold text-center mb-8 text-amber-800 dark:text-amber-400">
           {t('game.gameOver')}
         </h1>
 
@@ -113,45 +113,45 @@ export default function GameEndScreen({ players, DEVELOPMENTS, MONUMENTS }) {
           const showResources = isTie && winnersWithSameScore.some(w => w.player.name === player.name);
 
           return (
-            <div key={i} className={'mb-4 p-6 rounded-lg ' + (
-              isWinner ? 'bg-yellow-100 border-4 border-yellow-400' : 'bg-gray-100'
+            <div key={i} className={'mb-4 p-6 rounded-lg transition-colors ' + (
+              isWinner ? 'bg-yellow-100 dark:bg-yellow-900/30 border-4 border-yellow-400 dark:border-yellow-600' : 'bg-gray-100 dark:bg-dark-elevated'
             )}>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-2xl font-bold">
+                <h3 className="text-2xl font-bold dark:text-dark-text">
                   {isWinner ? '👑 ' : ''}
                   {player.name}
                 </h3>
-                <div className="text-4xl font-bold text-amber-700">
+                <div className="text-4xl font-bold text-amber-700 dark:text-amber-500">
                   {playerDetail.totalScore} pts
                 </div>
               </div>
-              <div className="bg-white rounded-lg p-4">
+              <div className="bg-white dark:bg-dark-surface rounded-lg p-4 transition-colors">
                 <table className="w-full text-base">
                   <tbody>
-                    <tr className="border-b border-gray-200">
-                      <td className="py-2 text-gray-700">{t('gameEnd.developmentsScore')}</td>
-                      <td className="py-2 text-right font-semibold text-gray-900">{playerDetail.developmentScore}</td>
+                    <tr className="border-b border-gray-200 dark:border-dark-border">
+                      <td className="py-2 text-gray-700 dark:text-dark-text">{t('gameEnd.developmentsScore')}</td>
+                      <td className="py-2 text-right font-semibold text-gray-900 dark:text-dark-text">{playerDetail.developmentScore}</td>
                     </tr>
-                    <tr className="border-b border-gray-200">
-                      <td className="py-2 text-gray-700">{t('gameEnd.monumentsScore')}</td>
-                      <td className="py-2 text-right font-semibold text-gray-900">+ {playerDetail.monumentScore}</td>
+                    <tr className="border-b border-gray-200 dark:border-dark-border">
+                      <td className="py-2 text-gray-700 dark:text-dark-text">{t('gameEnd.monumentsScore')}</td>
+                      <td className="py-2 text-right font-semibold text-gray-900 dark:text-dark-text">+ {playerDetail.monumentScore}</td>
                     </tr>
-                    <tr className="border-b border-gray-200">
-                      <td className="py-2 text-gray-700">{t('gameEnd.bonusScore')}</td>
-                      <td className="py-2 text-right font-semibold text-gray-900">+ {playerDetail.bonusScore}</td>
+                    <tr className="border-b border-gray-200 dark:border-dark-border">
+                      <td className="py-2 text-gray-700 dark:text-dark-text">{t('gameEnd.bonusScore')}</td>
+                      <td className="py-2 text-right font-semibold text-gray-900 dark:text-dark-text">+ {playerDetail.bonusScore}</td>
                     </tr>
-                    <tr className="border-b border-gray-200">
-                      <td className="py-2 text-gray-700">{t('gameEnd.disastersScore')}</td>
-                      <td className="py-2 text-right font-semibold text-red-600">- {playerDetail.disasterScore}</td>
+                    <tr className="border-b border-gray-200 dark:border-dark-border">
+                      <td className="py-2 text-gray-700 dark:text-dark-text">{t('gameEnd.disastersScore')}</td>
+                      <td className="py-2 text-right font-semibold text-red-600 dark:text-red-400">- {playerDetail.disasterScore}</td>
                     </tr>
-                    <tr className="border-t-2 border-gray-400">
-                      <td className="py-2 text-gray-900 font-bold">{t('gameEnd.totalScore')}</td>
-                      <td className="py-2 text-right font-bold text-amber-700 text-lg">= {playerDetail.totalScore}</td>
+                    <tr className="border-t-2 border-gray-400 dark:border-dark-border">
+                      <td className="py-2 text-gray-900 dark:text-dark-text font-bold">{t('gameEnd.totalScore')}</td>
+                      <td className="py-2 text-right font-bold text-amber-700 dark:text-amber-500 text-lg">= {playerDetail.totalScore}</td>
                     </tr>
                     {showResources && (
-                      <tr className="border-t border-gray-200">
-                        <td className="py-2 text-amber-700 font-semibold">{t('gameEnd.remainingResources')}</td>
-                        <td className="py-2 text-right font-semibold text-amber-700">{playerDetail.totalResourcesCount}</td>
+                      <tr className="border-t border-gray-200 dark:border-dark-border">
+                        <td className="py-2 text-amber-700 dark:text-amber-500 font-semibold">{t('gameEnd.remainingResources')}</td>
+                        <td className="py-2 text-right font-semibold text-amber-700 dark:text-amber-500">{playerDetail.totalResourcesCount}</td>
                       </tr>
                     )}
                   </tbody>
@@ -163,7 +163,7 @@ export default function GameEndScreen({ players, DEVELOPMENTS, MONUMENTS }) {
 
         <button
           onClick={() => window.location.reload()}
-          className="w-full bg-amber-600 text-white py-4 rounded-lg font-bold text-xl hover:bg-amber-700 transition mt-8 cursor-pointer"
+          className="w-full bg-amber-600 dark:bg-amber-dark-700 text-white py-4 rounded-lg font-bold text-xl hover:bg-amber-700 dark:hover:bg-amber-dark-600 transition mt-8 cursor-pointer"
         >
           {t('game.backToHome')}
         </button>

@@ -22,7 +22,9 @@
     "edit": "Edit",
     "delete": "Delete",
     "cities": "Cities",
-    "developments": "Developments"
+    "developments": "Developments",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode"
   },
 
   "credits": {

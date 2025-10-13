@@ -11,7 +11,7 @@ export default function PlayerNameInputs({
 
   return (
     <div>
-      <label className="block text-lg font-semibold mb-3 text-gray-700">
+      <label className="block text-lg font-semibold mb-3 text-gray-700 dark:text-dark-text">
         {playerCount === 1 ? t('setup.playerNameSingular') : t('setup.playerNames')}
       </label>
       {playerNames.map(function(name, i) {
@@ -21,7 +21,7 @@ export default function PlayerNameInputs({
               type="text"
               value={name}
               onChange={(e) => onUpdatePlayerName(i, e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-amber-500 focus:outline-none"
+              className="w-full px-4 py-2 border-2 border-gray-300 dark:border-dark-border dark:bg-dark-elevated dark:text-dark-text rounded-lg focus:border-amber-500 dark:focus:border-amber-dark-600 focus:outline-none transition-colors"
               placeholder={t('setup.playerNamePlaceholder', { number: i + 1 })}
               list={'player-history-' + i}
             />
@@ -32,7 +32,7 @@ export default function PlayerNameInputs({
                     <button
                       key={player.name}
                       onClick={() => onSelectPlayerFromHistory(i, player.name)}
-                      className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 cursor-pointer"
+                      className="text-xs px-2 py-1 bg-gray-100 dark:bg-dark-elevated text-gray-700 dark:text-dark-text rounded hover:bg-gray-200 dark:hover:bg-dark-border cursor-pointer transition-colors"
                     >
                       {player.name}
                     </button>

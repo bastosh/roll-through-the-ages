@@ -21,6 +21,7 @@ import DiceBar from './dice/DiceBar';
 import GameHeader from './layout/GameHeader';
 import GameEndScreen from './layout/GameEndScreen';
 import SmithingInvasionPanel from './phases/SmithingInvasionPanel';
+import ThemeToggle from './shared/ThemeToggle';
 
 export default function Game({ playerNames, variantId, isSoloMode, bronze2024DevCount = 5, savedGameState }) {
   // Load variant configuration
@@ -948,7 +949,10 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
   }
 
   return (
-    <div className="min-h-screen lg:h-screen lg:overflow-hidden bg-gradient-to-br from-amber-100 to-orange-200 p-4">
+    <div className="min-h-screen lg:h-screen lg:overflow-hidden bg-gradient-to-br from-amber-100 to-orange-200 dark:from-gray-900 dark:to-gray-800 p-4 transition-colors">
+      {/* Theme Toggle */}
+      <ThemeToggle />
+
       {/* Player Turn Modal */}
       <PlayerTurnModal
         show={showPlayerTurnModal}
@@ -972,7 +976,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         />
 
         {/* Dice Display - Compact bar with phase info and action buttons */}
-        <div className="flex-shrink-0 bg-white rounded-lg shadow-lg px-2 sm:px-4 py-3 mb-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 min-h-24">
+        <div className="flex-shrink-0 bg-white dark:bg-dark-surface rounded-lg shadow-lg px-2 sm:px-4 py-3 mb-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 min-h-24 transition-colors">
           <DiceBar
             diceResults={diceResults}
             lockedDice={lockedDice}

@@ -8,13 +8,13 @@ export default function LanguageSelector() {
   }
 
   return (
-    <div className="fixed top-4 left-4 bg-white rounded-lg shadow-lg p-2 flex gap-2">
+    <div className="fixed top-4 left-4 bg-white dark:bg-dark-surface rounded-lg shadow-lg p-2 flex gap-2 z-50 transition-colors">
       <button
         onClick={() => changeLanguage('fr')}
         className={`px-3 py-1 rounded transition cursor-pointer ${
           i18n.language === 'fr'
-            ? 'bg-amber-600 text-white font-bold'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            ? 'bg-amber-600 dark:bg-amber-dark-700 text-white font-bold'
+            : 'bg-gray-200 dark:bg-dark-elevated text-gray-700 dark:text-dark-text hover:bg-gray-300 dark:hover:bg-dark-border'
         }`}
         title="Français"
       >
@@ -24,8 +24,8 @@ export default function LanguageSelector() {
         onClick={() => changeLanguage('en')}
         className={`px-3 py-1 rounded transition cursor-pointer ${
           i18n.language === 'en'
-            ? 'bg-amber-600 text-white font-bold'
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            ? 'bg-amber-600 dark:bg-amber-dark-700 text-white font-bold'
+            : 'bg-gray-200 dark:bg-dark-elevated text-gray-700 dark:text-dark-text hover:bg-gray-300 dark:hover:bg-dark-border'
         }`}
         title="English"
       >

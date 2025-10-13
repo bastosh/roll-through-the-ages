@@ -108,10 +108,10 @@ export default function PhaseInfoBar({
       <div className="flex flex-row items-center gap-8">
         <div className="flex flex-col justify-center min-w-[120px]">
           <div className="flex items-center gap-3">
-            <div className="text-sm font-semibold text-amber-800">{t('phaseInfo.rollPhase')}</div>
-            <div className="text-xs text-gray-700 font-bold bg-amber-100 rounded px-2 py-0.5">{t('phaseInfo.rollNumber', { number: rollCount + 1 })}</div>
+            <div className="text-sm font-semibold text-amber-800 dark:text-amber-400">{t('phaseInfo.rollPhase')}</div>
+            <div className="text-xs text-gray-700 dark:text-amber-300 font-bold bg-amber-100 dark:bg-amber-900/30 rounded px-2 py-0.5">{t('phaseInfo.rollNumber', { number: rollCount + 1 })}</div>
           </div>
-          <div className="text-xs text-gray-600 leading-tight">{t('phaseInfo.clickToLockUnlock')}</div>
+          <div className="text-xs text-gray-600 dark:text-dark-text-muted leading-tight">{t('phaseInfo.clickToLockUnlock')}</div>
         </div>
         {disasterInfo && (
           <DisasterInfo skulls={skulls} label={disasterInfo.label} effect={disasterInfo.effect} isAvoided={disasterInfo.isAvoided} />
@@ -143,24 +143,24 @@ export default function PhaseInfoBar({
     return (
       <div className="flex items-center gap-8">
         <div className="flex flex-col gap-1">
-          <div className="text-sm font-semibold text-amber-800">{t('phaseInfo.chooseFoodOrWorkers')}</div>
-          <div className="text-xs text-gray-600">
+          <div className="text-sm font-semibold text-amber-800 dark:text-amber-400">{t('phaseInfo.chooseFoodOrWorkers')}</div>
+          <div className="text-xs text-gray-600 dark:text-dark-text-muted">
             {foodOrWorkerChoices.some(c => c === 'none') ? (
               <span>{t('phaseInfo.clickDiceToChoose')}</span>
             ) : willHaveFamine ? (
-              <span className="text-red-600 font-semibold">{t('phaseInfo.famineWarning', { count: faminePoints, plural: faminePoints > 1 ? 's' : '' })}</span>
+              <span className="text-red-600 dark:text-red-400 font-semibold">{t('phaseInfo.famineWarning', { count: faminePoints, plural: faminePoints > 1 ? 's' : '' })}</span>
             ) : (
-              <span className="text-green-600 font-semibold">{t('phaseInfo.citiesFed', { remaining: futureFoodAfterFeeding })}</span>
+              <span className="text-green-600 dark:text-green-400 font-semibold">{t('phaseInfo.citiesFed', { remaining: futureFoodAfterFeeding })}</span>
             )}
           </div>
         </div>
         {!foodOrWorkerChoices.some(c => c === 'none') && (
-          <div className="flex items-center gap-3 text-lg bg-gray-50 rounded px-3 py-1">
+          <div className="flex items-center gap-3 text-lg bg-gray-50 dark:bg-dark-elevated rounded px-3 py-1 dark:text-dark-text">
             <div>🌾 {futureFood}</div>
-            <div className="text-gray-400">→</div>
+            <div className="text-gray-400 dark:text-dark-text-muted">→</div>
             <div>🏛️ {citiesToFeed}</div>
-            <div className="text-gray-400">=</div>
-            <div className={willHaveFamine ? 'text-red-600 font-bold' : 'text-green-600 font-bold'}>
+            <div className="text-gray-400 dark:text-dark-text-muted">=</div>
+            <div className={willHaveFamine ? 'text-red-600 dark:text-red-400 font-bold' : 'text-green-600 dark:text-green-400 font-bold'}>
               {futureFoodAfterFeeding >= 0 ? futureFoodAfterFeeding : 0}
             </div>
           </div>
@@ -176,18 +176,18 @@ export default function PhaseInfoBar({
     return (
       <div className="flex items-center gap-8">
         <div className="flex flex-col gap-1">
-          <div className="text-sm font-semibold text-amber-800">{t('phaseInfo.feedCities')}</div>
-          <div className="text-xs text-gray-600">
+          <div className="text-sm font-semibold text-amber-800 dark:text-amber-400">{t('phaseInfo.feedCities')}</div>
+          <div className="text-xs text-gray-600 dark:text-dark-text-muted">
             {hasFamine ? (
-              <span className="text-red-600 font-semibold">{t('phaseInfo.famineWarningFeed', { count: foodShortage, plural: foodShortage > 1 ? 's' : '' })}</span>
+              <span className="text-red-600 dark:text-red-400 font-semibold">{t('phaseInfo.famineWarningFeed', { count: foodShortage, plural: foodShortage > 1 ? 's' : '' })}</span>
             ) : (
-              <span className="text-green-600 font-semibold">{t('phaseInfo.citiesFedSuccess', { remaining: foodRemaining })}</span>
+              <span className="text-green-600 dark:text-green-400 font-semibold">{t('phaseInfo.citiesFedSuccess', { remaining: foodRemaining })}</span>
             )}
           </div>
         </div>
-        <div className="flex items-center gap-3 text-lg">
+        <div className="flex items-center gap-3 text-lg dark:text-dark-text">
           <div>🌾 {foodAvailable}</div>
-          <div className="text-gray-400">→</div>
+          <div className="text-gray-400 dark:text-dark-text-muted">→</div>
           <div>🏛️ {foodNeeded}</div>
         </div>
         {disasterInfo && (
@@ -201,38 +201,38 @@ export default function PhaseInfoBar({
     return (
       <div className="flex items-center gap-8">
         <div className="flex flex-col gap-1">
-          <div className="text-sm font-semibold text-amber-800">{t('phaseInfo.buildPhase')}</div>
-          <div className="text-xs text-gray-600">
+          <div className="text-sm font-semibold text-amber-800 dark:text-amber-400">{t('phaseInfo.buildPhase')}</div>
+          <div className="text-xs text-gray-600 dark:text-dark-text-muted">
             {pendingWorkers > 0 ? (
-              <span className="text-amber-600 font-semibold">{t('phaseInfo.useAllWorkers', { count: pendingWorkers })}</span>
+              <span className="text-amber-600 dark:text-amber-400 font-semibold">{t('phaseInfo.useAllWorkers', { count: pendingWorkers })}</span>
             ) : (
               <span>{t('phaseInfo.clickCitiesMonuments')}</span>
             )}
           </div>
         </div>
-        <div className="text-xl font-bold">
+        <div className="text-xl font-bold dark:text-dark-text">
           ⚒️ {pendingWorkers}
         </div>
         {hasEngineering && (
-          <div className="flex items-center gap-4 bg-blue-50 border border-blue-400 rounded px-5 py-2">
-            <div className="text-base font-semibold text-blue-700">🏗️ {t('phaseInfo.engineering')}</div>
-            <div className="text-sm text-gray-600">{t('phaseInfo.stone')}</div>
+          <div className="flex items-center gap-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-400 dark:border-blue-700 rounded px-5 py-2 transition-colors">
+            <div className="text-base font-semibold text-blue-700 dark:text-blue-400">🏗️ {t('phaseInfo.engineering')}</div>
+            <div className="text-sm text-gray-600 dark:text-dark-text-muted">{t('phaseInfo.stone')}</div>
             <button
               onClick={() => onTradeStone(Math.max(0, stoneToTradeForWorkers - 1))}
               disabled={stoneToTradeForWorkers <= 0}
-              className="px-3 py-1 bg-blue-300 text-white text-lg rounded hover:bg-blue-400 disabled:bg-gray-200 disabled:text-gray-400"
+              className="px-3 py-1 bg-blue-300 dark:bg-blue-600 text-white text-lg rounded hover:bg-blue-400 dark:hover:bg-blue-700 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500 transition-colors"
             >–</button>
-            <span className="w-12 text-center text-lg font-bold">{stoneToTradeForWorkers}</span>
+            <span className="w-12 text-center text-lg font-bold dark:text-dark-text">{stoneToTradeForWorkers}</span>
             <button
               onClick={() => onTradeStone(Math.min(totalStoneAvailable, stoneToTradeForWorkers + 1))}
               disabled={stoneToTradeForWorkers >= totalStoneAvailable}
-              className="px-3 py-1 bg-blue-500 text-white text-lg rounded hover:bg-blue-600 disabled:bg-gray-200 disabled:text-gray-400"
+              className="px-3 py-1 bg-blue-500 dark:bg-blue-700 text-white text-lg rounded hover:bg-blue-600 dark:hover:bg-blue-800 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500 transition-colors"
             >+</button>
-            <div className="text-sm">→ {stoneToTradeForWorkers * 3} ⚒️</div>
+            <div className="text-sm dark:text-dark-text">→ {stoneToTradeForWorkers * 3} ⚒️</div>
             {stoneToTradeForWorkers > 0 && (
               <button
                 onClick={onResetStone}
-                className="px-3 py-1 bg-orange-500 text-white text-lg rounded hover:bg-orange-600 cursor-pointer ml-2"
+                className="px-3 py-1 bg-orange-500 dark:bg-orange-600 text-white text-lg rounded hover:bg-orange-600 dark:hover:bg-orange-700 cursor-pointer ml-2 transition-colors"
               >
                 ✕
               </button>
@@ -250,14 +250,14 @@ export default function PhaseInfoBar({
     return (
       <div className="flex items-center gap-8">
         <div className="flex flex-col gap-1">
-          <div className="text-sm font-semibold text-amber-800">
+          <div className="text-sm font-semibold text-amber-800 dark:text-amber-400">
             {selectedDevelopment ? t('phaseInfo.buyDevelopmentName', { name: selectedDevelopment.name }) : t('phaseInfo.buyDevelopment')}
           </div>
-          <div className="text-xs text-gray-600">
+          <div className="text-xs text-gray-600 dark:text-dark-text-muted">
             {selectedDevelopment ? (
               <span>{t('phaseInfo.clickResourcesToAdd')}</span>
             ) : hasPurchased && lastPurchasedDevelopment ? (
-              <span className="text-green-600 font-semibold">{t('phaseInfo.developmentPurchased', { name: lastPurchasedDevelopment.name })}</span>
+              <span className="text-green-600 dark:text-green-400 font-semibold">{t('phaseInfo.developmentPurchased', { name: lastPurchasedDevelopment.name })}</span>
             ) : (
               <span>{t('phaseInfo.clickDevelopmentToBuy')}</span>
             )}
@@ -265,41 +265,41 @@ export default function PhaseInfoBar({
         </div>
 
         {selectedDevelopment ? (
-          <div className="flex items-center gap-3 bg-gray-50 border border-gray-400 rounded px-3 py-1">
-            <div className="text-gray-600">{t('phaseInfo.cost')}</div>
-            <div className="text-lg font-bold text-gray-800">{selectedDevelopment.cost} 💰</div>
-            <div className="text-gray-400">|</div>
-            <div className="text-gray-600">{t('phaseInfo.committed')}</div>
-            <div className={`text-lg font-bold ${canAfford ? 'text-green-600' : 'text-red-600'}`}>
+          <div className="flex items-center gap-3 bg-gray-50 dark:bg-dark-elevated border border-gray-400 dark:border-dark-border rounded px-3 py-1 transition-colors">
+            <div className="text-gray-600 dark:text-dark-text-muted">{t('phaseInfo.cost')}</div>
+            <div className="text-lg font-bold text-gray-800 dark:text-dark-text">{selectedDevelopment.cost} 💰</div>
+            <div className="text-gray-400 dark:text-dark-text-muted">|</div>
+            <div className="text-gray-600 dark:text-dark-text-muted">{t('phaseInfo.committed')}</div>
+            <div className={`text-lg font-bold ${canAfford ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {selectedValue} 💰
             </div>
           </div>
         ) : (
-          <div className="w-24 text-xl font-bold">
+          <div className="w-24 text-xl font-bold dark:text-dark-text">
             💰 {totalValue} {pendingCoins > 0 && `(${pendingCoins})`}
           </div>
         )}
 
         {hasGranaries && !selectedDevelopment && (
-          <div className="flex items-center gap-4 bg-green-50 border border-green-400 rounded px-5 py-2">
-            <div className="text-base font-semibold text-green-700">🌾 {t('phaseInfo.granaries')}</div>
-            <div className="text-sm text-gray-600">{t('common.food')}:</div>
+          <div className="flex items-center gap-4 bg-green-50 dark:bg-green-900/30 border border-green-400 dark:border-green-700 rounded px-5 py-2 transition-colors">
+            <div className="text-base font-semibold text-green-700 dark:text-green-400">🌾 {t('phaseInfo.granaries')}</div>
+            <div className="text-sm text-gray-600 dark:text-dark-text-muted">{t('common.food')}:</div>
             <button
               onClick={() => onTradeFood(Math.max(0, foodToTradeForCoins - 1))}
               disabled={foodToTradeForCoins <= 0}
-              className="px-3 py-1 bg-green-300 text-white text-lg rounded hover:bg-green-400 disabled:bg-gray-200 disabled:text-gray-400"
+              className="px-3 py-1 bg-green-300 dark:bg-green-600 text-white text-lg rounded hover:bg-green-400 dark:hover:bg-green-700 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500 transition-colors"
             >–</button>
-            <span className="w-12 text-center text-lg font-bold">{foodToTradeForCoins}</span>
+            <span className="w-12 text-center text-lg font-bold dark:text-dark-text">{foodToTradeForCoins}</span>
             <button
               onClick={() => onTradeFood(Math.min(totalFoodAvailable, foodToTradeForCoins + 1))}
               disabled={foodToTradeForCoins >= totalFoodAvailable}
-              className="px-3 py-1 bg-green-500 text-white text-lg rounded hover:bg-green-600 disabled:bg-gray-200 disabled:text-gray-400"
+              className="px-3 py-1 bg-green-500 dark:bg-green-700 text-white text-lg rounded hover:bg-green-600 dark:hover:bg-green-800 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500 transition-colors"
             >+</button>
-            <div className="text-sm">→ {foodToTradeForCoins * granariesRate} 💰</div>
+            <div className="text-sm dark:text-dark-text">→ {foodToTradeForCoins * granariesRate} 💰</div>
             {foodToTradeForCoins > 0 && (
               <button
                 onClick={onResetTrade}
-                className="px-3 py-1 bg-orange-500 text-white text-lg rounded hover:bg-orange-600 cursor-pointer ml-2"
+                className="px-3 py-1 bg-orange-500 dark:bg-orange-600 text-white text-lg rounded hover:bg-orange-600 dark:hover:bg-orange-700 cursor-pointer ml-2 transition-colors"
               >
                 ✕
               </button>
@@ -313,9 +313,9 @@ export default function PhaseInfoBar({
   if (phase === 'smithing_invasion') {
     return (
       <div className="flex flex-col gap-1">
-        <div className="text-sm font-semibold text-orange-800">{t('phaseInfo.smithingInvasionTitle')}</div>
-        <div className="text-xs text-gray-600">
-          <span className="text-orange-600 font-semibold">{t('phaseInfo.smithingInvasionDescription')}</span>
+        <div className="text-sm font-semibold text-orange-800 dark:text-orange-400">{t('phaseInfo.smithingInvasionTitle')}</div>
+        <div className="text-xs text-gray-600 dark:text-dark-text-muted">
+          <span className="text-orange-600 dark:text-orange-400 font-semibold">{t('phaseInfo.smithingInvasionDescription')}</span>
         </div>
       </div>
     );
@@ -325,14 +325,14 @@ export default function PhaseInfoBar({
     const discardCount = totalGoodsCount - 6;
     return (
       <div className="flex flex-col gap-1">
-        <div className="text-sm font-semibold text-amber-800">{t('phaseInfo.endOfTurn')}</div>
-        <div className="text-xs text-gray-600">
+        <div className="text-sm font-semibold text-amber-800 dark:text-amber-400">{t('phaseInfo.endOfTurn')}</div>
+        <div className="text-xs text-gray-600 dark:text-dark-text-muted">
           {hasCaravans ? (
-            <span className="text-green-600 font-semibold">{t('phaseInfo.caravansKeepAll')}</span>
+            <span className="text-green-600 dark:text-green-400 font-semibold">{t('phaseInfo.caravansKeepAll')}</span>
           ) : needsToDiscard ? (
-            <span className="text-red-600 font-semibold">{t('phaseInfo.discardResources', { count: discardCount, plural: discardCount > 1 ? 's' : '' })}</span>
+            <span className="text-red-600 dark:text-red-400 font-semibold">{t('phaseInfo.discardResources', { count: discardCount, plural: discardCount > 1 ? 's' : '' })}</span>
           ) : (
-            <span className="text-green-600 font-semibold">{t('phaseInfo.respectLimit')}</span>
+            <span className="text-green-600 dark:text-green-400 font-semibold">{t('phaseInfo.respectLimit')}</span>
           )}
         </div>
       </div>
