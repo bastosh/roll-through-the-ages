@@ -4,8 +4,6 @@ import { getScoreHistory, clearScoreHistory } from '../../utils/scoreHistory';
 import { getPlayerHistory, addPlayer, removePlayer, clearPlayerHistory } from '../../utils/playerHistory';
 import { VARIANTS } from '../../constants/variants';
 import VariantDetails from '../info/VariantDetails';
-import Credits from '../info/Credits';
-import ConfigModal from './ConfigModal';
 import SavedGameBanner from './SavedGameBanner';
 import PlayerCountSelector from './PlayerCountSelector';
 import PlayerNameInputs from './PlayerNameInputs';
@@ -13,6 +11,7 @@ import VariantSelector from './VariantSelector';
 import ScoreHistory from './ScoreHistory';
 import LanguageSelector from '../shared/LanguageSelector';
 import ThemeToggle from '../shared/ThemeToggle';
+import PlayerHistoryList from './PlayerHistoryList';
 
 export default function GameSetup({ onStart, savedGameState, onResume, onClearSavedGame }) {
   const { t } = useTranslation();
@@ -20,11 +19,10 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
   const [playerNames, setPlayerNames] = useState(['']);
   const [selectedVariant, setSelectedVariant] = useState(VARIANTS[0].id);
   const [isSoloMode, setIsSoloMode] = useState(true);
-  const [showConfig, setShowConfig] = useState(false);
+  const [currentView, setCurrentView] = useState('main'); // 'main', 'config', 'credits'
   const [scoreHistory, setScoreHistory] = useState({});
   const [playerHistory, setPlayerHistory] = useState([]);
   const [bronze2024DevCount, setBronze2024DevCount] = useState(5);
-  const [showCredits, setShowCredits] = useState(false);
 
   useEffect(function () {
     setScoreHistory(getScoreHistory());
@@ -84,7 +82,7 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
       }
       setScoreHistory({});
       setPlayerHistory([]);
-      setShowConfig(false);
+      setCurrentView('main');
       alert(t('setup.resetSuccess'));
     }
   }
@@ -111,7 +109,11 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
             <LanguageSelector />
           </div>
 
-          <h1 className="text-center text-4xl font-bold text-amber-800 dark:text-amber-400">
+          <h1
+            className="text-center text-4xl font-bold text-amber-800 dark:text-amber-400 cursor-pointer hover:text-amber-600 dark:hover:text-amber-300 transition-colors"
+            onClick={() => setCurrentView('main')}
+            title={t('common.backToHome')}
+          >
             Roll Through the Ages
           </h1>
 
@@ -120,8 +122,8 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
 
             {/* Credits Button */}
             <button
-              onClick={() => setShowCredits(!showCredits)}
-              className="h-12 w-12 bg-white dark:bg-dark-surface text-gray-900 dark:text-dark-text rounded-lg shadow-lg p-3 hover:bg-gray-100 dark:hover:bg-dark-elevated transition cursor-pointer z-10"
+              onClick={() => setCurrentView('credits')}
+              className={`h-12 w-12 ${currentView === 'credits' ? 'bg-amber-200 dark:bg-amber-900' : 'bg-white dark:bg-dark-surface'} text-gray-900 dark:text-dark-text rounded-lg shadow-lg p-3 hover:bg-gray-100 dark:hover:bg-dark-elevated transition cursor-pointer z-10`}
               title={t('common.credits')}
             >
               ℹ️
@@ -129,8 +131,8 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
 
             {/* Config Button */}
             <button
-              onClick={() => setShowConfig(!showConfig)}
-              className="h-12 w-12 bg-white dark:bg-dark-surface text-gray-900 dark:text-dark-text rounded-lg shadow-lg p-3 hover:bg-gray-100 dark:hover:bg-dark-elevated transition cursor-pointer z-10"
+              onClick={() => setCurrentView('config')}
+              className={`h-12 w-12 ${currentView === 'config' ? 'bg-amber-200 dark:bg-amber-900' : 'bg-white dark:bg-dark-surface'} text-gray-900 dark:text-dark-text rounded-lg shadow-lg p-3 hover:bg-gray-100 dark:hover:bg-dark-elevated transition cursor-pointer z-10`}
               title={t('common.configuration')}
             >
               ⚙️
@@ -139,79 +141,197 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
         </div>
       </header>
 
-      <ConfigModal
-        isOpen={showConfig}
-        onClose={() => setShowConfig(false)}
-        onResetGame={handleResetGame}
-        playerHistory={playerHistory}
-        onDeletePlayer={handleDeletePlayer}
-        onUpdatePlayer={handleUpdatePlayer}
-      />
-
-      <Credits
-        isOpen={showCredits}
-        onClose={() => setShowCredits(false)}
-      />
-
       <div className="max-w-7xl mx-auto p-8">
+        {/* Vue principale */}
+        {currentView === 'main' && (
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              {/* Colonne de gauche : Configuration */}
+              <div className="bg-white dark:bg-dark-surface rounded-xl shadow-2xl p-8 transition-colors">
+                <h2 className="text-2xl font-bold mb-6 text-amber-800 dark:text-amber-400">⚙️ {t('common.configuration')}</h2>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Colonne de gauche : Configuration */}
-          <div className="bg-white dark:bg-dark-surface rounded-xl shadow-2xl p-8 transition-colors">
-            <h2 className="text-2xl font-bold mb-6 text-amber-800 dark:text-amber-400">⚙️ {t('common.configuration')}</h2>
+                <SavedGameBanner
+                  savedGameState={savedGameState}
+                  onResume={onResume}
+                  onClearSavedGame={onClearSavedGame}
+                />
 
-            <SavedGameBanner
-              savedGameState={savedGameState}
-              onResume={onResume}
-              onClearSavedGame={onClearSavedGame}
-            />
+                <div className="space-y-6">
+                  <PlayerCountSelector
+                    playerCount={playerCount}
+                    onUpdatePlayerCount={updatePlayerCount}
+                  />
 
+                  <PlayerNameInputs
+                    playerCount={playerCount}
+                    playerNames={playerNames}
+                    playerHistory={playerHistory}
+                    onUpdatePlayerName={updatePlayerName}
+                    onSelectPlayerFromHistory={selectPlayerFromHistory}
+                  />
 
-            <div className="space-y-6">
-              <PlayerCountSelector
-                playerCount={playerCount}
-                onUpdatePlayerCount={updatePlayerCount}
-              />
+                  <VariantSelector
+                    selectedVariant={selectedVariant}
+                    playerCount={playerCount}
+                    isSoloMode={isSoloMode}
+                    bronze2024DevCount={bronze2024DevCount}
+                    onSelectVariant={setSelectedVariant}
+                    onSetBronze2024DevCount={setBronze2024DevCount}
+                    onSetIsSoloMode={setIsSoloMode}
+                  />
 
-              <PlayerNameInputs
-                playerCount={playerCount}
-                playerNames={playerNames}
-                playerHistory={playerHistory}
-                onUpdatePlayerName={updatePlayerName}
-                onSelectPlayerFromHistory={selectPlayerFromHistory}
-              />
+                  <button
+                    onClick={handleStart}
+                    className="w-full bg-amber-600 dark:bg-amber-dark-700 text-white py-4 rounded-lg font-bold text-xl hover:bg-amber-700 dark:hover:bg-amber-dark-600 transition cursor-pointer"
+                  >
+                    {t('setup.startGameButton')}
+                  </button>
+                </div>
+              </div>
 
-              <VariantSelector
-                selectedVariant={selectedVariant}
+              {/* Colonne de droite : Détails du variant */}
+              <VariantDetails
+                variantId={selectedVariant}
                 playerCount={playerCount}
                 isSoloMode={isSoloMode}
-                bronze2024DevCount={bronze2024DevCount}
-                onSelectVariant={setSelectedVariant}
-                onSetBronze2024DevCount={setBronze2024DevCount}
-                onSetIsSoloMode={setIsSoloMode}
               />
+            </div>
+
+            <ScoreHistory
+              scoreHistory={scoreHistory}
+              selectedVariant={selectedVariant}
+            />
+          </>
+        )}
+
+        {/* Vue Configuration */}
+        {currentView === 'config' && (
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white dark:bg-dark-surface rounded-xl shadow-2xl p-8 transition-colors">
+              <h2 className="text-3xl font-bold mb-6 text-amber-800 dark:text-amber-400">⚙️ {t('common.configuration')}</h2>
+
+              <div className="space-y-6">
+                <div>
+                  <button
+                    onClick={handleResetGame}
+                    className="w-full bg-red-600 dark:bg-red-700 text-white py-3 rounded-lg font-bold hover:bg-red-700 dark:hover:bg-red-800 transition cursor-pointer"
+                  >
+                    {t('common.resetGameButton')}
+                  </button>
+                  <p className="text-xs text-gray-500 dark:text-dark-text-muted mt-2">
+                    {t('common.resetGameDescription')}
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-bold mb-3 text-gray-800 dark:text-dark-text">{t('common.registeredPlayers')}</h3>
+                  <PlayerHistoryList
+                    playerHistory={playerHistory}
+                    onDeletePlayer={handleDeletePlayer}
+                    onUpdatePlayer={handleUpdatePlayer}
+                  />
+                </div>
+              </div>
 
               <button
-                onClick={handleStart}
-                className="w-full bg-amber-600 dark:bg-amber-dark-700 text-white py-4 rounded-lg font-bold text-xl hover:bg-amber-700 dark:hover:bg-amber-dark-600 transition cursor-pointer"
+                onClick={() => setCurrentView('main')}
+                className="w-full mt-6 bg-amber-600 dark:bg-amber-dark-700 text-white py-3 rounded-lg font-bold hover:bg-amber-700 dark:hover:bg-amber-dark-600 transition cursor-pointer"
               >
-                {t('setup.startGameButton')}
+                {t('common.close')}
               </button>
             </div>
           </div>
+        )}
 
-          {/* Colonne de droite : Détails du variant */}
-          <VariantDetails
-            variantId={selectedVariant}
-            playerCount={playerCount}
-            isSoloMode={isSoloMode}
-          />
-        </div>
+        {/* Vue Crédits */}
+        {currentView === 'credits' && (
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white dark:bg-dark-surface rounded-xl shadow-2xl p-8 transition-colors">
+              <h2 className="text-3xl font-bold mb-6 text-amber-800 dark:text-amber-400">{t('credits.title')}</h2>
 
-        <ScoreHistory
-          scoreHistory={scoreHistory}
-          selectedVariant={selectedVariant}
-        />
+              <div className="space-y-6 text-gray-700 dark:text-dark-text">
+                <section>
+                  <h3 className="text-xl font-bold text-amber-700 dark:text-amber-500 mb-2">{t('credits.originalGame')}</h3>
+                  <p className="mb-2">
+                    <strong>Roll Through the Ages: The Bronze Age</strong>
+                  </p>
+                  <p className="mb-1">{t('credits.designedBy')} <strong>Matt Leacock</strong></p>
+                  <p className="mb-1">{t('credits.publishedBy')} <strong>Gryphon Games</strong> (2008)</p>
+                  <p className="text-sm">
+                    {t('credits.description')}
+                  </p>
+                </section>
+
+                <section>
+                  <h3 className="text-xl font-bold text-amber-700 dark:text-amber-500 mb-2">{t('credits.variants')}</h3>
+
+                  <div className="mb-4">
+                    <p className="mb-2">
+                      <strong>Roll Through the Ages: The Late Bronze Age</strong>
+                    </p>
+                    <p className="mb-1">{t('credits.designedBy')} <strong>Matt Leacock</strong></p>
+                    <p className="mb-1">{t('credits.publishedBy')} <strong>Pegasus Spiele</strong> (2009)</p>
+                    <p className="text-sm">
+                      {t('credits.lateBronzeAge')}
+                    </p>
+                  </div>
+
+                  <div className="mb-4">
+                    <p className="mb-2">
+                      <strong>Roll Through the Ages: The Iron Age</strong>
+                    </p>
+                    <p className="mb-1">{t('credits.designedBy')} <strong>Wei-Hwa Huang</strong></p>
+                    <p className="mb-1">{t('credits.publishedBy')} <strong>Gryphon Games</strong> (2013)</p>
+                    <p className="text-sm">
+                      {t('credits.ironAge')}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="mb-2">
+                      <strong>Roll Through the Ages: The Bronze Age 2024</strong>
+                    </p>
+                    <p className="text-sm">
+                      {t('credits.bronzeAge2024')}
+                    </p>
+                  </div>
+                </section>
+
+                <section>
+                  <h3 className="text-xl font-bold text-amber-700 dark:text-amber-500 mb-2">{t('credits.digitalImplementation')}</h3>
+                  <p className="text-sm mb-2">
+                    {t('credits.digitalDescription')}
+                  </p>
+                  <p className="text-sm">
+                    {t('credits.disclaimer')}
+                  </p>
+                </section>
+
+                <section className="pt-4 border-t border-gray-200 dark:border-dark-border">
+                  <p className="text-sm text-gray-600 dark:text-dark-text-muted mb-3">
+                    {t('credits.moreInfo')}
+                  </p>
+                  <a
+                    href="https://boardgamegeek.com/boardgame/37380/roll-through-the-ages-the-bronze-age"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-amber-600 dark:text-amber-500 hover:text-amber-700 dark:hover:text-amber-400 font-medium underline"
+                  >
+                    {t('credits.bggLink')}
+                    <span className="text-xs">↗</span>
+                  </a>
+                </section>
+              </div>
+
+              <button
+                onClick={() => setCurrentView('main')}
+                className="w-full mt-6 bg-amber-600 dark:bg-amber-dark-700 text-white py-3 rounded-lg font-bold hover:bg-amber-700 dark:hover:bg-amber-dark-600 transition cursor-pointer"
+              >
+                {t('common.close')}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
