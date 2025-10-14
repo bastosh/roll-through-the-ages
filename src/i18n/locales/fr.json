@@ -138,7 +138,7 @@
 
   "buildingBonuses": {
     "1 good": "+1 ressource",
-    "1 coin": "+1 pièce",
+    "1 coin": "+1 dé Pièce",
     "1 food": "+1 nourriture"
   },
 
