@@ -26,7 +26,7 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
   const [bronze2024DevCount, setBronze2024DevCount] = useState(5);
   const [showCredits, setShowCredits] = useState(false);
 
-  useEffect(function() {
+  useEffect(function () {
     setScoreHistory(getScoreHistory());
     setPlayerHistory(getPlayerHistory());
   }, []);
@@ -103,30 +103,41 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-200 dark:from-gray-900 dark:to-gray-800 p-8 transition-colors">
-      {/* Language Selector */}
-      <LanguageSelector />
+    <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-200 dark:from-gray-900 dark:to-gray-800 transition-colors">
+      {/* Header */}
+      <header className="bg-white dark:bg-dark-surface shadow-lg transition-colors">
+        <div className="px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3 w-64">
+            <LanguageSelector />
+          </div>
 
-      {/* Theme Toggle */}
-      <ThemeToggle />
+          <h1 className="text-center text-4xl font-bold text-amber-800 dark:text-amber-400">
+            Roll Through the Ages
+          </h1>
 
-      {/* Config Button */}
-      <button
-        onClick={() => setShowConfig(!showConfig)}
-        className="fixed h-12 w-12 top-4 right-4 bg-gray-600 dark:bg-dark-surface text-white p-3 rounded-lg shadow-lg hover:bg-gray-700 dark:hover:bg-dark-elevated transition cursor-pointer"
-        title={t('common.configuration')}
-      >
-        ⚙️
-      </button>
+          <div className="flex items-center gap-3 w-64 justify-end">
+            <ThemeToggle />
 
-      {/* Credits Button */}
-      <button
-        onClick={() => setShowCredits(!showCredits)}
-        className="fixed h-12 w-12 top-4 right-20 bg-gray-600 dark:bg-dark-surface text-white p-3 rounded-lg shadow-lg hover:bg-gray-700 dark:hover:bg-dark-elevated transition cursor-pointer"
-        title={t('common.credits')}
-      >
-        ℹ️
-      </button>
+            {/* Credits Button */}
+            <button
+              onClick={() => setShowCredits(!showCredits)}
+              className="h-12 w-12 bg-white dark:bg-dark-surface text-gray-900 dark:text-dark-text rounded-lg shadow-lg p-3 hover:bg-gray-100 dark:hover:bg-dark-elevated transition cursor-pointer z-10"
+              title={t('common.credits')}
+            >
+              ℹ️
+            </button>
+
+            {/* Config Button */}
+            <button
+              onClick={() => setShowConfig(!showConfig)}
+              className="h-12 w-12 bg-white dark:bg-dark-surface text-gray-900 dark:text-dark-text rounded-lg shadow-lg p-3 hover:bg-gray-100 dark:hover:bg-dark-elevated transition cursor-pointer z-10"
+              title={t('common.configuration')}
+            >
+              ⚙️
+            </button>
+          </div>
+        </div>
+      </header>
 
       <ConfigModal
         isOpen={showConfig}
@@ -142,10 +153,7 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
         onClose={() => setShowCredits(false)}
       />
 
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-8 text-amber-800 dark:text-amber-400 bg-white dark:bg-dark-surface rounded-xl shadow-lg p-6 transition-colors">
-          Roll Through the Ages
-        </h1>
+      <div className="max-w-7xl mx-auto p-8">
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Colonne de gauche : Configuration */}
@@ -159,37 +167,37 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
             />
 
 
-          <div className="space-y-6">
-            <PlayerCountSelector
-              playerCount={playerCount}
-              onUpdatePlayerCount={updatePlayerCount}
-            />
+            <div className="space-y-6">
+              <PlayerCountSelector
+                playerCount={playerCount}
+                onUpdatePlayerCount={updatePlayerCount}
+              />
 
-            <PlayerNameInputs
-              playerCount={playerCount}
-              playerNames={playerNames}
-              playerHistory={playerHistory}
-              onUpdatePlayerName={updatePlayerName}
-              onSelectPlayerFromHistory={selectPlayerFromHistory}
-            />
+              <PlayerNameInputs
+                playerCount={playerCount}
+                playerNames={playerNames}
+                playerHistory={playerHistory}
+                onUpdatePlayerName={updatePlayerName}
+                onSelectPlayerFromHistory={selectPlayerFromHistory}
+              />
 
-            <VariantSelector
-              selectedVariant={selectedVariant}
-              playerCount={playerCount}
-              isSoloMode={isSoloMode}
-              bronze2024DevCount={bronze2024DevCount}
-              onSelectVariant={setSelectedVariant}
-              onSetBronze2024DevCount={setBronze2024DevCount}
-              onSetIsSoloMode={setIsSoloMode}
-            />
+              <VariantSelector
+                selectedVariant={selectedVariant}
+                playerCount={playerCount}
+                isSoloMode={isSoloMode}
+                bronze2024DevCount={bronze2024DevCount}
+                onSelectVariant={setSelectedVariant}
+                onSetBronze2024DevCount={setBronze2024DevCount}
+                onSetIsSoloMode={setIsSoloMode}
+              />
 
-            <button
-              onClick={handleStart}
-              className="w-full bg-amber-600 dark:bg-amber-dark-700 text-white py-4 rounded-lg font-bold text-xl hover:bg-amber-700 dark:hover:bg-amber-dark-600 transition cursor-pointer"
-            >
-              {t('setup.startGameButton')}
-            </button>
-          </div>
+              <button
+                onClick={handleStart}
+                className="w-full bg-amber-600 dark:bg-amber-dark-700 text-white py-4 rounded-lg font-bold text-xl hover:bg-amber-700 dark:hover:bg-amber-dark-600 transition cursor-pointer"
+              >
+                {t('setup.startGameButton')}
+              </button>
+            </div>
           </div>
 
           {/* Colonne de droite : Détails du variant */}

@@ -20,7 +20,6 @@ import PlayerTurnModal from './player/PlayerTurnModal';
 import DiceBar from './dice/DiceBar';
 import GameHeader from './layout/GameHeader';
 import GameEndScreen from './layout/GameEndScreen';
-import SmithingInvasionPanel from './phases/SmithingInvasionPanel';
 import ThemeToggle from './shared/ThemeToggle';
 
 export default function Game({ playerNames, variantId, isSoloMode, bronze2024DevCount = 5, savedGameState }) {
@@ -950,9 +949,6 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
 
   return (
     <div className="min-h-screen lg:h-screen lg:overflow-hidden bg-gradient-to-br from-amber-100 to-orange-200 dark:from-gray-900 dark:to-gray-800 p-4 transition-colors">
-      {/* Theme Toggle */}
-      <ThemeToggle />
-
       {/* Player Turn Modal */}
       <PlayerTurnModal
         show={showPlayerTurnModal}

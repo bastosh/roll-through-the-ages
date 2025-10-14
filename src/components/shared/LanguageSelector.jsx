@@ -8,7 +8,7 @@ export default function LanguageSelector() {
   }
 
   return (
-    <div className="fixed top-4 left-4 bg-white dark:bg-dark-surface rounded-lg shadow-lg p-2 flex gap-2 z-50 transition-colors">
+    <div className="bg-white dark:bg-dark-surface rounded-lg shadow-lg p-2 flex gap-2 z-50 transition-colors">
       <button
         onClick={() => changeLanguage('fr')}
         className={`px-3 py-1 rounded transition cursor-pointer ${

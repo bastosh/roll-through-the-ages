@@ -8,7 +8,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleDarkMode}
-      className="fixed top-4 left-32 bg-white dark:bg-dark-surface text-gray-900 dark:text-dark-text rounded-lg shadow-lg p-3 hover:bg-gray-100 dark:hover:bg-dark-elevated transition cursor-pointer z-10"
+      className="bg-white dark:bg-dark-surface text-gray-900 dark:text-dark-text rounded-lg shadow-lg p-3 hover:bg-gray-100 dark:hover:bg-dark-elevated transition cursor-pointer z-10"
       title={isDarkMode ? t('common.lightMode') : t('common.darkMode')}
     >
       {isDarkMode ? '☀️' : '🌙'}
