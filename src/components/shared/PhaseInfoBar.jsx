@@ -24,7 +24,8 @@ export default function PhaseInfoBar({
   foodOrWorkerChoices = [],
   pendingFoodOrWorkers = 0,
   calculateSelectedValue = null,
-  rollCount = 0
+  rollCount = 0,
+  variantConfig = null
 }) {
   const { t } = useTranslation();
   const hasEngineering = currentPlayer.developments.indexOf('engineering') !== -1;
@@ -133,6 +134,17 @@ export default function PhaseInfoBar({
     let foodToAdd = foodDiceCount * 2;
     if (hasAgriculture) {
       foodToAdd += foodDiceCount;
+    }
+
+    // Add food bonus from completed village production buildings (Ancient Empires)
+    if (variantConfig && variantConfig.productions && currentPlayer.productions) {
+      for (let i = 0; i < currentPlayer.productions.length; i++) {
+        const production = currentPlayer.productions[i];
+        const productionDef = variantConfig.productions[i];
+        if (production.built && productionDef.name === 'village' && productionDef.bonus === '1 food') {
+          foodToAdd += 1;
+        }
+      }
     }
 
     const futureFood = currentPlayer.food + foodToAdd;

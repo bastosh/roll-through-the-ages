@@ -321,7 +321,8 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     const result = processRollResults(
       results,
       currentPlayerIndex,
-      players
+      players,
+      variantConfig
     );
 
     setPlayers(result.players);
@@ -981,6 +982,17 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         }
       }
     }
+
+    // Add food bonus from completed village production buildings (Ancient Empires)
+    if (variantConfig.productions && currentPlayer.productions) {
+      for (let i = 0; i < currentPlayer.productions.length; i++) {
+        const production = currentPlayer.productions[i];
+        const productionDef = variantConfig.productions[i];
+        if (production.built && productionDef.name === 'village' && productionDef.bonus === '1 food') {
+          previewFood += 1;
+        }
+      }
+    }
   }
 
   return (
@@ -1056,6 +1068,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
               calculateSelectedValue={calculateSelectedValue}
               rollCount={rollCount}
               diceResults={diceResults}
+              variantConfig={variantConfig}
             />
           </div>
 

@@ -4,7 +4,7 @@ import { addGoods, handleDisasters } from '../gameUtils';
  * Process dice results and update player state
  * @returns {Object} Updated state including next phase
  */
-export function processRollResults(results, currentPlayerIndex, allPlayers) {
+export function processRollResults(results, currentPlayerIndex, allPlayers, variantConfig = null) {
   const newPlayers = [...allPlayers];
   const currentPlayer = newPlayers[currentPlayerIndex];
 
@@ -25,6 +25,18 @@ export function processRollResults(results, currentPlayerIndex, allPlayers) {
       }
     }
   }
+
+  // Add food bonus from completed village production buildings (Ancient Empires)
+  if (variantConfig && variantConfig.productions && currentPlayer.productions) {
+    for (let i = 0; i < currentPlayer.productions.length; i++) {
+      const production = currentPlayer.productions[i];
+      const productionDef = variantConfig.productions[i];
+      if (production.built && productionDef.name === 'village' && productionDef.bonus === '1 food') {
+        foodToAdd += 1;
+      }
+    }
+  }
+
   currentPlayer.food = Math.min(currentPlayer.food + foodToAdd, 15);
 
   // Process goods
