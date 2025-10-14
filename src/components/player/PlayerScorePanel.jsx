@@ -65,9 +65,9 @@ export default function PlayerScorePanel({
   return (
     <div className="bg-white dark:bg-dark-surface rounded-lg shadow-lg p-2 sm:px-4 lg:h-full flex flex-col lg:overflow-hidden transition-colors">
       {/* Contenu principal en grille */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 lg:flex-1 lg:min-h-0">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 lg:flex-1 lg:min-h-0">
         {/* Colonne de gauche */}
-        <div className={"flex flex-col lg:overflow-y-auto " + (isAncientEmpires ? 'space-y-4' : 'space-y-2')}>
+        <div className={"flex flex-col lg:overflow-y-auto scrollbar-hide " + (isAncientEmpires ? 'space-y-4' : 'space-y-2')}>
           <div className='flex justify-between gap-2'>
             <div className='flex gap-2'>
               <CityDisplay
@@ -181,7 +181,7 @@ export default function PlayerScorePanel({
         </div>
   
         {/* Colonne de droite */}
-        <div className="flex flex-col justify-between gap-3 lg:overflow-y-auto">
+        <div className="flex flex-col justify-between gap-3 lg:overflow-y-auto scrollbar-hide">
           {/* Resources display - for Ancient Empires only (moved to right column) */}
           {isAncientEmpires && (
             <ResourcesDisplay

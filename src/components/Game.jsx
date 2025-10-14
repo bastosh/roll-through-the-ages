@@ -948,7 +948,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
   }
 
   return (
-    <div className="min-h-screen lg:h-screen lg:overflow-hidden bg-gradient-to-br from-amber-100 to-orange-200 dark:from-gray-900 dark:to-gray-800 p-4 transition-colors">
+    <div className="min-h-screen lg:h-screen lg:overflow-hidden bg-gradient-to-br from-amber-100 to-orange-200 dark:from-gray-900 dark:to-gray-800 transition-colors">
       {/* Player Turn Modal */}
       <PlayerTurnModal
         show={showPlayerTurnModal}
@@ -972,7 +972,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         />
 
         {/* Dice Display - Compact bar with phase info and action buttons */}
-        <div className="flex-shrink-0 bg-white dark:bg-dark-surface rounded-lg shadow-lg px-2 sm:px-4 py-3 mb-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 min-h-24 transition-colors">
+        <div className="flex-shrink-0 bg-white dark:bg-dark-surface rounded-lg shadow-lg px-2 sm:px-4 py-3 my-4 mx-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 min-h-24 transition-colors">
           <DiceBar
             diceResults={diceResults}
             lockedDice={lockedDice}
@@ -1061,7 +1061,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         </div>
 
         {/* Player panel - full width */}
-        <div className="lg:flex-1 lg:min-h-0">
+        <div className="lg:flex-1 lg:min-h-0 mx-4 mb-4">
           <PlayerScorePanel
             player={currentPlayer}
             onBuyDevelopment={handleSelectDevelopment}

@@ -104,20 +104,20 @@ export default function GameSetup({ onStart, savedGameState, onResume, onClearSa
     <div className="min-h-screen bg-gradient-to-br from-amber-100 to-orange-200 dark:from-gray-900 dark:to-gray-800 transition-colors">
       {/* Header */}
       <header className="bg-white dark:bg-dark-surface shadow-lg transition-colors">
-        <div className="px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3 w-64">
+        <div className="px-6 py-3 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 flex-1">
             <LanguageSelector />
           </div>
 
           <h1
-            className="text-center text-4xl font-bold text-amber-800 dark:text-amber-400 cursor-pointer hover:text-amber-600 dark:hover:text-amber-300 transition-colors"
+            className="text-center text-4xl font-bold text-amber-800 dark:text-amber-400 flex-shrink-0 cursor-pointer hover:text-amber-600 dark:hover:text-amber-300 transition-colors"
             onClick={() => setCurrentView('main')}
             title={t('common.backToHome')}
           >
             Roll Through the Ages
           </h1>
 
-          <div className="flex items-center gap-3 w-64 justify-end">
+          <div className="flex items-center gap-3 flex-1 justify-end">
             <ThemeToggle />
 
             {/* Credits Button */}
