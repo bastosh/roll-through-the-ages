@@ -6,7 +6,8 @@ export default function MonumentsGrid({ playerMonuments, onBuildMonument, onUnbu
         {playerMonuments.map(function (m) {
           const monument = monuments.find(mon => mon.id === m.id);
           const canAddWorker = canBuild && !m.completed && pendingWorkers >= 1;
-          const canRemoveWorker = canBuild && !m.completed && m.progress > 0;
+          // Allow removing workers even if completed (during this turn only)
+          const canRemoveWorker = canBuild && m.progress > 0;
 
           // Vérifier si quelqu'un d'autre a terminé ce monument en premier
           let someoneElseCompletedFirst = false;

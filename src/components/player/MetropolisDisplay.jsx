@@ -4,7 +4,8 @@ export default function MetropolisDisplay({ metropolis, onBuildMetropolis, onUnb
   const { t } = useTranslation();
 
   const canAddWorker = canBuild && !metropolis.built && pendingWorkers >= 1;
-  const canRemoveWorker = canBuild && !metropolis.built && metropolis.progress > 0;
+  // Allow removing workers even if built (during this turn only)
+  const canRemoveWorker = canBuild && metropolis.progress > 0;
 
   const handleClick = (e) => {
     // Clic droit pour retirer un ouvrier

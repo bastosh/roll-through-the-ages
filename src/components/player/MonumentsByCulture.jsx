@@ -110,7 +110,8 @@ export default function MonumentsByCulture({
 
                   const isLastAndAlone = index === cultureMonuments.length - 1 && cultureMonuments.length % 3 === 1;
                   const canAddWorker = canBuild && !playerMonument.completed && pendingWorkers >= 1;
-                  const canRemoveWorker = canBuild && !playerMonument.completed && playerMonument.progress > 0;
+                  // Allow removing workers even if completed (during this turn only)
+                  const canRemoveWorker = canBuild && playerMonument.progress > 0;
 
                   // Vérifier si quelqu'un d'autre a terminé ce monument en premier
                   let someoneElseCompletedFirst = false;

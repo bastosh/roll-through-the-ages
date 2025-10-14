@@ -24,7 +24,8 @@ export default function ProductionBuildingsList({
           const workersCost = prod.workers[cityKey] || prod.workers['3 cities'];
 
           const canAddWorker = canBuild && !isBuilt && pendingWorkers >= 1;
-          const canRemoveWorker = canBuild && !isBuilt && playerProd && playerProd.progress > 0;
+          // Allow removing workers even if built (during this turn only)
+          const canRemoveWorker = canBuild && playerProd && playerProd.progress > 0;
 
           const handleClick = (e) => {
             // Clic droit pour retirer un ouvrier

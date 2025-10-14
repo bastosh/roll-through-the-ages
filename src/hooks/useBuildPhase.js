@@ -31,7 +31,29 @@ export function useBuildPhase() {
     const pendingBoats = player.pendingBoats || 0;
     const initialStoneTraded = stoneToTradeForWorkers;
 
-    setBuildPhaseInitialState({ cities, monuments, goodsPositions, builtBoats, pendingBoats, stoneTraded: initialStoneTraded });
+    // Sauvegarder l'état initial de la métropole (Ancient Empires)
+    let metropolis = null;
+    if (player.metropolis) {
+      metropolis = {
+        built: player.metropolis.built,
+        progress: player.metropolis.progress,
+        requiredWorkers: player.metropolis.requiredWorkers
+      };
+    }
+
+    // Sauvegarder l'état initial des bâtiments de production (Ancient Empires)
+    const productions = [];
+    if (player.productions) {
+      for (let i = 0; i < player.productions.length; i++) {
+        productions.push({
+          name: player.productions[i].name,
+          built: player.productions[i].built,
+          progress: player.productions[i].progress
+        });
+      }
+    }
+
+    setBuildPhaseInitialState({ cities, monuments, goodsPositions, builtBoats, pendingBoats, stoneTraded: initialStoneTraded, metropolis, productions });
   }
 
   function buildCity(player, cityIndex, pendingWorkers) {
@@ -54,9 +76,93 @@ export function useBuildPhase() {
     const city = player.cities[cityIndex];
     let newPendingWorkers = pendingWorkers;
 
-    if (!city.built && city.progress > 0) {
+    if (city.progress > 0) {
       // Remove a worker from city
       city.progress--;
+      // If city was built and we remove a worker, mark it as not built
+      if (city.built && city.progress < city.requiredWorkers) {
+        city.built = false;
+      }
+      newPendingWorkers++;
+    }
+
+    return newPendingWorkers;
+  }
+
+  function buildMetropolis(player, pendingWorkers) {
+    const metropolis = player.metropolis;
+    let newPendingWorkers = pendingWorkers;
+
+    if (metropolis && !metropolis.built && pendingWorkers >= 1) {
+      // Add a worker to metropolis
+      metropolis.progress++;
+      if (metropolis.progress >= metropolis.requiredWorkers) {
+        metropolis.built = true;
+      }
+      newPendingWorkers--;
+    }
+
+    return newPendingWorkers;
+  }
+
+  function unbuildMetropolis(player, pendingWorkers) {
+    const metropolis = player.metropolis;
+    let newPendingWorkers = pendingWorkers;
+
+    if (metropolis && metropolis.progress > 0) {
+      // Remove a worker from metropolis
+      metropolis.progress--;
+      // If metropolis was built and we remove a worker, mark it as not built
+      if (metropolis.built && metropolis.progress < metropolis.requiredWorkers) {
+        metropolis.built = false;
+      }
+      newPendingWorkers++;
+    }
+
+    return newPendingWorkers;
+  }
+
+  function buildProduction(player, productionIndex, pendingWorkers, variantConfig) {
+    const production = player.productions[productionIndex];
+    const productionDef = variantConfig.productions[productionIndex];
+    let newPendingWorkers = pendingWorkers;
+
+    if (production && !production.built && pendingWorkers >= 1) {
+      // Add a worker to production building
+      production.progress++;
+
+      // Calculate required workers based on cities built
+      const citiesBuilt = 3 + player.cities.filter(c => c.built).length;
+      const cityKey = `${citiesBuilt} cities`;
+      const requiredWorkers = productionDef.workers[cityKey] || productionDef.workers['3 cities'];
+
+      if (production.progress >= requiredWorkers) {
+        production.built = true;
+      }
+      newPendingWorkers--;
+    }
+
+    return newPendingWorkers;
+  }
+
+  function unbuildProduction(player, productionIndex, pendingWorkers, variantConfig) {
+    const production = player.productions[productionIndex];
+    const productionDef = variantConfig.productions[productionIndex];
+    let newPendingWorkers = pendingWorkers;
+
+    if (production && production.progress > 0) {
+      // Remove a worker from production building
+      production.progress--;
+
+      // Calculate required workers to check if we need to mark as not built
+      const citiesBuilt = 3 + player.cities.filter(c => c.built).length;
+      const cityKey = `${citiesBuilt} cities`;
+      const requiredWorkers = productionDef.workers[cityKey] || productionDef.workers['3 cities'];
+
+      // If production was built and we remove a worker, mark it as not built
+      if (production.built && production.progress < requiredWorkers) {
+        production.built = false;
+      }
       newPendingWorkers++;
     }
 
@@ -113,7 +219,7 @@ export function useBuildPhase() {
     return { newPendingWorkers, monumentCompleted };
   }
 
-  function unbuildMonument(player, monumentId, pendingWorkers) {
+  function unbuildMonument(player, monumentId, pendingWorkers, MONUMENTS) {
     let monument = null;
     for (let i = 0; i < player.monuments.length; i++) {
       if (player.monuments[i].id === monumentId) {
@@ -122,11 +228,26 @@ export function useBuildPhase() {
       }
     }
 
+    let monumentDef = null;
+    if (MONUMENTS) {
+      for (let i = 0; i < MONUMENTS.length; i++) {
+        if (MONUMENTS[i].id === monumentId) {
+          monumentDef = MONUMENTS[i];
+          break;
+        }
+      }
+    }
+
     let newPendingWorkers = pendingWorkers;
 
-    if (monument && !monument.completed && monument.progress > 0) {
+    if (monument && monument.progress > 0) {
       // Remove a worker from monument
       monument.progress--;
+      // If monument was completed and we remove a worker, mark it as not completed
+      if (monumentDef && monument.completed && monument.progress < monumentDef.workers) {
+        monument.completed = false;
+        monument.firstToComplete = false;
+      }
       newPendingWorkers++;
     }
 
@@ -176,6 +297,25 @@ export function useBuildPhase() {
       }
     }
 
+    // Calculate workers placed on metropolis during this turn (Ancient Empires)
+    if (player.metropolis && buildPhaseInitialState.metropolis) {
+      const initialProgress = buildPhaseInitialState.metropolis.progress;
+      const currentProgress = player.metropolis.progress;
+      workersToReturn += currentProgress - initialProgress;
+    }
+
+    // Calculate workers placed on production buildings during this turn (Ancient Empires)
+    if (player.productions && buildPhaseInitialState.productions) {
+      for (let i = 0; i < player.productions.length; i++) {
+        const initialProduction = buildPhaseInitialState.productions[i];
+        if (initialProduction) {
+          const initialProgress = initialProduction.progress;
+          const currentProgress = player.productions[i].progress;
+          workersToReturn += currentProgress - initialProgress;
+        }
+      }
+    }
+
     // Restore initial state
     for (let i = 0; i < player.cities.length; i++) {
       player.cities[i].built = buildPhaseInitialState.cities[i].built;
@@ -188,6 +328,23 @@ export function useBuildPhase() {
         player.monuments[i].progress = initialMonument.progress;
         player.monuments[i].completed = initialMonument.completed;
         player.monuments[i].firstToComplete = initialMonument.firstToComplete;
+      }
+    }
+
+    // Restore metropolis (Ancient Empires)
+    if (player.metropolis && buildPhaseInitialState.metropolis) {
+      player.metropolis.built = buildPhaseInitialState.metropolis.built;
+      player.metropolis.progress = buildPhaseInitialState.metropolis.progress;
+    }
+
+    // Restore production buildings (Ancient Empires)
+    if (player.productions && buildPhaseInitialState.productions) {
+      for (let i = 0; i < player.productions.length; i++) {
+        const initialProduction = buildPhaseInitialState.productions[i];
+        if (initialProduction) {
+          player.productions[i].built = initialProduction.built;
+          player.productions[i].progress = initialProduction.progress;
+        }
       }
     }
 
@@ -219,6 +376,20 @@ export function useBuildPhase() {
     for (let i = 0; i < player.cities.length; i++) {
       if (!player.cities[i].built) {
         return false;
+      }
+    }
+
+    // Check if metropolis can be built (Ancient Empires)
+    if (player.metropolis && !player.metropolis.built) {
+      return false;
+    }
+
+    // Check if any production building can be built (Ancient Empires)
+    if (player.productions) {
+      for (let i = 0; i < player.productions.length; i++) {
+        if (!player.productions[i].built) {
+          return false;
+        }
       }
     }
 
@@ -309,6 +480,10 @@ export function useBuildPhase() {
     initializeBuildPhase,
     buildCity,
     unbuildCity,
+    buildMetropolis,
+    unbuildMetropolis,
+    buildProduction,
+    unbuildProduction,
     buildMonument,
     unbuildMonument,
     checkAllMonumentsBuilt,

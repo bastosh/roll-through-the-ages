@@ -17,7 +17,8 @@ export default function CityDisplay({ cities, onBuildCity, onUnbuildCity, canBui
           const height = city.requiredWorkers <= 4 ? 'h-16' : 'h-20';
 
           const canAddWorker = canBuild && !city.built && pendingWorkers >= 1;
-          const canRemoveWorker = canBuild && !city.built && city.progress > 0;
+          // Allow removing workers even if built (during this turn only)
+          const canRemoveWorker = canBuild && city.progress > 0;
 
           const handleClick = (e) => {
             // Clic droit pour retirer un ouvrier

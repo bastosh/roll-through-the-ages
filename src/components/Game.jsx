@@ -158,6 +158,10 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     initializeBuildPhase,
     buildCity,
     unbuildCity,
+    buildMetropolis,
+    unbuildMetropolis,
+    buildProduction,
+    unbuildProduction,
     buildMonument,
     unbuildMonument,
     checkAllMonumentsBuilt,
@@ -447,6 +451,38 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     setPlayers(newPlayers);
   }
 
+  function handleBuildMetropolis() {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+    const newPendingWorkers = buildMetropolis(player, pendingWorkers);
+    setPendingWorkers(newPendingWorkers);
+    setPlayers(newPlayers);
+  }
+
+  function handleUnbuildMetropolis() {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+    const newPendingWorkers = unbuildMetropolis(player, pendingWorkers);
+    setPendingWorkers(newPendingWorkers);
+    setPlayers(newPlayers);
+  }
+
+  function handleBuildProduction(productionIndex) {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+    const newPendingWorkers = buildProduction(player, productionIndex, pendingWorkers, variantConfig);
+    setPendingWorkers(newPendingWorkers);
+    setPlayers(newPlayers);
+  }
+
+  function handleUnbuildProduction(productionIndex) {
+    const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
+    const newPendingWorkers = unbuildProduction(player, productionIndex, pendingWorkers, variantConfig);
+    setPendingWorkers(newPendingWorkers);
+    setPlayers(newPlayers);
+  }
+
   function handleBuildMonument(monumentId) {
     const newPlayers = [...players];
     const player = newPlayers[currentPlayerIndex];
@@ -471,7 +507,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     const newPlayers = [...players];
     const player = newPlayers[currentPlayerIndex];
 
-    const result = unbuildMonument(player, monumentId, pendingWorkers);
+    const result = unbuildMonument(player, monumentId, pendingWorkers, MONUMENTS);
     setPendingWorkers(result.newPendingWorkers);
     setPlayers(newPlayers);
   }
@@ -1069,6 +1105,10 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
             pendingCoins={pendingCoins}
             onBuildCity={handleBuildCity}
             onUnbuildCity={handleUnbuildCity}
+            onBuildMetropolis={handleBuildMetropolis}
+            onUnbuildMetropolis={handleUnbuildMetropolis}
+            onBuildProduction={handleBuildProduction}
+            onUnbuildProduction={handleUnbuildProduction}
             onBuildMonument={handleBuildMonument}
             onUnbuildMonument={handleUnbuildMonument}
             canBuild={phase === 'build'}
