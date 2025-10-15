@@ -133,20 +133,10 @@ export default function PhaseInfoBar({
     const workerDiceCount = pendingFoodOrWorkers - foodDiceCount;
 
     // Calculer la nourriture qui sera ajoutée
+    // Note: le bonus des villages a déjà été ajouté à currentPlayer.food par processRollResults()
     let foodToAdd = foodDiceCount * 2;
     if (hasAgriculture) {
       foodToAdd += foodDiceCount;
-    }
-
-    // Add food bonus from completed village production buildings (Ancient Empires)
-    if (variantConfig && variantConfig.productions && currentPlayer.productions) {
-      for (let i = 0; i < currentPlayer.productions.length; i++) {
-        const production = currentPlayer.productions[i];
-        const productionDef = variantConfig.productions[i];
-        if (production.built && productionDef.name === 'village' && productionDef.bonus === '1 food') {
-          foodToAdd += 1;
-        }
-      }
     }
 
     const futureFood = currentPlayer.food + foodToAdd;

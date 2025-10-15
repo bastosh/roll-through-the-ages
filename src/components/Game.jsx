@@ -1047,19 +1047,45 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
   if (diceResults && (phase === 'roll' || phase === 'choose_food_or_workers')) {
     const hasAgriculture = currentPlayer.developments.indexOf('agriculture') !== -1;
 
-    for (let i = 0; i < diceResults.length; i++) {
-      const r = diceResults[i];
-      if (r.type === 'food') {
-        previewFood += r.value;
-        if (hasAgriculture) {
-          previewFood += 1;
+    // During roll phase, show all food and goods from dice
+    // During choose phase, only show pending food_or_workers choices (other resources already added)
+    if (phase === 'roll') {
+      for (let i = 0; i < diceResults.length; i++) {
+        const r = diceResults[i];
+        if (r.type === 'food') {
+          previewFood += r.value;
+          if (hasAgriculture) {
+            previewFood += 1;
+          }
+        } else if (r.type === 'goods') {
+          previewGoodsCount += r.value;
         }
-      } else if (r.type === 'goods') {
-        previewGoodsCount += r.value;
+      }
+
+      // Add food bonus from completed village production buildings (Ancient Empires)
+      if (variantConfig.productions && currentPlayer.productions) {
+        for (let i = 0; i < currentPlayer.productions.length; i++) {
+          const production = currentPlayer.productions[i];
+          const productionDef = variantConfig.productions[i];
+          if (production.built && productionDef.name === 'village' && productionDef.bonus === '1 food') {
+            previewFood += 1;
+          }
+        }
+      }
+
+      // Add goods bonus from completed market production buildings (Ancient Empires)
+      if (variantConfig.productions && currentPlayer.productions) {
+        for (let i = 0; i < currentPlayer.productions.length; i++) {
+          const production = currentPlayer.productions[i];
+          const productionDef = variantConfig.productions[i];
+          if (production.built && productionDef.name === 'market' && productionDef.bonus === '1 good') {
+            previewGoodsCount += 1;
+          }
+        }
       }
     }
 
-    // Handle food_or_workers in choose phase
+    // Handle food_or_workers in choose phase - only show pending choices
     if (phase === 'choose_food_or_workers') {
       for (let i = 0; i < foodOrWorkerChoices.length; i++) {
         if (foodOrWorkerChoices[i] === 'food') {
@@ -1067,28 +1093,6 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
           if (hasAgriculture) {
             previewFood += 1;
           }
-        }
-      }
-    }
-
-    // Add food bonus from completed village production buildings (Ancient Empires)
-    if (variantConfig.productions && currentPlayer.productions) {
-      for (let i = 0; i < currentPlayer.productions.length; i++) {
-        const production = currentPlayer.productions[i];
-        const productionDef = variantConfig.productions[i];
-        if (production.built && productionDef.name === 'village' && productionDef.bonus === '1 food') {
-          previewFood += 1;
-        }
-      }
-    }
-
-    // Add goods bonus from completed market production buildings (Ancient Empires)
-    if (variantConfig.productions && currentPlayer.productions) {
-      for (let i = 0; i < currentPlayer.productions.length; i++) {
-        const production = currentPlayer.productions[i];
-        const productionDef = variantConfig.productions[i];
-        if (production.built && productionDef.name === 'market' && productionDef.bonus === '1 good') {
-          previewGoodsCount += 1;
         }
       }
     }
