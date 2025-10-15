@@ -68,6 +68,31 @@ export default function PlayerScorePanel({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-12 lg:flex-1 lg:min-h-0">
         {/* Colonne de gauche */}
         <div className={"flex flex-col lg:overflow-y-auto scrollbar-hide " + (isAncientEmpires ? 'space-y-4' : 'space-y-2')}>
+          {/* Trade panel - appears during trade phase at the top */}
+          {isTradePhase && (
+            <TradeResourcesPanel
+              player={player}
+              tradesUsed={tradesUsed}
+              onTrade={onTrade}
+              onReset={onResetTrades}
+              onSkip={onSkipTrade}
+            />
+          )}
+
+          {/* Smithing invasion panel - appears during smithing_invasion phase at the top */}
+          {isSmithingInvasionPhase && (
+            <SmithingInvasionPanel
+              currentPlayer={player}
+              allPlayers={allPlayers}
+              currentPlayerIndex={currentPlayerIndex}
+              spearheadsToSpend={spearheadsToSpend}
+              onIncrementSpearheads={onIncrementSpearheads}
+              onDecrementSpearheads={onDecrementSpearheads}
+              onConfirm={onConfirmSmithing}
+              onSkip={onSkipSmithing}
+            />
+          )}
+
           <div className='flex justify-between gap-2'>
             <div className='flex gap-2'>
               <CityDisplay
@@ -135,31 +160,6 @@ export default function PlayerScorePanel({
               allPlayers={allPlayers}
               currentPlayerIndex={currentPlayerIndex}
               monuments={monuments}
-            />
-          )}
-
-          {/* Trade panel - appears during trade phase */}
-          {isTradePhase && (
-            <TradeResourcesPanel
-              player={player}
-              tradesUsed={tradesUsed}
-              onTrade={onTrade}
-              onReset={onResetTrades}
-              onSkip={onSkipTrade}
-            />
-          )}
-
-          {/* Smithing invasion panel - appears during smithing_invasion phase */}
-          {isSmithingInvasionPhase && (
-            <SmithingInvasionPanel
-              currentPlayer={player}
-              allPlayers={allPlayers}
-              currentPlayerIndex={currentPlayerIndex}
-              spearheadsToSpend={spearheadsToSpend}
-              onIncrementSpearheads={onIncrementSpearheads}
-              onDecrementSpearheads={onDecrementSpearheads}
-              onConfirm={onConfirmSmithing}
-              onSkip={onSkipSmithing}
             />
           )}
 

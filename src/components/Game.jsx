@@ -623,9 +623,10 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     setPendingFoodOrWorkers(0);
     resetStone();
 
-    // If variant is Late Bronze Age, player has shipping development and boats, go to trade phase
+    // If variant is Late Bronze Age or Ancient Empires, player has shipping development and boats, go to trade phase
     const hasShipping = newPlayers[currentPlayerIndex].developments.indexOf('shipping') !== -1;
-    if (variantId === 'late_bronze_age' && hasShipping && newPlayers[currentPlayerIndex].builtBoats > 0) {
+    const isTradeVariant = variantId === 'late_bronze_age' || variantId === 'ancient_empires';
+    if (isTradeVariant && hasShipping && newPlayers[currentPlayerIndex].builtBoats > 0) {
       initializeTradePhase(newPlayers[currentPlayerIndex]);
       setPhase('trade');
     } else {
