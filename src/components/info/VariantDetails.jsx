@@ -23,7 +23,7 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
         <h3 className="text-lg font-semibold text-amber-700 dark:text-amber-500 mb-2">🏆 {t('setup.victoryConditions')}</h3>
         <div className="bg-amber-50 dark:bg-dark-elevated rounded p-3 space-y-1 text-sm dark:text-dark-text">
           {isSoloMode ? (
-            <p>{t('setup.play10Turns')}</p>
+            <p>{t('setup.playNTurns', { turns: variant.soloMaxRounds })}</p>
           ) : playerCount === 1 ? (
             <p>{t('setup.noEndCondition')}</p>
           ) : (

@@ -76,7 +76,7 @@ export default function VariantSelector({
                   : 'bg-gray-200 dark:bg-dark-elevated text-gray-700 dark:text-dark-text hover:bg-gray-300 dark:hover:bg-dark-border'
               )}
             >
-              {t('setup.soloMode10Turns')}
+              {t('setup.soloModeLabel')}
             </button>
             <button
               onClick={() => onSetIsSoloMode(false)}

@@ -72,7 +72,7 @@
     "playerHistory": "Player History",
     "rulesTitle": "Rules - {{variant}}",
     "victoryConditions": "Victory conditions",
-    "play10Turns": "Play 10 turns and maximize your score",
+    "playNTurns": "Play {{turns}} turns and maximize your score",
     "noEndCondition": "No end condition, play freely",
     "buyDevelopments": "Buy {{count}} developments",
     "orBuildAllMonuments": "Or build all monuments collectively",
