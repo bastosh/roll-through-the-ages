@@ -46,6 +46,18 @@ export function processRollResults(results, currentPlayerIndex, allPlayers, vari
       goodsToAdd += results[i].value;
     }
   }
+
+  // Add goods bonus from completed market production buildings (Ancient Empires)
+  if (variantConfig && variantConfig.productions && currentPlayer.productions) {
+    for (let i = 0; i < currentPlayer.productions.length; i++) {
+      const production = currentPlayer.productions[i];
+      const productionDef = variantConfig.productions[i];
+      if (production.built && productionDef.name === 'market' && productionDef.bonus === '1 good') {
+        goodsToAdd += 1;
+      }
+    }
+  }
+
   addGoods(currentPlayer, goodsToAdd);
 
   // Process workers, food_or_workers, and coins

@@ -69,6 +69,17 @@ export function calculatePlayerScore(player, DEVELOPMENTS, MONUMENTS) {
     score += totalGoodsCount;
   }
 
+  // Economy development bonus (Ancient Empires only)
+  if (player.developments.indexOf('economy') !== -1) {
+    if (player.productions) {
+      let completedProductionsCount = 0;
+      for (let j = 0; j < player.productions.length; j++) {
+        if (player.productions[j].built) completedProductionsCount++;
+      }
+      score += completedProductionsCount * 2;
+    }
+  }
+
   // Subtract disasters
   score -= player.disasters;
 
@@ -142,6 +153,17 @@ export function calculateScoreBreakdown(player, DEVELOPMENTS, MONUMENTS) {
   if (player.developments.indexOf('commerce') !== -1) {
     const totalGoodsCount = getTotalGoodsCount(player.goodsPositions);
     bonusScore += totalGoodsCount;
+  }
+
+  // Economy development bonus (Ancient Empires only)
+  if (player.developments.indexOf('economy') !== -1) {
+    if (player.productions) {
+      let completedProductionsCount = 0;
+      for (let j = 0; j < player.productions.length; j++) {
+        if (player.productions[j].built) completedProductionsCount++;
+      }
+      bonusScore += completedProductionsCount * 2;
+    }
   }
 
   const total = developmentsScore + monumentsScore + bonusScore - player.disasters;

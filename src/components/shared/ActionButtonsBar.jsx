@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { calculateDevelopmentCost } from '../../utils/developmentCost';
 
 export default function ActionButtonsBar({
   phase,
@@ -30,7 +31,8 @@ export default function ActionButtonsBar({
   onContinueDiscard,
   preservationUsed,
   onUsePreservation,
-  onRollInitial
+  onRollInitial,
+  playerCount = 1
 }) {
   const { t } = useTranslation();
 
@@ -171,7 +173,8 @@ export default function ActionButtonsBar({
   if (phase === 'buy') {
     if (selectedDevelopment) {
       const selectedValue = calculateSelectedValue();
-      const canPurchase = selectedValue >= selectedDevelopment.cost;
+      const actualCost = calculateDevelopmentCost(selectedDevelopment, currentPlayer.productions, currentPlayer.monuments, playerCount);
+      const canPurchase = selectedValue >= actualCost;
       return (
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <button

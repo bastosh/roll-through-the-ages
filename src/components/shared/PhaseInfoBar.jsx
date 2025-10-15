@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { handleDisasters } from '../../utils/gameUtils';
+import { calculateDevelopmentCost } from '../../utils/developmentCost';
 import DisasterInfo from './DisasterInfo';
 export default function PhaseInfoBar({
   phase,
@@ -25,7 +26,8 @@ export default function PhaseInfoBar({
   pendingFoodOrWorkers = 0,
   calculateSelectedValue = null,
   rollCount = 0,
-  variantConfig = null
+  variantConfig = null,
+  playerCount = 1
 }) {
   const { t } = useTranslation();
   const hasEngineering = currentPlayer.developments.indexOf('engineering') !== -1;
@@ -257,7 +259,8 @@ export default function PhaseInfoBar({
 
   if (phase === 'buy') {
     const selectedValue = selectedDevelopment && calculateSelectedValue ? calculateSelectedValue() : pendingCoins;
-    const canAfford = selectedDevelopment ? selectedValue >= selectedDevelopment.cost : false;
+    const actualCost = selectedDevelopment ? calculateDevelopmentCost(selectedDevelopment, currentPlayer.productions, currentPlayer.monuments, playerCount) : 0;
+    const canAfford = selectedDevelopment ? selectedValue >= actualCost : false;
 
     return (
       <div className="flex items-center gap-8">
@@ -279,7 +282,7 @@ export default function PhaseInfoBar({
         {selectedDevelopment ? (
           <div className="flex items-center gap-3 bg-gray-50 dark:bg-dark-elevated border border-gray-400 dark:border-dark-border rounded px-3 py-1 transition-colors">
             <div className="text-gray-600 dark:text-dark-text-muted">{t('phaseInfo.cost')}</div>
-            <div className="text-lg font-bold text-gray-800 dark:text-dark-text">{selectedDevelopment.cost} 💰</div>
+            <div className="text-lg font-bold text-gray-800 dark:text-dark-text">{actualCost} 💰</div>
             <div className="text-gray-400 dark:text-dark-text-muted">|</div>
             <div className="text-gray-600 dark:text-dark-text-muted">{t('phaseInfo.committed')}</div>
             <div className={`text-lg font-bold ${canAfford ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>

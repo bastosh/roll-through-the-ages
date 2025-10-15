@@ -19,9 +19,15 @@ export default function ProductionBuildingsList({
           const playerProd = playerProductions[index];
           const isBuilt = playerProd && playerProd.built;
 
-          // Calculer le coût en ouvriers selon le nombre de cités construites
-          const cityKey = `${citiesBuiltCount} cities`;
-          const workersCost = prod.workers[cityKey] || prod.workers['3 cities'];
+          // Utiliser requiredWorkers si défini (coût fixé au début de la construction),
+          // sinon calculer selon le nombre de cités construites
+          let workersCost;
+          if (playerProd && playerProd.requiredWorkers !== undefined) {
+            workersCost = playerProd.requiredWorkers;
+          } else {
+            const cityKey = `${citiesBuiltCount} cities`;
+            workersCost = prod.workers[cityKey] || prod.workers['3 cities'];
+          }
 
           const canAddWorker = canBuild && !isBuilt && pendingWorkers >= 1;
           // Allow removing workers even if built (during this turn only)

@@ -120,6 +120,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
   const [pendingWorkers, setPendingWorkers] = useState(savedGameState?.pendingWorkers ?? 0);
   const [pendingFoodOrWorkers, setPendingFoodOrWorkers] = useState(savedGameState?.pendingFoodOrWorkers ?? 0);
   const [pendingCoins, setPendingCoins] = useState(savedGameState?.pendingCoins ?? 0);
+  const [workerDiceCount, setWorkerDiceCount] = useState(savedGameState?.workerDiceCount ?? 0);
   const [gameEnded, setGameEnded] = useState(false);
   const [testMode, setTestMode] = useState(false);
   const [gameEndTriggered, setGameEndTriggered] = useState(savedGameState?.gameEndTriggered ?? false);
@@ -325,6 +326,15 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
       variantConfig
     );
 
+    // Count worker dice for slavery bonus
+    let workersCount = 0;
+    for (let i = 0; i < results.length; i++) {
+      if (results[i].type === 'workers') {
+        workersCount++;
+      }
+    }
+    setWorkerDiceCount(workersCount);
+
     setPlayers(result.players);
     setPendingWorkers(result.pendingWorkers);
     setPendingFoodOrWorkers(result.pendingFoodOrWorkers);
@@ -354,6 +364,15 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     const hasMasonry = player.developments.indexOf('masonry') !== -1;
 
     const result = validateChoices(player, pendingWorkers, hasAgriculture, hasMasonry);
+
+    // Count food_or_workers dice that were chosen as workers (for slavery bonus)
+    let additionalWorkerDice = 0;
+    for (let i = 0; i < foodOrWorkerChoices.length; i++) {
+      if (foodOrWorkerChoices[i] === 'workers') {
+        additionalWorkerDice++;
+      }
+    }
+    setWorkerDiceCount(workerDiceCount + additionalWorkerDice);
 
     // Transform food_or_workers dice to show the actual choice
     const newDiceResults = [...diceResults];
@@ -396,14 +415,41 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
   }
 
   function skipToBuyPhase() {
+    const currentPlayerState = players[currentPlayerIndex];
+
+    // Add coins bonus from completed mine production buildings (Ancient Empires)
+    let mineBonus = 0;
+    if (variantConfig.productions && currentPlayerState.productions) {
+      const hasCoinage = currentPlayerState.developments.indexOf('coinage') !== -1;
+      const coinValue = hasCoinage ? 12 : 7;
+
+      for (let i = 0; i < currentPlayerState.productions.length; i++) {
+        const production = currentPlayerState.productions[i];
+        const productionDef = variantConfig.productions[i];
+        if (production.built && productionDef.name === 'mine' && productionDef.bonus === '1 coin') {
+          mineBonus += coinValue;
+        }
+      }
+    }
+
+    // Add coins bonus from slavery development (+5 per worker die)
+    let slaveryBonus = 0;
+    if (currentPlayerState.developments.indexOf('slavery') !== -1) {
+      slaveryBonus = workerDiceCount * 5;
+    }
+
+    // Apply mine bonus and slavery bonus to pendingCoins
+    const totalCoins = pendingCoins + mineBonus + slaveryBonus;
+    setPendingCoins(totalCoins);
+
     // Calculate minimum cost of available developments
-    const purchasedDevIds = players[currentPlayerIndex].developments;
+    const purchasedDevIds = currentPlayerState.developments;
     const availableDevs = DEVELOPMENTS.filter(d => purchasedDevIds.indexOf(d.id) === -1);
     const minCost = availableDevs.length > 0 ? Math.min(...availableDevs.map(d => d.cost)) : Infinity;
 
     // Calculate total value available
-    const goodsValue = getGoodsValue(players[currentPlayerIndex].goodsPositions);
-    const totalValue = goodsValue + pendingCoins;
+    const goodsValue = getGoodsValue(currentPlayerState.goodsPositions);
+    const totalValue = goodsValue + totalCoins;
 
     // Skip buy phase if can't afford anything
     if (totalValue < minCost) {
@@ -662,7 +708,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     if (!dev) return;
 
     const player = players[currentPlayerIndex];
-    const result = selectDevelopment(dev, player, pendingCoins);
+    const result = selectDevelopment(dev, player, pendingCoins, players.length);
 
     if (result && result.autoBuy) {
       handleAutoBuyDevelopment(dev);
@@ -674,7 +720,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     const newPlayers = [...players];
     const player = newPlayers[currentPlayerIndex];
 
-    const result = autoBuyDevelopment(dev, player, pendingCoins);
+    const result = autoBuyDevelopment(dev, player, pendingCoins, players.length);
     setPendingCoins(result.newCoins);
     setPlayers(newPlayers);
 
@@ -706,7 +752,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     const newPlayers = [...players];
     const player = newPlayers[currentPlayerIndex];
 
-    const result = confirmPurchase(player, pendingCoins);
+    const result = confirmPurchase(player, pendingCoins, players.length);
     if (!result) return;
 
     setPendingCoins(result.newPendingCoins);
@@ -838,6 +884,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     setPhase('roll');
     resetForNewTurn();
     setPendingCoins(0);
+    setWorkerDiceCount(0);
     setPreservationUsed(false);
     // Reset any ongoing trade states from hooks
     resetTrade();
@@ -877,6 +924,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         pendingWorkers: pendingWorkers,
         pendingFoodOrWorkers: pendingFoodOrWorkers,
         pendingCoins: pendingCoins,
+        workerDiceCount: workerDiceCount,
         gameEndTriggered: gameEndTriggered,
         leadershipUsed: leadershipUsed,
         preservationUsed: preservationUsed,
@@ -904,6 +952,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     pendingWorkers,
     pendingFoodOrWorkers,
     pendingCoins,
+    workerDiceCount,
     gameEndTriggered,
     leadershipUsed,
     preservationUsed,
@@ -993,6 +1042,17 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         }
       }
     }
+
+    // Add goods bonus from completed market production buildings (Ancient Empires)
+    if (variantConfig.productions && currentPlayer.productions) {
+      for (let i = 0; i < currentPlayer.productions.length; i++) {
+        const production = currentPlayer.productions[i];
+        const productionDef = variantConfig.productions[i];
+        if (production.built && productionDef.name === 'market' && productionDef.bonus === '1 good') {
+          previewGoodsCount += 1;
+        }
+      }
+    }
   }
 
   return (
@@ -1069,6 +1129,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
               rollCount={rollCount}
               diceResults={diceResults}
               variantConfig={variantConfig}
+              playerCount={players.length}
             />
           </div>
 
@@ -1105,6 +1166,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
               preservationUsed={preservationUsed}
               onUsePreservation={handleUsePreservation}
               onRollInitial={handleRollInitial}
+              playerCount={players.length}
             />
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { GOODS_TYPES, GOODS_VALUES } from '../constants/gameData';
 import { getGoodsValue } from '../utils/gameUtils';
+import { calculateDevelopmentCost } from '../utils/developmentCost';
 
 /**
  * Hook pour gérer la phase d'achat de développements
@@ -21,17 +22,18 @@ export function useBuyPhase() {
   const [lastPurchasedDevelopment, setLastPurchasedDevelopment] = useState(null);
   const [foodToTradeForCoins, setFoodToTradeForCoins] = useState(0);
 
-  function selectDevelopment(dev, player, pendingCoins) {
+  function selectDevelopment(dev, player, pendingCoins, playerCount = 1) {
     const totalValue = getGoodsValue(player.goodsPositions) + pendingCoins;
+    const actualCost = calculateDevelopmentCost(dev, player.productions, player.monuments, playerCount);
 
-    if (totalValue >= dev.cost && player.developments.indexOf(dev.id) === -1) {
+    if (totalValue >= actualCost && player.developments.indexOf(dev.id) === -1) {
       if (originalGoodsPositions) {
         return null; // Already purchased something this turn
       }
 
       // If total equals cost, auto-buy
-      if (totalValue === dev.cost) {
-        return { autoBuy: true, dev };
+      if (totalValue === actualCost) {
+        return { autoBuy: true, dev, actualCost };
       } else {
         // Otherwise, ask player to choose resources
         setSelectedDevelopmentToBuy(dev);
@@ -43,13 +45,13 @@ export function useBuyPhase() {
           spearheads: 0
         });
         setCoinsForPurchase(pendingCoins);
-        return { autoBuy: false };
+        return { autoBuy: false, actualCost };
       }
     }
     return null;
   }
 
-  function autoBuyDevelopment(dev, player, pendingCoins) {
+  function autoBuyDevelopment(dev, player, pendingCoins, playerCount = 1) {
     // Save original state
     const savedState = {
       goodsPositions: { ...player.goodsPositions },
@@ -60,8 +62,11 @@ export function useBuyPhase() {
     setOriginalCoins(savedState.coins);
     setOriginalDevelopments(savedState.developments);
 
+    // Calculate actual cost with discount
+    const actualCost = calculateDevelopmentCost(dev, player.productions, player.monuments, playerCount);
+
     // Use all coins first
-    let remaining = dev.cost - pendingCoins;
+    let remaining = actualCost - pendingCoins;
     let newCoins = 0;
 
     // Use goods from most expensive to least expensive
@@ -112,11 +117,14 @@ export function useBuyPhase() {
     return total;
   }
 
-  function confirmPurchase(player, pendingCoins) {
+  function confirmPurchase(player, pendingCoins, playerCount = 1) {
     if (!selectedDevelopmentToBuy) return null;
 
+    // Calculate actual cost with discount
+    const actualCost = calculateDevelopmentCost(selectedDevelopmentToBuy, player.productions, player.monuments, playerCount);
+
     const selectedValue = calculateSelectedValue();
-    if (selectedValue < selectedDevelopmentToBuy.cost) return null;
+    if (selectedValue < actualCost) return null;
 
     // Save original state
     setOriginalGoodsPositions({ ...player.goodsPositions });

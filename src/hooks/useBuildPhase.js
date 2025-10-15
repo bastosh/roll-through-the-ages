@@ -48,7 +48,8 @@ export function useBuildPhase() {
         productions.push({
           name: player.productions[i].name,
           built: player.productions[i].built,
-          progress: player.productions[i].progress
+          progress: player.productions[i].progress,
+          requiredWorkers: player.productions[i].requiredWorkers
         });
       }
     }
@@ -128,15 +129,17 @@ export function useBuildPhase() {
     let newPendingWorkers = pendingWorkers;
 
     if (production && !production.built && pendingWorkers >= 1) {
+      // If this is the first worker, set requiredWorkers based on current city count
+      if (production.progress === 0) {
+        const citiesBuilt = 3 + player.cities.filter(c => c.built).length;
+        const cityKey = `${citiesBuilt} cities`;
+        production.requiredWorkers = productionDef.workers[cityKey] || productionDef.workers['3 cities'];
+      }
+
       // Add a worker to production building
       production.progress++;
 
-      // Calculate required workers based on cities built
-      const citiesBuilt = 3 + player.cities.filter(c => c.built).length;
-      const cityKey = `${citiesBuilt} cities`;
-      const requiredWorkers = productionDef.workers[cityKey] || productionDef.workers['3 cities'];
-
-      if (production.progress >= requiredWorkers) {
+      if (production.progress >= production.requiredWorkers) {
         production.built = true;
       }
       newPendingWorkers--;
@@ -147,22 +150,22 @@ export function useBuildPhase() {
 
   function unbuildProduction(player, productionIndex, pendingWorkers, variantConfig) {
     const production = player.productions[productionIndex];
-    const productionDef = variantConfig.productions[productionIndex];
     let newPendingWorkers = pendingWorkers;
 
     if (production && production.progress > 0) {
       // Remove a worker from production building
       production.progress--;
 
-      // Calculate required workers to check if we need to mark as not built
-      const citiesBuilt = 3 + player.cities.filter(c => c.built).length;
-      const cityKey = `${citiesBuilt} cities`;
-      const requiredWorkers = productionDef.workers[cityKey] || productionDef.workers['3 cities'];
-
       // If production was built and we remove a worker, mark it as not built
-      if (production.built && production.progress < requiredWorkers) {
+      if (production.built && production.progress < production.requiredWorkers) {
         production.built = false;
       }
+
+      // If all workers removed, reset requiredWorkers so it can be recalculated
+      if (production.progress === 0) {
+        production.requiredWorkers = undefined;
+      }
+
       newPendingWorkers++;
     }
 
@@ -344,6 +347,7 @@ export function useBuildPhase() {
         if (initialProduction) {
           player.productions[i].built = initialProduction.built;
           player.productions[i].progress = initialProduction.progress;
+          player.productions[i].requiredWorkers = initialProduction.requiredWorkers;
         }
       }
     }
