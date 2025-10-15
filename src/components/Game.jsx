@@ -662,6 +662,8 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     const newPlayers = [...players];
     const player = newPlayers[currentPlayerIndex];
     resetTrades(player);
+    // Force update by creating a new player object
+    newPlayers[currentPlayerIndex] = { ...player };
     setPlayers(newPlayers);
   }
 
@@ -722,10 +724,18 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     // Check if we have enough stone (current stone + already traded stone >= new amount)
     const totalStoneAvailable = player.goodsPositions.stone + stoneToTradeForWorkers;
 
+    // Calculate what the new pending workers would be
+    const newPendingWorkers = pendingWorkers + (difference * 3);
+
+    // Prevent reducing stone trade if it would result in negative workers
+    if (newPendingWorkers < 0) {
+      return;
+    }
+
     if (amount <= totalStoneAvailable) {
       // Update stone and workers based on the difference
       player.goodsPositions.stone -= difference;
-      setPendingWorkers(pendingWorkers + (difference * 3));
+      setPendingWorkers(newPendingWorkers);
       tradeStone(amount);
       setPlayers(newPlayers);
     }
