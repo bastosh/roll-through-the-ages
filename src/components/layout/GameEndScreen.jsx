@@ -1,79 +1,25 @@
 import { useTranslation } from 'react-i18next';
 import { getTotalGoodsCount } from '../../utils/gameUtils';
+import { calculateScoreBreakdown } from '../../utils/scoring';
 
 /**
  * Composant pour l'écran de fin de partie avec les scores
  */
-export default function GameEndScreen({ players, DEVELOPMENTS, MONUMENTS }) {
+export default function GameEndScreen({ players, DEVELOPMENTS, MONUMENTS, variantConfig = null }) {
   const { t } = useTranslation();
 
   // Calculate score breakdown and resources for each player
   const playersWithDetails = players.map(function(player) {
-    let developmentScore = 0;
-    for (let j = 0; j < player.developments.length; j++) {
-      const devId = player.developments[j];
-      for (let k = 0; k < DEVELOPMENTS.length; k++) {
-        if (DEVELOPMENTS[k].id === devId) {
-          developmentScore += DEVELOPMENTS[k].points;
-          break;
-        }
-      }
-    }
-
-    let monumentScore = 0;
-    for (let j = 0; j < player.monuments.length; j++) {
-      const m = player.monuments[j];
-      if (m.completed) {
-        for (let k = 0; k < MONUMENTS.length; k++) {
-          if (MONUMENTS[k].id === m.id) {
-            const monument = MONUMENTS[k];
-            monumentScore += m.firstToComplete ? monument.points[0] : monument.points[1];
-            break;
-          }
-        }
-      }
-    }
-
-    let bonusScore = 0;
-
-    if (player.developments.indexOf('architecture') !== -1) {
-      let completedCount = 0;
-      for (let j = 0; j < player.monuments.length; j++) {
-        if (player.monuments[j].completed) completedCount++;
-      }
-      let architectureDev = null;
-      for (let k = 0; k < DEVELOPMENTS.length; k++) {
-        if (DEVELOPMENTS[k].id === 'architecture') {
-          architectureDev = DEVELOPMENTS[k];
-          break;
-        }
-      }
-      const multiplier = architectureDev && architectureDev.cost >= 60 ? 2 : 1;
-      bonusScore += completedCount * multiplier;
-    }
-
-    if (player.developments.indexOf('empire') !== -1) {
-      let cityCount = 3;
-      for (let j = 0; j < player.cities.length; j++) {
-        if (player.cities[j].built) cityCount++;
-      }
-      bonusScore += cityCount;
-    }
-
-    if (player.developments.indexOf('commerce') !== -1) {
-      const totalGoodsCount = getTotalGoodsCount(player.goodsPositions);
-      bonusScore += totalGoodsCount;
-    }
-
+    const breakdown = calculateScoreBreakdown(player, DEVELOPMENTS, MONUMENTS, variantConfig);
     const totalResourcesCount = getTotalGoodsCount(player.goodsPositions) + player.food;
 
     return {
       player: player,
-      developmentScore: developmentScore,
-      monumentScore: monumentScore,
-      bonusScore: bonusScore,
-      disasterScore: player.disasters,
-      totalScore: player.score,
+      developmentScore: breakdown.developments,
+      monumentScore: breakdown.monuments,
+      bonusScore: breakdown.bonus,
+      disasterScore: breakdown.disasters,
+      totalScore: breakdown.total,
       totalResourcesCount: totalResourcesCount
     };
   });

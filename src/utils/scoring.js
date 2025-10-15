@@ -136,6 +136,13 @@ export function calculatePlayerScore(player, DEVELOPMENTS, MONUMENTS, variantCon
     }
   }
 
+  // Score from metropolis (Ancient Empires only)
+  if (player.metropolis && player.metropolis.built) {
+    if (variantConfig && variantConfig.metropolis) {
+      score += variantConfig.metropolis.points;
+    }
+  }
+
   // Architecture development bonus
   if (player.developments.indexOf('architecture') !== -1) {
     let completedCount = 0;
@@ -160,6 +167,19 @@ export function calculatePlayerScore(player, DEVELOPMENTS, MONUMENTS, variantCon
     let cityCount = 3;
     for (let j = 0; j < player.cities.length; j++) {
       if (player.cities[j].built) cityCount++;
+    }
+    score += cityCount;
+  }
+
+  // Kingdom development bonus (Ancient Empires only)
+  if (player.developments.indexOf('kingdom') !== -1) {
+    let cityCount = 3;
+    for (let j = 0; j < player.cities.length; j++) {
+      if (player.cities[j].built) cityCount++;
+    }
+    // Add metropolis to city count if built
+    if (player.metropolis && player.metropolis.built) {
+      cityCount++;
     }
     score += cityCount;
   }
@@ -231,6 +251,13 @@ export function calculateScoreBreakdown(player, DEVELOPMENTS, MONUMENTS, variant
     }
   }
 
+  // Score from metropolis (Ancient Empires only)
+  if (player.metropolis && player.metropolis.built) {
+    if (variantConfig && variantConfig.metropolis) {
+      monumentsScore += variantConfig.metropolis.points;
+    }
+  }
+
   // Architecture development bonus
   if (player.developments.indexOf('architecture') !== -1) {
     let completedCount = 0;
@@ -253,6 +280,19 @@ export function calculateScoreBreakdown(player, DEVELOPMENTS, MONUMENTS, variant
     let cityCount = 3;
     for (let j = 0; j < player.cities.length; j++) {
       if (player.cities[j].built) cityCount++;
+    }
+    bonusScore += cityCount;
+  }
+
+  // Kingdom development bonus (Ancient Empires only)
+  if (player.developments.indexOf('kingdom') !== -1) {
+    let cityCount = 3;
+    for (let j = 0; j < player.cities.length; j++) {
+      if (player.cities[j].built) cityCount++;
+    }
+    // Add metropolis to city count if built
+    if (player.metropolis && player.metropolis.built) {
+      cityCount++;
     }
     bonusScore += cityCount;
   }

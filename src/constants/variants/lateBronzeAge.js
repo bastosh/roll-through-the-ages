@@ -48,7 +48,7 @@ export const LATE_BRONZE_AGE_CONFIG = {
   soloSkullsLocked: true,
 
   // Solo mode: maximum number of rounds
-  soloMaxRounds: 12,
+  soloMaxRounds: 11,
 
   // Monument restrictions - all monuments available for all player counts
   monumentRestrictions: {

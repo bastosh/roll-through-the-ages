@@ -86,7 +86,14 @@
     "pointsShort": "pts",
     "costLabel": "Coût",
     "soloModeLabel": "Mode Solo",
-    "multiplayerMode": "Mode Multijoueur"
+    "multiplayerMode": "Mode Multijoueur",
+    "metropolis": "Métropole",
+    "metropolisRule": "10 ouvriers, 4 pts. Requis pour Commerce, Architecture, Royaume et Empire Antique",
+    "productionBuildings": "Bâtiments de production",
+    "productionBuildingsRule": "6 bâtiments disponibles : Marchés (bonus de ressource), Mines (bonus de pièces), Villages (bonus de nourriture)",
+    "cultures": "Cultures",
+    "culturesRule": "5 cultures disponibles. Complétez tous les monuments d’une culture pour des bonus de points",
+    "cultureBonus": "{{first}} pts (1er joueur) / {{second}} pts (autres)"
   },
 
   "variants": {

@@ -89,7 +89,7 @@ export const ANCIENT_EMPIRES_CONFIG = {
   soloSkullsLocked: true,
 
   // Solo mode: maximum number of rounds
-  soloMaxRounds: 15,
+  soloMaxRounds: 12,
 
   useMetropolis: true,
   metropolis: METROPOLIS,

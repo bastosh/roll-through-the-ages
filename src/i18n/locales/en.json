@@ -85,7 +85,14 @@
     "pointsShort": "pts",
     "costLabel": "Cost",
     "soloModeLabel": "Solo Mode",
-    "multiplayerMode": "Multiplayer Mode"
+    "multiplayerMode": "Multiplayer Mode",
+    "metropolis": "Metropolis",
+    "metropolisRule": "10 workers, 4 pts. Required for Commerce, Architecture, Kingdom, and Ancient Empire",
+    "productionBuildings": "Production buildings",
+    "productionBuildingsRule": "6 buildings available: Markets (goods bonus), Mines (coins bonus), Villages (food bonus)",
+    "cultures": "Cultures",
+    "culturesRule": "5 cultures available. Complete all monuments of one culture for bonus points",
+    "cultureBonus": "{{first}} pts (1st player) / {{second}} pts (others)"
   },
 
   "variants": {

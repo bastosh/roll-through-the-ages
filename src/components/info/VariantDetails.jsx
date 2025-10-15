@@ -38,7 +38,7 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
       </div>
 
       {/* Règles spécifiques */}
-      {(playerCount === 1 || variantId === 'late_bronze_age') && (
+      {(playerCount === 1 || variantId === 'late_bronze_age' || variantId === 'ancient_empires') && (
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-amber-700 dark:text-amber-500 mb-2">📜 {t('setup.specificRules')}</h3>
           <div className="bg-blue-50 dark:bg-dark-elevated rounded p-3 space-y-2 text-sm dark:text-dark-text">
@@ -52,6 +52,24 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
                   <p>• <span className="font-semibold">{t('developments.smithing')}</span> : {t('developmentEffects.smithing')}</p>
                   <p>• <span className="font-semibold">{t('developments.shipping')}</span> : {t('developmentEffects.shipping')}</p>
                   <p>• <span className="font-semibold">{t('developments.commerce')}</span> : {t('developmentEffects.commerce')}</p>
+                </div>
+              </>
+            )}
+            {variantId === 'ancient_empires' && (
+              <>
+                <div className="space-y-1.5">
+                  <p>• <span className="font-semibold">{t('setup.metropolis')}</span> : {t('setup.metropolisRule')}</p>
+                  <p>• <span className="font-semibold">{t('setup.productionBuildings')}</span> : {t('setup.productionBuildingsRule')}</p>
+                  <p>• <span className="font-semibold">{t('setup.cultures')}</span> : {t('setup.culturesRule')}</p>
+                  <div className="ml-4 space-y-1 text-xs">
+                    <p>- <span className="font-semibold">{t('cultures.celtic')}</span> : {t('setup.cultureBonus', { first: 8, second: 4 })}</p>
+                    <p>- <span className="font-semibold">{t('cultures.babylonian')}</span> : {t('setup.cultureBonus', { first: 6, second: 3 })}</p>
+                    <p>- <span className="font-semibold">{t('cultures.greek')}</span> : {t('setup.cultureBonus', { first: 4, second: 2 })}</p>
+                    <p>- <span className="font-semibold">{t('cultures.chinese')}</span> : {t('setup.cultureBonus', { first: 4, second: 2 })}</p>
+                    <p>- <span className="font-semibold">{t('cultures.egyptian')}</span> : {t('setup.cultureBonus', { first: 2, second: 1 })}</p>
+                  </div>
+                  <p>• <span className="font-semibold">{t('developments.economy')}</span> : {t('developmentEffects.economy')}</p>
+                  <p>• <span className="font-semibold">{t('developments.ancientEmpire')}</span> : {t('developmentEffects.ancientEmpire')}</p>
                 </div>
               </>
             )}

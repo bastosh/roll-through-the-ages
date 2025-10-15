@@ -1043,7 +1043,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
   }
 
   if (gameEnded) {
-    return <GameEndScreen players={players} DEVELOPMENTS={DEVELOPMENTS} MONUMENTS={MONUMENTS} />;
+    return <GameEndScreen players={players} DEVELOPMENTS={DEVELOPMENTS} MONUMENTS={MONUMENTS} variantConfig={variantConfig} />;
   }
 
   let citiesToFeed = 3;
