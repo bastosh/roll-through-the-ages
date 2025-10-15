@@ -496,8 +496,8 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
   }
 
   function checkAndSkipDiscard() {
-    // In solo mode, check if game should end at turn 10
-    if (isSoloMode && soloTurn >= 10) {
+    // In solo mode, check if game should end based on variant's max rounds
+    if (isSoloMode && soloTurn >= variantConfig.soloMaxRounds) {
       console.log('🎯 Solo game ending at turn', soloTurn);
       endGame();
       return;
@@ -874,8 +874,8 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     };
     setPlayers(newPlayers);
 
-    // In solo mode, check if game should end at turn 10
-    if (isSoloMode && soloTurn >= 10) {
+    // In solo mode, check if game should end based on variant's max rounds
+    if (isSoloMode && soloTurn >= variantConfig.soloMaxRounds) {
       endGame();
       return;
     }
@@ -888,7 +888,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
 
     if (isLastPlayer) {
       // In solo mode, check if game should end BEFORE incrementing
-      if (isSoloMode && soloTurn >= 10) {
+      if (isSoloMode && soloTurn >= variantConfig.soloMaxRounds) {
         endGame();
         return;
       }
@@ -1124,6 +1124,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
           testMode={testMode}
           showTestMode={import.meta.env.VITE_ENABLE_TEST_MODE === 'true'}
           onToggleTestMode={handleToggleTestMode}
+          soloMaxRounds={variantConfig.soloMaxRounds}
         />
 
         {/* Dice Display - Compact bar with phase info and action buttons */}

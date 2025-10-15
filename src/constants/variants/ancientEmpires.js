@@ -88,6 +88,9 @@ export const ANCIENT_EMPIRES_CONFIG = {
   // Solo mode: skulls can't be rerolled
   soloSkullsLocked: true,
 
+  // Solo mode: maximum number of rounds
+  soloMaxRounds: 15,
+
   useMetropolis: true,
   metropolis: METROPOLIS,
   productions: PRODUCTION,

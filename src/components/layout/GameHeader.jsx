@@ -13,7 +13,8 @@ export default function GameHeader({
   isMultiplayer,
   testMode,
   showTestMode,
-  onToggleTestMode
+  onToggleTestMode,
+  soloMaxRounds
 }) {
   const { t } = useTranslation();
 
@@ -24,7 +25,7 @@ export default function GameHeader({
         <div className="flex items-center gap-3 flex-1">
           {isSoloMode && (
             <div className="text-sm font-bold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/30 px-3 py-2 rounded-lg whitespace-nowrap">
-              {t('game.turn')} {soloTurn}/10
+              {t('game.turn')} {soloTurn}/{soloMaxRounds}
             </div>
           )}
           {isMultiplayer && (

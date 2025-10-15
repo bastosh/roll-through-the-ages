@@ -43,6 +43,9 @@ export const BRONZE_AGE_2024_CONFIG = {
   // Solo mode: skulls cannot be rerolled
   soloSkullsLocked: true,
 
+  // Solo mode: maximum number of rounds
+  soloMaxRounds: 10,
+
   // Monument restrictions based on player count
   monumentRestrictions: {
     1: [],
