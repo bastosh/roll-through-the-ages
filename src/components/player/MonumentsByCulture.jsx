@@ -38,8 +38,50 @@ export default function MonumentsByCulture({
         return monument && monument.origin === cultureName && m.completed;
       });
 
-      if (completedMonuments.length >= 2) {
-        playersWithCulture.push({ playerIndex: i, count: completedMonuments.length });
+      // Compter les monuments en tenant compte des groupes (ex: Stonehenge 1 ET 2 doivent être complétés pour compter comme 1)
+      let monumentCount = 0;
+      const processedGroups = new Set();
+
+      for (let j = 0; j < completedMonuments.length; j++) {
+        const monument = monuments.find(mon => mon.id === completedMonuments[j].id);
+        if (monument) {
+          // Si le monument fait partie d'un groupe
+          if (monument.monumentGroup) {
+            // On ne traite chaque groupe qu'une seule fois
+            if (!processedGroups.has(monument.monumentGroup)) {
+              processedGroups.add(monument.monumentGroup);
+
+              // Trouver tous les monuments de ce groupe dans la culture
+              const monumentsInGroup = monuments.filter(m =>
+                m.monumentGroup === monument.monumentGroup && m.origin === cultureName
+              );
+
+              // Vérifier que TOUS les monuments du groupe sont complétés par le joueur
+              let allGroupCompleted = true;
+              for (let k = 0; k < monumentsInGroup.length; k++) {
+                const found = player.monuments.find(pm =>
+                  pm.id === monumentsInGroup[k].id && pm.completed
+                );
+                if (!found) {
+                  allGroupCompleted = false;
+                  break;
+                }
+              }
+
+              // Compter le groupe seulement si TOUS ses monuments sont complétés
+              if (allGroupCompleted) {
+                monumentCount++;
+              }
+            }
+          } else {
+            // Monument normal, on compte
+            monumentCount++;
+          }
+        }
+      }
+
+      if (monumentCount >= 2) {
+        playersWithCulture.push({ playerIndex: i, count: monumentCount });
       }
     }
 

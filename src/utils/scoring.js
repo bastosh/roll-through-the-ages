@@ -1,13 +1,114 @@
 import { getTotalGoodsCount } from './gameUtils';
 
 /**
+ * Count the number of completed cultures for Ancient Empire bonus
+ * @param {Object} player - The player object
+ * @param {Array} MONUMENTS - Array of all monuments in the variant
+ * @param {Object} variantConfig - The variant configuration
+ * @returns {number} Number of cultures that are fully completed
+ */
+function getCompletedCulturesCount(player, MONUMENTS, variantConfig) {
+  if (!variantConfig || !variantConfig.cultures) {
+    return 0;
+  }
+
+  let completedCulturesCount = 0;
+
+  for (let i = 0; i < variantConfig.cultures.length; i++) {
+    const culture = variantConfig.cultures[i];
+    const cultureMonuments = [];
+
+    // Trouver tous les monuments de cette culture
+    for (let j = 0; j < MONUMENTS.length; j++) {
+      if (MONUMENTS[j].origin === culture.name) {
+        cultureMonuments.push(MONUMENTS[j]);
+      }
+    }
+
+    // Déterminer quels monuments le joueur doit avoir complété
+    // Gérer les groupes de monuments (ex: Stonehenge 1 et 2)
+    const requiredMonumentGroups = new Set();
+    const requiredMonumentIds = new Set();
+
+    for (let j = 0; j < cultureMonuments.length; j++) {
+      const monument = cultureMonuments[j];
+      if (monument.monumentGroup) {
+        requiredMonumentGroups.add(monument.monumentGroup);
+      } else {
+        requiredMonumentIds.add(monument.id);
+      }
+    }
+
+    // Vérifier que le joueur a complété tous les monuments requis
+    let allCompleted = true;
+
+    // Vérifier les monuments individuels
+    for (const monumentId of requiredMonumentIds) {
+      let found = false;
+      for (let j = 0; j < player.monuments.length; j++) {
+        if (player.monuments[j].id === monumentId && player.monuments[j].completed) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        allCompleted = false;
+        break;
+      }
+    }
+
+    // Vérifier les groupes de monuments (TOUS les monuments du groupe doivent être complétés)
+    if (allCompleted) {
+      for (const groupName of requiredMonumentGroups) {
+        // Trouver tous les monuments de ce groupe
+        const monumentsInGroup = [];
+        for (let k = 0; k < MONUMENTS.length; k++) {
+          if (MONUMENTS[k].monumentGroup === groupName) {
+            monumentsInGroup.push(MONUMENTS[k].id);
+          }
+        }
+
+        // Vérifier que TOUS les monuments du groupe sont complétés
+        let allMonumentsInGroupCompleted = true;
+        for (let m = 0; m < monumentsInGroup.length; m++) {
+          const monumentId = monumentsInGroup[m];
+          let found = false;
+          for (let j = 0; j < player.monuments.length; j++) {
+            if (player.monuments[j].id === monumentId && player.monuments[j].completed) {
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            allMonumentsInGroupCompleted = false;
+            break;
+          }
+        }
+
+        if (!allMonumentsInGroupCompleted) {
+          allCompleted = false;
+          break;
+        }
+      }
+    }
+
+    if (allCompleted) {
+      completedCulturesCount++;
+    }
+  }
+
+  return completedCulturesCount;
+}
+
+/**
  * Calculate the total score for a player
  * @param {Object} player - The player object
  * @param {Array} DEVELOPMENTS - Array of all developments in the variant
  * @param {Array} MONUMENTS - Array of all monuments in the variant
+ * @param {Object} variantConfig - The variant configuration (optional, for Ancient Empire bonus)
  * @returns {number} The calculated score
  */
-export function calculatePlayerScore(player, DEVELOPMENTS, MONUMENTS) {
+export function calculatePlayerScore(player, DEVELOPMENTS, MONUMENTS, variantConfig = null) {
   let score = 0;
 
   // Score from developments
@@ -80,6 +181,12 @@ export function calculatePlayerScore(player, DEVELOPMENTS, MONUMENTS) {
     }
   }
 
+  // Ancient Empire development bonus (Ancient Empires only)
+  if (player.developments.indexOf('ancientEmpire') !== -1) {
+    const completedCulturesCount = getCompletedCulturesCount(player, MONUMENTS, variantConfig);
+    score += completedCulturesCount * 9;
+  }
+
   // Subtract disasters
   score -= player.disasters;
 
@@ -91,9 +198,10 @@ export function calculatePlayerScore(player, DEVELOPMENTS, MONUMENTS) {
  * @param {Object} player - The player object
  * @param {Array} DEVELOPMENTS - Array of all developments in the variant
  * @param {Array} MONUMENTS - Array of all monuments in the variant
+ * @param {Object} variantConfig - The variant configuration (optional, for Ancient Empire bonus)
  * @returns {Object} Object with score breakdown
  */
-export function calculateScoreBreakdown(player, DEVELOPMENTS, MONUMENTS) {
+export function calculateScoreBreakdown(player, DEVELOPMENTS, MONUMENTS, variantConfig = null) {
   let developmentsScore = 0;
   let monumentsScore = 0;
   let bonusScore = 0;
@@ -164,6 +272,12 @@ export function calculateScoreBreakdown(player, DEVELOPMENTS, MONUMENTS) {
       }
       bonusScore += completedProductionsCount * 2;
     }
+  }
+
+  // Ancient Empire development bonus (Ancient Empires only)
+  if (player.developments.indexOf('ancientEmpire') !== -1) {
+    const completedCulturesCount = getCompletedCulturesCount(player, MONUMENTS, variantConfig);
+    bonusScore += completedCulturesCount * 9;
   }
 
   const total = developmentsScore + monumentsScore + bonusScore - player.disasters;

@@ -897,7 +897,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     let hasChanged = false;
 
     for (let i = 0; i < newPlayers.length; i++) {
-      const newScore = calculatePlayerScore(newPlayers[i], DEVELOPMENTS, MONUMENTS);
+      const newScore = calculatePlayerScore(newPlayers[i], DEVELOPMENTS, MONUMENTS, variantConfig);
       if (newPlayers[i].score !== newScore) {
         newPlayers[i].score = newScore;
         hasChanged = true;
@@ -967,7 +967,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     const newPlayers = [...players];
 
     for (let i = 0; i < newPlayers.length; i++) {
-      newPlayers[i].score = calculatePlayerScore(newPlayers[i], DEVELOPMENTS, MONUMENTS);
+      newPlayers[i].score = calculatePlayerScore(newPlayers[i], DEVELOPMENTS, MONUMENTS, variantConfig);
     }
 
     setPlayers(newPlayers);

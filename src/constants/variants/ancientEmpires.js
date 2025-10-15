@@ -24,8 +24,8 @@ const CULTURES = [
 const BASE_MONUMENTS = [
   { id: 'menhir', workers: 3, points: [1, 0], effect: null, origin: 'celtic' },
   { id: 'stone_circle', workers: 5, points: [2, 1], effect: null, origin: 'celtic' },
-  { id: 'stonehenge_1', workers: 6, points: [3, 2], effect: null, origin: 'celtic' },
-  { id: 'stonehenge_2', workers: 4, points: [3, 2], effect: null, origin: 'celtic' },
+  { id: 'stonehenge_1', workers: 6, points: [3, 2], effect: null, origin: 'celtic', monumentGroup: 'stonehenge' },
+  { id: 'stonehenge_2', workers: 4, points: [3, 2], effect: null, origin: 'celtic', monumentGroup: 'stonehenge' },
 
   { id: 'step_pyramid', workers: 3, points: [1, 0], effect: null, origin: 'babylonian' },
   { id: 'ishtar_gate', workers: 10, points: [6, 4], effect: null, origin: 'babylonian' },
