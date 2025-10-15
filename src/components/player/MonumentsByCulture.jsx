@@ -66,6 +66,17 @@ export default function MonumentsByCulture({
             }
           }
 
+          // Vérifier si un autre joueur a déjà obtenu la première ou deuxième place
+          let someoneElseCompletedCultureFirst = false;
+          let someoneElseCompletedCultureSecond = false;
+
+          if (completionStatus.length > 0 && completionStatus[0].playerIndex !== currentPlayerIndex) {
+            someoneElseCompletedCultureFirst = true;
+          }
+          if (completionStatus.length > 1 && completionStatus[1].playerIndex !== currentPlayerIndex) {
+            someoneElseCompletedCultureSecond = true;
+          }
+
           return (
             <div key={culture.name} className="border-2 rounded-lg p-2.5 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-300 dark:border-amber-700 shadow-sm transition-colors">
               {/* En-tête de la culture */}
@@ -76,10 +87,14 @@ export default function MonumentsByCulture({
                     {/* Checkbox premier joueur */}
                     <div className="flex items-center gap-1">
                       <div className={'w-7 h-7 border-2 rounded flex items-center justify-center transition-colors ' + (
-                        playerCultureStatus === 'first' ? 'bg-green-600 dark:bg-green-700 border-green-700 dark:border-green-800' : 'bg-white dark:bg-dark-surface border-gray-400 dark:border-dark-border'
+                        playerCultureStatus === 'first' ? 'bg-green-600 dark:bg-green-700 border-green-700 dark:border-green-800' :
+                          someoneElseCompletedCultureFirst ? 'bg-gray-300 dark:bg-gray-600 border-gray-400 dark:border-gray-500' :
+                            'bg-white dark:bg-dark-surface border-gray-400 dark:border-dark-border'
                       )}>
                         {playerCultureStatus === 'first' ? (
                           <span className="text-white text-xs font-bold">{culture.bonusFirst}</span>
+                        ) : someoneElseCompletedCultureFirst ? (
+                          <span className="text-gray-600 dark:text-gray-300 text-xs font-bold">✗</span>
                         ) : (
                           <span className="text-gray-600 dark:text-gray-400 text-xs font-bold">{culture.bonusFirst}</span>
                         )}
@@ -89,10 +104,14 @@ export default function MonumentsByCulture({
                     {/* Checkbox second joueur */}
                     <div className="flex items-center gap-1">
                       <div className={'w-6 h-6 border-2 rounded flex items-center justify-center transition-colors ' + (
-                        playerCultureStatus === 'second' ? 'bg-purple-600 dark:bg-purple-700 border-purple-700 dark:border-purple-800' : 'bg-white dark:bg-dark-surface border-gray-400 dark:border-dark-border'
+                        playerCultureStatus === 'second' ? 'bg-purple-600 dark:bg-purple-700 border-purple-700 dark:border-purple-800' :
+                          someoneElseCompletedCultureSecond ? 'bg-gray-300 dark:bg-gray-600 border-gray-400 dark:border-gray-500' :
+                            'bg-white dark:bg-dark-surface border-gray-400 dark:border-dark-border'
                       )}>
                         {playerCultureStatus === 'second' ? (
                           <span className="text-white text-xs font-bold">{culture.bonusSecond}</span>
+                        ) : someoneElseCompletedCultureSecond ? (
+                          <span className="text-gray-600 dark:text-gray-300 text-xs font-bold">✗</span>
                         ) : (
                           <span className="text-gray-600 dark:text-gray-400 text-xs font-bold">{culture.bonusSecond}</span>
                         )}
