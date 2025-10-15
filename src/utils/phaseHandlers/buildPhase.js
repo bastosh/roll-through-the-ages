@@ -55,6 +55,7 @@ export function buildMonument(player, monumentId, pendingWorkers, MONUMENTS, all
 
   let newPendingWorkers = pendingWorkers;
   let monumentCompleted = false;
+  let oracleBonus = 0;
 
   if (monument && !monument.completed && pendingWorkers >= 1) {
     // Add a worker to monument
@@ -79,11 +80,18 @@ export function buildMonument(player, monumentId, pendingWorkers, MONUMENTS, all
       if (!anyoneElseCompleted) {
         monument.firstToComplete = true;
       }
+
+      // Apply monument completion effects
+      if (monumentDef.effect === 'delphi_oracle') {
+        oracleBonus = 12;
+      } else if (monumentDef.effect === 'sphinx') {
+        player.sphinxPowerAvailable = true;
+      }
     }
     newPendingWorkers--;
   }
 
-  return { player, newPendingWorkers, monumentCompleted };
+  return { player, newPendingWorkers, monumentCompleted, oracleBonus };
 }
 
 /**

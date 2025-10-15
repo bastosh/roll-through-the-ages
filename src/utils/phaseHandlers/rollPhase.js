@@ -58,6 +58,27 @@ export function processRollResults(results, currentPlayerIndex, allPlayers, vari
     }
   }
 
+  // Add Heavenly Gate bonus: +1 resource if at least one 1-resource die (goods with value 1) is kept
+  let hasHeavenlyGate = false;
+  for (let i = 0; i < currentPlayer.monuments.length; i++) {
+    if (currentPlayer.monuments[i].id === 'heavenly_gate' && currentPlayer.monuments[i].completed) {
+      hasHeavenlyGate = true;
+      break;
+    }
+  }
+  if (hasHeavenlyGate) {
+    let hasOneResourceDie = false;
+    for (let i = 0; i < results.length; i++) {
+      if (results[i].type === 'goods' && results[i].value === 1) {
+        hasOneResourceDie = true;
+        break;
+      }
+    }
+    if (hasOneResourceDie) {
+      goodsToAdd += 1;
+    }
+  }
+
   addGoods(currentPlayer, goodsToAdd);
 
   // Process workers, food_or_workers, and coins
@@ -81,6 +102,18 @@ export function processRollResults(results, currentPlayerIndex, allPlayers, vari
         coins += 5;
       }
     }
+  }
+
+  // Add Ishtar Gate bonus: +1 worker permanently each turn
+  let hasIshtarGate = false;
+  for (let i = 0; i < currentPlayer.monuments.length; i++) {
+    if (currentPlayer.monuments[i].id === 'ishtar_gate' && currentPlayer.monuments[i].completed) {
+      hasIshtarGate = true;
+      break;
+    }
+  }
+  if (hasIshtarGate) {
+    workers += 1;
   }
 
   // Check if Smithing (Forge) phase is needed (4 skulls + smithing development)

@@ -17,6 +17,7 @@ import PhaseInfoBar from './shared/PhaseInfoBar';
 import ActionButtonsBar from './shared/ActionButtonsBar';
 import DisasterHelp from './shared/DisasterHelp';
 import PlayerTurnModal from './player/PlayerTurnModal';
+import SphinxChoiceModal from './shared/SphinxChoiceModal';
 import DiceBar from './dice/DiceBar';
 import GameHeader from './layout/GameHeader';
 import GameEndScreen from './layout/GameEndScreen';
@@ -108,7 +109,8 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         builtBoats: 0,
         pendingBoats: 0,
         metropolis: metropolis,
-        productions: productions
+        productions: productions,
+        sphinxPowerAvailable: false
       };
     });
   });
@@ -127,6 +129,8 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
   const [showPlayerTurnModal, setShowPlayerTurnModal] = useState(!isSoloMode && playerNames.length > 1 && !savedGameState);
   const [preservationUsed, setPreservationUsed] = useState(savedGameState?.preservationUsed ?? false);
   const [pendingSkulls, setPendingSkulls] = useState(savedGameState?.pendingSkulls ?? 0);
+  const [showSphinxModal, setShowSphinxModal] = useState(false);
+  const [sphinxStarvationPoints, setSphinxStarvationPoints] = useState(0);
 
   const currentPlayer = players[currentPlayerIndex];
   let numDice = 3;
@@ -398,9 +402,39 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     setPhase('feed');
   }
 
-  function handleFeed() {
+  function handleFeed(useSphinx = false) {
     const newPlayers = [...players];
-    const result = feedCities(newPlayers[currentPlayerIndex], pendingWorkers);
+    const result = feedCities(newPlayers[currentPlayerIndex], pendingWorkers, useSphinx);
+    newPlayers[currentPlayerIndex] = result.player;
+    setPlayers(newPlayers);
+
+    // If Sphinx can be used, show modal
+    if (result.canUseSphinx && !useSphinx) {
+      setSphinxStarvationPoints(result.starvationPoints);
+      setShowSphinxModal(true);
+      return;
+    }
+
+    // Skip build phase if no workers
+    if (result.shouldSkipBuild) {
+      skipToBuyPhase();
+    } else {
+      // Initialize build phase state before entering build phase
+      initializeBuildPhase(result.player);
+      setPhase('build');
+    }
+  }
+
+  function handleSphinxUse() {
+    setShowSphinxModal(false);
+    handleFeed(true);
+  }
+
+  function handleSphinxDecline() {
+    setShowSphinxModal(false);
+    // Re-run feed without using Sphinx
+    const newPlayers = [...players];
+    const result = feedCities(newPlayers[currentPlayerIndex], pendingWorkers, false);
     newPlayers[currentPlayerIndex] = result.player;
     setPlayers(newPlayers);
 
@@ -537,6 +571,11 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     const result = buildMonument(player, monumentId, pendingWorkers, MONUMENTS, newPlayers, currentPlayerIndex);
     setPendingWorkers(result.newPendingWorkers);
     setPlayers(newPlayers);
+
+    // Apply Delphi Oracle bonus if monument was completed
+    if (result.oracleBonus > 0) {
+      setPendingCoins(pendingCoins + result.oracleBonus);
+    }
 
     // Check if all monuments have been collectively built (for variants that require it)
     if (result.monumentCompleted && variantConfig.endGameConditions.allMonumentsBuilt) {
@@ -1064,6 +1103,14 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         round={round}
         gameEndTriggered={gameEndTriggered}
         onStart={() => setShowPlayerTurnModal(false)}
+      />
+
+      {/* Sphinx Choice Modal */}
+      <SphinxChoiceModal
+        show={showSphinxModal}
+        starvationPoints={sphinxStarvationPoints}
+        onUseSphinx={handleSphinxUse}
+        onDecline={handleSphinxDecline}
       />
 
       <div className="lg:h-full flex flex-col">

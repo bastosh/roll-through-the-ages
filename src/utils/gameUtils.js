@@ -65,17 +65,43 @@ export function addGoods(player, count) {
   }
 }
 
+/**
+ * Helper function to check if player has completed Great Pyramid
+ */
+function hasGreatPyramid(player) {
+  for (let i = 0; i < player.monuments.length; i++) {
+    if (player.monuments[i].id === 'great_pyramid' && player.monuments[i].completed) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Helper function to apply disaster points with Great Pyramid reduction
+ */
+function applyDisasterPoints(player, points) {
+  if (points <= 0) return;
+
+  player.disasters += points;
+
+  // Apply Great Pyramid effect: -1 disaster point if at least 1 was added
+  if (hasGreatPyramid(player) && points >= 1) {
+    player.disasters -= 1;
+  }
+}
+
 export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend = 0) {
   const player = allPlayers[playerIdx];
 
   if (skulls === 2) {
     if (player.developments.indexOf('irrigation') === -1) {
-      player.disasters += 2;
+      applyDisasterPoints(player, 2);
     }
   } else if (skulls === 3) {
     for (let i = 0; i < allPlayers.length; i++) {
       if (i !== playerIdx && allPlayers[i].developments.indexOf('medicine') === -1) {
-        allPlayers[i].disasters += 3;
+        applyDisasterPoints(allPlayers[i], 3);
       }
     }
   } else if (skulls === 4) {
@@ -98,7 +124,7 @@ export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend
             }
           }
           if (!hasGreatWall) {
-            allPlayers[i].disasters += totalDamage;
+            applyDisasterPoints(allPlayers[i], totalDamage);
           }
         }
       }
@@ -112,7 +138,7 @@ export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend
         }
       }
       if (!hasGreatWall) {
-        player.disasters += 4;
+        applyDisasterPoints(player, 4);
       }
     }
   } else if (skulls >= 5) {

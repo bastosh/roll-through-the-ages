@@ -116,10 +116,12 @@
   },
 
   "monumentEffects": {
+    "ishtar_gate": "À chaque tour, vous avez 1 ouvrier supplémentaire",
+    "delphi_oracle": "Vous gagnez 12 pièces à dépenser dans le tour où vous achevez cette merveille",
+    "heavenly_gate": "En phase 1, si vous conservez au moins un dé 1 ressource, vous recevez 1 ressource supplémentaire",
     "great_wall": "Les invasions ne vous affectent plus",
-    "delphi_oracle": "Oracle de Delphes: effet spécial",
-    "great_pyramid": "Grande Pyramide: effet spécial",
-    "sphinx": "Sphinx: effet spécial"
+    "sphinx": "Une fois dans la partie, ignorez la perte de PV due à la famine (à activer au moment de la famine)",
+    "great_pyramid": "Lorsque vous subissez au moins 1 point de Catastrophe, subissez-en 1 de moins"
   },
 
   "cultures": {
@@ -383,5 +385,14 @@
     "disastersScore": "Catastrophes",
     "totalScore": "Total",
     "remainingResources": "Ressources restantes"
+  },
+
+  "sphinx": {
+    "title": "Utiliser le pouvoir du Sphinx ?",
+    "message": "Vous allez subir {{points}} point(s) de Catastrophe dus à la famine.",
+    "question": "Voulez-vous utiliser le pouvoir du Sphinx pour les ignorer ?",
+    "warning": "(Ce pouvoir ne peut être utilisé qu'une seule fois dans la partie)",
+    "use": "Utiliser le Sphinx",
+    "decline": "Subir la catastrophe"
   }
 }

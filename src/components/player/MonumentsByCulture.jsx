@@ -225,10 +225,28 @@ export default function MonumentsByCulture({
                     >
                       <div className='flex justify-between gap-1'>
                         <div className="flex-1 min-w-0">
-                          <div className="text-[11px] font-bold mb-1 truncate dark:text-dark-text" title={monument.name}>
-                            {monument.name} ({monument.workers})
+                          <div className="flex items-center gap-1 mb-1">
+                            <div className="text-[11px] font-bold truncate dark:text-dark-text flex-1 min-w-0" title={monument.name}>
+                              {monument.name} ({monument.workers})
+                            </div>
+                            {/* Effect badge for monuments with special effects */}
+                            {monument.effect && (
+                              <div className="flex-shrink-0" title={t(`monumentEffects.${monument.id}`)}>
+                                {monument.effect === 'sphinx' ? (
+                                  playerMonument.completed && allPlayers[currentPlayerIndex].sphinxPowerAvailable ? (
+                                    <span className="text-xs">⚡</span>
+                                  ) : playerMonument.completed ? (
+                                    <span className="text-xs opacity-40">⚡</span>
+                                  ) : (
+                                    <span className="text-xs opacity-20">⚡</span>
+                                  )
+                                ) : (
+                                  <span className={'text-xs ' + (playerMonument.completed ? '' : 'opacity-30')}>✨</span>
+                                )}
+                              </div>
+                            )}
                           </div>
-                          <div className="flex gap-0.5 flex-wrap">
+                          <div className="flex gap-0.5 flex-wrap mb-1">
                             {Array(monument.workers).fill(0).map(function (_, j) {
                               return (
                                 <div
@@ -240,6 +258,12 @@ export default function MonumentsByCulture({
                               );
                             })}
                           </div>
+                          {/* Effect description for monuments with special effects */}
+                          {monument.effect && (
+                            <div className="text-[9px] text-amber-800 dark:text-amber-300 italic leading-tight">
+                              {t(`monumentEffects.${monument.id}`)}
+                            </div>
+                          )}
                         </div>
                         <div className="flex flex-col items-center justify-start gap-0.5 text-xs font-semibold">
                           {/* Points maximum (première case à cocher) */}

@@ -28,14 +28,14 @@ const BASE_MONUMENTS = [
   { id: 'stonehenge_2', workers: 4, points: [3, 2], effect: null, origin: 'celtic', monumentGroup: 'stonehenge' },
 
   { id: 'step_pyramid', workers: 3, points: [1, 0], effect: null, origin: 'babylonian' },
-  { id: 'ishtar_gate', workers: 10, points: [6, 4], effect: null, origin: 'babylonian' },
+  { id: 'ishtar_gate', workers: 10, points: [6, 4], effect: 'ishtar_gate', origin: 'babylonian' },
   { id: 'hanging_gardens', workers: 11, points: [8, 5], effect: null, origin: 'babylonian' },
 
   { id: 'temple', workers: 6, points: [3, 2], effect: null, origin: 'greek' },
   { id: 'delphi_oracle', workers: 15, points: [10, 6], effect: 'delphi_oracle', origin: 'greek' },
   { id: 'colossus', workers: 12, points: [9, 5], effect: null, origin: 'greek' },
 
-  { id: 'heavenly_gate', workers: 7, points: [4, 3], effect: null, origin: 'chinese' },
+  { id: 'heavenly_gate', workers: 7, points: [4, 3], effect: 'heavenly_gate', origin: 'chinese' },
   { id: 'great_wall', workers: 13, points: [10, 6], effect: 'great_wall', origin: 'chinese' },
   { id: 'forbidden_city', workers: 18, points: [12, 8], effect: null, origin: 'chinese' },
 

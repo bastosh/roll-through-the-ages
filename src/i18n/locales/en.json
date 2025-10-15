@@ -115,10 +115,12 @@
   },
 
   "monumentEffects": {
+    "ishtar_gate": "Each turn, you have 1 additional worker",
+    "delphi_oracle": "You gain 12 coins to spend in the turn you complete this wonder",
+    "heavenly_gate": "In phase 1, if you keep at least one 1-resource die, you receive 1 additional resource",
     "great_wall": "Invasions no longer affect you",
-    "delphi_oracle": "Delphi Oracle: special effect",
-    "great_pyramid": "Great Pyramid: special effect",
-    "sphinx": "Sphinx: special effect"
+    "sphinx": "Once per game, ignore VP loss from starvation (activate when starvation occurs)",
+    "great_pyramid": "When you suffer at least 1 Disaster point, suffer 1 less"
   },
 
   "cultures": {
@@ -382,5 +384,14 @@
     "disastersScore": "Disasters",
     "totalScore": "Total",
     "remainingResources": "Remaining resources"
+  },
+
+  "sphinx": {
+    "title": "Use the Sphinx Power?",
+    "message": "You will suffer {{points}} Disaster point(s) from starvation.",
+    "question": "Do you want to use the Sphinx power to ignore them?",
+    "warning": "(This power can only be used once per game)",
+    "use": "Use Sphinx",
+    "decline": "Suffer the disaster"
   }
 }
