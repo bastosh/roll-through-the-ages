@@ -228,25 +228,15 @@ export default function MonumentsByCulture({
                       <div className='flex justify-between gap-1'>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1 mb-1">
-                            <div className="text-[11px] font-bold truncate dark:text-dark-text flex-1 min-w-0" title={monument.name}>
-                              {monument.name} ({monument.workers})
-                            </div>
                             {/* Effect badge for monuments with special effects */}
                             {monument.effect && (
                               <div className="flex-shrink-0" title={monument.effect}>
-                                {monument.effect === 'sphinx' ? (
-                                  playerMonument.completed && allPlayers[currentPlayerIndex].sphinxPowerAvailable ? (
-                                    <span className="text-xs">⚡</span>
-                                  ) : playerMonument.completed ? (
-                                    <span className="text-xs opacity-40">⚡</span>
-                                  ) : (
-                                    <span className="text-xs opacity-20">⚡</span>
-                                  )
-                                ) : (
-                                  <span className={'text-xs ' + (playerMonument.completed ? '' : 'opacity-30')}>✨</span>
-                                )}
+                                <span>⚡</span>
                               </div>
                             )}
+                            <div className="text-[11px] font-bold truncate dark:text-dark-text flex-1 min-w-0" title={monument.name}>
+                              {monument.name} ({monument.workers})
+                            </div>
                           </div>
                           <div className="flex gap-0.5 flex-wrap mb-1">
                             {Array(monument.workers).fill(0).map(function (_, j) {
@@ -262,7 +252,8 @@ export default function MonumentsByCulture({
                           </div>
                           {/* Effect description for monuments with special effects */}
                           {monument.effect && (
-                            <div className="text-[10px] text-amber-800 dark:text-amber-300 italic leading-tight">
+                            <div className={'text-[10px] text-amber-800 dark:text-amber-300 italic leading-tight ' +
+                              (monument.id === 'sphinx' && playerMonument.completed && !allPlayers[currentPlayerIndex].sphinxPowerAvailable ? 'line-through opacity-50' : '')}>
                               {monument.effect}
                             </div>
                           )}

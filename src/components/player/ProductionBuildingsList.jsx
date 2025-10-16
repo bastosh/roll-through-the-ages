@@ -8,16 +8,30 @@ export default function ProductionBuildingsList({
   pendingWorkers,
   productions,
   citiesBuiltCount,
-  developments = []
+  developments = [],
+  variantConfig = null
 }) {
   const { t } = useTranslation();
 
-  // Map production buildings to the developments they unlock
-  const unlockMap = {
-    'village': ['agriculture', 'granaries'],
-    'mine': ['coinage'],
-    'market': ['caravans']
-  };
+  // Build a map of production buildings to developments they unlock/discount
+  // For Ancient Empires Original: prerequisite system (unlock)
+  // For Ancient Empires Beri: discount system (reduction)
+  const buildingDevMap = {};
+  const useDiscount = variantConfig && variantConfig.id === 'ancient_empires';
+
+  if (developments && developments.length > 0) {
+    for (let i = 0; i < developments.length; i++) {
+      const dev = developments[i];
+      const buildingKey = useDiscount ? dev.discount : dev.prerequisite;
+
+      if (buildingKey && buildingKey !== 'none' && buildingKey !== 'metropolis') {
+        if (!buildingDevMap[buildingKey]) {
+          buildingDevMap[buildingKey] = [];
+        }
+        buildingDevMap[buildingKey].push(dev.id);
+      }
+    }
+  }
 
   return (
     <div className="flex-shrink-0">
@@ -99,9 +113,9 @@ export default function ProductionBuildingsList({
               <div className="text-xs text-green-700 dark:text-green-400 font-semibold">
                 {t(`buildingBonuses.${prod.bonus}`)}
               </div>
-              {unlockMap[prod.name] && unlockMap[prod.name].length > 0 && (
+              {buildingDevMap[prod.name] && buildingDevMap[prod.name].length > 0 && (
                 <div className="text-[10px] text-amber-700 dark:text-amber-400 mt-1">
-                  <span className="not-italic">🔓</span> <span className="italic">{t('game.unlocks')}: {unlockMap[prod.name].map(devId => {
+                  <span className="not-italic">{useDiscount ? '💰' : '🔓'}</span> <span className="italic">{useDiscount ? t('game.discount') : t('game.unlocks')}: {buildingDevMap[prod.name].map(devId => {
                     const dev = developments.find(d => d.id === devId);
                     return dev ? dev.name : devId;
                   }).join(', ')}</span>

@@ -405,7 +405,8 @@
     "goods": "Ressources",
     "goodsOf": "Ressources ({{current}}/{{max}})",
     "value": "Valeur",
-    "unlocks": "Débloque"
+    "unlocks": "Débloque",
+    "discount": "Réduction"
   },
 
   "gameEnd": {

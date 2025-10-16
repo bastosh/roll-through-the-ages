@@ -141,7 +141,7 @@ export default function ActionButtonsBar({
   if (phase === 'feed') {
     return (
       <button
-        onClick={onFeed}
+        onClick={() => onFeed()}
         className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 cursor-pointer"
       >
         {t('common.ok')}

@@ -202,6 +202,7 @@ export function useBuildPhase() {
     if (monument && !monument.completed && pendingWorkers >= 1) {
       // Add a worker to monument
       monument.progress++;
+
       if (monument.progress >= monumentDef.workers) {
         monument.completed = true;
         monumentCompleted = true;
@@ -221,6 +222,11 @@ export function useBuildPhase() {
 
         if (!anyoneElseCompleted) {
           monument.firstToComplete = true;
+        }
+
+        // Apply monument completion effects
+        if (monumentId === 'sphinx') {
+          player.sphinxPowerAvailable = true;
         }
       }
       newPendingWorkers--;

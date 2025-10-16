@@ -84,7 +84,7 @@ export function buildMonument(player, monumentId, pendingWorkers, MONUMENTS, all
       // Apply monument completion effects
       if (monumentDef.effect === 'delphi_oracle') {
         oracleBonus = 12;
-      } else if (monumentDef.effect === 'sphinx') {
+      } else if (monumentId === 'sphinx') {
         player.sphinxPowerAvailable = true;
       }
     }

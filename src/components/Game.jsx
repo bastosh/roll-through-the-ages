@@ -420,14 +420,16 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     const newPlayers = [...players];
     const result = feedCities(newPlayers[currentPlayerIndex], pendingWorkers, useSphinx);
     newPlayers[currentPlayerIndex] = result.player;
-    setPlayers(newPlayers);
 
-    // If Sphinx can be used, show modal
+    // If Sphinx can be used, show modal (don't update players yet!)
     if (result.canUseSphinx && !useSphinx) {
       setSphinxStarvationPoints(result.starvationPoints);
       setShowSphinxModal(true);
-      return;
+      return; // Don't update players or change phase
     }
+
+    // Update players state
+    setPlayers(newPlayers);
 
     // Skip build phase if no workers
     if (result.shouldSkipBuild) {

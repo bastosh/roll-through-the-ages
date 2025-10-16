@@ -404,7 +404,8 @@
     "goods": "Goods",
     "goodsOf": "Goods ({{current}}/{{max}})",
     "value": "Value",
-    "unlocks": "Unlocks"
+    "unlocks": "Unlocks",
+    "discount": "Discount"
   },
 
   "gameEnd": {

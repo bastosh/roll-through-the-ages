@@ -11,6 +11,18 @@ function hasGreatPyramid(player) {
 }
 
 /**
+ * Helper function to check if player has Sphinx monument completed
+ */
+function hasSphinxCompleted(player) {
+  for (let i = 0; i < player.monuments.length; i++) {
+    if (player.monuments[i].id === 'sphinx' && player.monuments[i].completed) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Handle feeding cities
  * @returns Updated player and whether to skip build phase
  */
@@ -30,8 +42,8 @@ export function feedCities(player, pendingWorkers, useSphinx = false) {
     starvationPoints = unfedCities;
     newPlayer.food = 0;
 
-    // Check if Sphinx can be used
-    if (newPlayer.sphinxPowerAvailable && !useSphinx) {
+    // Check if Sphinx can be used (must be completed and power still available)
+    if (newPlayer.sphinxPowerAvailable && hasSphinxCompleted(newPlayer) && !useSphinx) {
       canUseSphinx = true;
     }
 

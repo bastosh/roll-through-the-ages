@@ -136,6 +136,7 @@ export default function PlayerScorePanel({
               productions={variantConfig.productions}
               citiesBuiltCount={3 + player.cities.filter(c => c.built).length}
               developments={developments}
+              variantConfig={variantConfig}
             />
           )}
 
