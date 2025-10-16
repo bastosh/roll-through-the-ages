@@ -119,8 +119,10 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
   }
 
   function toggleLock(index) {
-    // Skulls cannot be unlocked unless in solo mode AND variant allows rerolling skulls
-    const skullsAreLocked = !isSoloMode || variantConfig.soloSkullsLocked;
+    // Skulls cannot be unlocked unless:
+    // - In leadership mode (allows rerolling one skull)
+    // - OR in solo mode AND variant allows rerolling skulls
+    const skullsAreLocked = !leadershipMode && (!isSoloMode || variantConfig.soloSkullsLocked);
     if (skullsAreLocked && diceResults[index] && diceResults[index].skulls > 0) return;
 
     const currentIndex = lockedDice.indexOf(index);
