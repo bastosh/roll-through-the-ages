@@ -7,9 +7,17 @@ export default function ProductionBuildingsList({
   canBuild,
   pendingWorkers,
   productions,
-  citiesBuiltCount
+  citiesBuiltCount,
+  developments = []
 }) {
   const { t } = useTranslation();
+
+  // Map production buildings to the developments they unlock
+  const unlockMap = {
+    'village': ['agriculture', 'granaries'],
+    'mine': ['coinage'],
+    'market': ['caravans']
+  };
 
   return (
     <div className="flex-shrink-0">
@@ -20,11 +28,16 @@ export default function ProductionBuildingsList({
           const isBuilt = playerProd && playerProd.built;
 
           // Utiliser requiredWorkers si défini (coût fixé au début de la construction),
-          // sinon calculer selon le nombre de cités construites
+          // sinon calculer selon le nombre de cités construites (coût dynamique)
+          // ou utiliser directement si c'est un nombre (coût fixe)
           let workersCost;
           if (playerProd && playerProd.requiredWorkers !== undefined) {
             workersCost = playerProd.requiredWorkers;
+          } else if (typeof prod.workers === 'number') {
+            // Coût fixe (Ancient Empires Original)
+            workersCost = prod.workers;
           } else {
+            // Coût dynamique (Ancient Empires Beri)
             const cityKey = `${citiesBuiltCount} cities`;
             workersCost = prod.workers[cityKey] || prod.workers['3 cities'];
           }
@@ -86,6 +99,14 @@ export default function ProductionBuildingsList({
               <div className="text-xs text-green-700 dark:text-green-400 font-semibold">
                 {t(`buildingBonuses.${prod.bonus}`)}
               </div>
+              {unlockMap[prod.name] && unlockMap[prod.name].length > 0 && (
+                <div className="text-[10px] text-amber-700 dark:text-amber-400 mt-1">
+                  <span className="not-italic">🔓</span> <span className="italic">{t('game.unlocks')}: {unlockMap[prod.name].map(devId => {
+                    const dev = developments.find(d => d.id === devId);
+                    return dev ? dev.name : devId;
+                  }).join(', ')}</span>
+                </div>
+              )}
             </div>
           );
         })}

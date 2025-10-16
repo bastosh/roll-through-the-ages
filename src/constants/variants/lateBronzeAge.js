@@ -60,7 +60,7 @@ export const LATE_BRONZE_AGE_CONFIG = {
 
   // Getter functions for translated data
   get monuments() {
-    return getTranslatedMonuments(BASE_MONUMENTS);
+    return getTranslatedMonuments(BASE_MONUMENTS, this.id);
   },
 
   get developments() {

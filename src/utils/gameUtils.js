@@ -91,6 +91,18 @@ function applyDisasterPoints(player, points) {
   }
 }
 
+/**
+ * Helper function to check if player has Sphinx monument completed
+ */
+function hasSphinxCompleted(player) {
+  for (let i = 0; i < player.monuments.length; i++) {
+    if (player.monuments[i].id === 'sphinx' && player.monuments[i].completed) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend = 0) {
   const player = allPlayers[playerIdx];
 
@@ -145,11 +157,55 @@ export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend
     if (player.developments.indexOf('religion') !== -1) {
       for (let i = 0; i < allPlayers.length; i++) {
         if (i !== playerIdx && allPlayers[i].developments.indexOf('religion') === -1) {
-          allPlayers[i].goodsPositions = { wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 };
+          // Check if target has Sphinx power available (Ancient Empires Original: keep 1 resource)
+          if (allPlayers[i].sphinxPowerAvailable && hasSphinxCompleted(allPlayers[i])) {
+            // Keep the highest value resource (spearheads first, then cloth, pottery, stone, wood)
+            const goodsOrder = ['spearheads', 'cloth', 'pottery', 'stone', 'wood'];
+            let keptResource = null;
+            for (let k = 0; k < goodsOrder.length; k++) {
+              const type = goodsOrder[k];
+              if (allPlayers[i].goodsPositions[type] > 0) {
+                keptResource = { type, position: allPlayers[i].goodsPositions[type] };
+                break;
+              }
+            }
+            // Clear all resources
+            allPlayers[i].goodsPositions = { wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 };
+            // Restore the kept resource
+            if (keptResource) {
+              allPlayers[i].goodsPositions[keptResource.type] = keptResource.position;
+            }
+            // Use up the Sphinx power
+            allPlayers[i].sphinxPowerAvailable = false;
+          } else {
+            allPlayers[i].goodsPositions = { wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 };
+          }
         }
       }
     } else {
-      player.goodsPositions = { wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 };
+      // Check if player has Sphinx power available (Ancient Empires Original: keep 1 resource)
+      if (player.sphinxPowerAvailable && hasSphinxCompleted(player)) {
+        // Keep the highest value resource (spearheads first, then cloth, pottery, stone, wood)
+        const goodsOrder = ['spearheads', 'cloth', 'pottery', 'stone', 'wood'];
+        let keptResource = null;
+        for (let k = 0; k < goodsOrder.length; k++) {
+          const type = goodsOrder[k];
+          if (player.goodsPositions[type] > 0) {
+            keptResource = { type, position: player.goodsPositions[type] };
+            break;
+          }
+        }
+        // Clear all resources
+        player.goodsPositions = { wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 };
+        // Restore the kept resource
+        if (keptResource) {
+          player.goodsPositions[keptResource.type] = keptResource.position;
+        }
+        // Use up the Sphinx power
+        player.sphinxPowerAvailable = false;
+      } else {
+        player.goodsPositions = { wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 };
+      }
     }
   }
 }

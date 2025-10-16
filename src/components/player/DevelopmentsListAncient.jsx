@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { checkDevelopmentPrerequisite } from '../../utils/developmentCost';
 
 export default function DevelopmentsListAncient({
   playerDevelopments,
@@ -47,13 +48,7 @@ export default function DevelopmentsListAncient({
 
   // Fonction pour vérifier si le prérequis est satisfait
   function checkPrerequisite(dev) {
-    if (!dev.prerequisite) return true;
-
-    if (dev.prerequisite === 'metropolis') {
-      return hasMetropolis;
-    }
-
-    return true;
+    return checkDevelopmentPrerequisite(dev, playerProductions, hasMetropolis);
   }
 
   // Séparer les développements avec et sans prérequis métropole
@@ -135,6 +130,16 @@ export default function DevelopmentsListAncient({
             );
           }
 
+          // Afficher l'indicateur de prérequis non satisfait (si prerequisite existe)
+          let prerequisiteWarning = null;
+          if (dev.prerequisite && dev.prerequisite !== 'metropolis' && !meetsPrerequisite && !isOwned) {
+            prerequisiteWarning = (
+              <span className="text-xs text-red-600 dark:text-red-400 ml-1" title={`Nécessite: ${t(`productionBuildings.${dev.prerequisite}`)}`}>
+                🔒
+              </span>
+            );
+          }
+
           const element = (
             <div key={dev.id} className={className} onClick={isClickable ? () => onBuyDevelopment(dev.id) : undefined}>
               <div className="w-16 text-right font-semibold text-gray-700 dark:text-dark-text text-sm">{costDisplay}</div>
@@ -145,8 +150,9 @@ export default function DevelopmentsListAncient({
                   {isOwned && <span className="text-white text-sm">✓</span>}
                 </div>
               </div>
-              <div className="w-28 font-medium text-sm dark:text-dark-text">
+              <div className="w-28 font-medium text-sm dark:text-dark-text flex items-center">
                 {dev.name}
+                {prerequisiteWarning}
               </div>
               <div className="w-12 text-center font-semibold text-amber-700 dark:text-amber-500 text-sm">{dev.points}🏆</div>
               {dev.effect && (

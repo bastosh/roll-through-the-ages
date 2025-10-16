@@ -143,22 +143,24 @@ export default function MonumentsByCulture({
                       </div>
                     </div>
 
-                    {/* Checkbox second joueur */}
-                    <div className="flex items-center gap-1">
-                      <div className={'w-6 h-6 border-2 rounded flex items-center justify-center transition-colors ' + (
-                        playerCultureStatus === 'second' ? 'bg-purple-600 dark:bg-purple-700 border-purple-700 dark:border-purple-800' :
-                          someoneElseCompletedCultureSecond ? 'bg-gray-300 dark:bg-gray-600 border-gray-400 dark:border-gray-500' :
-                            'bg-white dark:bg-dark-surface border-gray-400 dark:border-dark-border'
-                      )}>
-                        {playerCultureStatus === 'second' ? (
-                          <span className="text-white text-xs font-bold">{culture.bonusSecond}</span>
-                        ) : someoneElseCompletedCultureSecond ? (
-                          <span className="text-gray-600 dark:text-gray-300 text-xs font-bold">✗</span>
-                        ) : (
-                          <span className="text-gray-600 dark:text-gray-400 text-xs font-bold">{culture.bonusSecond}</span>
-                        )}
+                    {/* Checkbox second joueur (seulement si bonusSecond existe) */}
+                    {culture.bonusSecond !== undefined && (
+                      <div className="flex items-center gap-1">
+                        <div className={'w-6 h-6 border-2 rounded flex items-center justify-center transition-colors ' + (
+                          playerCultureStatus === 'second' ? 'bg-purple-600 dark:bg-purple-700 border-purple-700 dark:border-purple-800' :
+                            someoneElseCompletedCultureSecond ? 'bg-gray-300 dark:bg-gray-600 border-gray-400 dark:border-gray-500' :
+                              'bg-white dark:bg-dark-surface border-gray-400 dark:border-dark-border'
+                        )}>
+                          {playerCultureStatus === 'second' ? (
+                            <span className="text-white text-xs font-bold">{culture.bonusSecond}</span>
+                          ) : someoneElseCompletedCultureSecond ? (
+                            <span className="text-gray-600 dark:text-gray-300 text-xs font-bold">✗</span>
+                          ) : (
+                            <span className="text-gray-600 dark:text-gray-400 text-xs font-bold">{culture.bonusSecond}</span>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -231,7 +233,7 @@ export default function MonumentsByCulture({
                             </div>
                             {/* Effect badge for monuments with special effects */}
                             {monument.effect && (
-                              <div className="flex-shrink-0" title={t(`monumentEffects.${monument.id}`)}>
+                              <div className="flex-shrink-0" title={monument.effect}>
                                 {monument.effect === 'sphinx' ? (
                                   playerMonument.completed && allPlayers[currentPlayerIndex].sphinxPowerAvailable ? (
                                     <span className="text-xs">⚡</span>
@@ -260,8 +262,8 @@ export default function MonumentsByCulture({
                           </div>
                           {/* Effect description for monuments with special effects */}
                           {monument.effect && (
-                            <div className="text-[9px] text-amber-800 dark:text-amber-300 italic leading-tight">
-                              {t(`monumentEffects.${monument.id}`)}
+                            <div className="text-[10px] text-amber-800 dark:text-amber-300 italic leading-tight">
+                              {monument.effect}
                             </div>
                           )}
                         </div>

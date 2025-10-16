@@ -56,7 +56,7 @@ export const BRONZE_AGE_2024_CONFIG = {
 
   // Getter functions for translated data
   get monuments() {
-    return getTranslatedMonuments(BASE_MONUMENTS);
+    return getTranslatedMonuments(BASE_MONUMENTS, this.id);
   },
 
   get developments() {

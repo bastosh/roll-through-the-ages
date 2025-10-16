@@ -57,9 +57,24 @@ export default function DiceRollPhase({
   const canReroll = rollCount < 2 && lockedDice.length < diceResults.length;
   const hasAgriculture = currentPlayer.developments.indexOf('agriculture') !== -1;
   const hasMasonry = currentPlayer.developments.indexOf('masonry') !== -1;
-  const hasLeadership = currentPlayer.developments.indexOf('leadership') !== -1;
   const hasCoinage = currentPlayer.developments.indexOf('coinage') !== -1;
-  const canUseLeadership = hasLeadership && !leadershipUsed && rollCount >= 2;
+
+  // Check for Leadership development (Bronze Age variants)
+  const hasLeadership = currentPlayer.developments.indexOf('leadership') !== -1;
+
+  // Check for Delphi Oracle monument (Ancient Empires Original variant)
+  let hasDelphiOracle = false;
+  if (currentPlayer.monuments) {
+    for (let i = 0; i < currentPlayer.monuments.length; i++) {
+      if (currentPlayer.monuments[i].id === 'delphi_oracle' && currentPlayer.monuments[i].completed) {
+        hasDelphiOracle = true;
+        break;
+      }
+    }
+  }
+
+  const canUseLeadership = (hasLeadership || hasDelphiOracle) && !leadershipUsed && rollCount >= 2;
+  const rerollAbilityName = hasDelphiOracle ? t('monuments.delphi_oracle') : t('developments.leadership');
 
   // Compter les crânes
   let totalSkulls = 0;
@@ -135,7 +150,7 @@ export default function DiceRollPhase({
           <div className="space-y-3">
             <div className="bg-purple-50 border-2 border-purple-400 rounded-lg p-3">
               <div className="text-center text-purple-700 font-bold mb-2">
-                👑 {t('game.useLeadership')}
+                {hasDelphiOracle ? '✨' : '👑'} {hasDelphiOracle ? rerollAbilityName : t('game.useLeadership')}
               </div>
               <p className="text-sm text-gray-600 text-center">
                 {t('game.clickToLockUnlock')}
@@ -172,7 +187,7 @@ export default function DiceRollPhase({
                 disabled={isRolling}
                 className="w-full bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 disabled:bg-gray-400 transition cursor-pointer disabled:cursor-not-allowed"
               >
-                👑 {t('game.useLeadership')}
+                {hasDelphiOracle ? '✨' : '👑'} {hasDelphiOracle ? rerollAbilityName : t('game.useLeadership')}
               </button>
             )}
           </div>

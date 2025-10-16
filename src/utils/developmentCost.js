@@ -14,7 +14,7 @@ export function calculateDevelopmentCost(dev, playerProductions = [], playerMonu
     baseCost = 10 * playerCount;
   }
 
-  // Check if player has a discount
+  // Check if player has a discount (Ancient Empires Beri variant)
   let discount = 0;
   if (dev.discount && dev.discount !== 'none') {
     if (dev.discount === 'monument') {
@@ -33,4 +33,29 @@ export function calculateDevelopmentCost(dev, playerProductions = [], playerMonu
   }
 
   return Math.max(0, baseCost - discount);
+}
+
+/**
+ * Check if a development's prerequisite is met
+ * @param {Object} dev - The development object
+ * @param {Array} playerProductions - Array of player's production buildings
+ * @param {boolean} hasMetropolis - Whether player has built metropolis
+ * @returns {boolean} True if prerequisite is met or no prerequisite exists
+ */
+export function checkDevelopmentPrerequisite(dev, playerProductions = [], hasMetropolis = false) {
+  // If no prerequisite, it's always available
+  if (!dev.prerequisite) return true;
+
+  // Check for metropolis prerequisite
+  if (dev.prerequisite === 'metropolis') {
+    return hasMetropolis;
+  }
+
+  // Check for production building prerequisite (Ancient Empires Original variant)
+  if (dev.prerequisite === 'market' || dev.prerequisite === 'mine' || dev.prerequisite === 'village') {
+    const prodIndex = playerProductions.findIndex(p => p.name === dev.prerequisite && p.built);
+    return prodIndex !== -1;
+  }
+
+  return true;
 }

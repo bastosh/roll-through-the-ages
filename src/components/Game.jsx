@@ -285,6 +285,13 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     }
   }, [phase]);
 
+  // Initialize discard phase when entering it
+  useEffect(function() {
+    if (phase === 'discard' && !tempGoodsPositions) {
+      initializeDiscard(currentPlayer.goodsPositions);
+    }
+  }, [phase, tempGoodsPositions]);
+
   function handleUsePreservation() {
     const newPlayers = [...players];
     const player = newPlayers[currentPlayerIndex];
@@ -511,8 +518,8 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     if (totalGoods <= 6 || hasCaravans) {
       nextTurn();
     } else {
-      initializeDiscard(player.goodsPositions);
       setPhase('discard');
+      // initializeDiscard will be called by useEffect when phase changes
     }
   }
 

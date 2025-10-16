@@ -65,9 +65,23 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
     // Auto-validate if:
     // 1. No more rerolls available (currentRollCount will be 2 after the 3rd roll)
     // 2. OR all dice are locked
-    // BUT only if Leadership is not available (doesn't have it OR already used it)
+    // BUT only if Leadership/Delphi Oracle is not available (doesn't have it OR already used it)
+
+    // Check for Leadership development (Bronze Age variants)
     const hasLeadership = newResults.length > 0 && currentPlayer.developments.indexOf('leadership') !== -1;
-    const canUseLeadership = hasLeadership && !leadershipUsed;
+
+    // Check for Delphi Oracle monument (Ancient Empires Original variant)
+    let hasDelphiOracle = false;
+    if (newResults.length > 0 && currentPlayer.monuments) {
+      for (let i = 0; i < currentPlayer.monuments.length; i++) {
+        if (currentPlayer.monuments[i].id === 'delphi_oracle' && currentPlayer.monuments[i].completed) {
+          hasDelphiOracle = true;
+          break;
+        }
+      }
+    }
+
+    const canUseLeadership = (hasLeadership || hasDelphiOracle) && !leadershipUsed;
     const allDiceLocked = newLockedDice.length >= newResults.length;
 
     // Check if we can reroll after this roll (rollCount starts at 0, after 3rd roll currentRollCount is 2)

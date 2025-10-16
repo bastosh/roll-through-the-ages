@@ -157,8 +157,10 @@ export function calculatePlayerScore(player, DEVELOPMENTS, MONUMENTS, variantCon
         break;
       }
     }
-    // Late Bronze Age: 2 points per monument, Bronze Age: 1 point per monument
-    const multiplier = architectureDev && architectureDev.cost >= 60 ? 2 : 1;
+    // Use explicit scoringMultiplier if defined, otherwise fallback to heuristic
+    const multiplier = architectureDev && architectureDev.scoringMultiplier !== undefined
+      ? architectureDev.scoringMultiplier
+      : (architectureDev && architectureDev.cost >= 60 ? 2 : 1);
     score += completedCount * multiplier;
   }
 
@@ -197,14 +199,38 @@ export function calculatePlayerScore(player, DEVELOPMENTS, MONUMENTS, variantCon
       for (let j = 0; j < player.productions.length; j++) {
         if (player.productions[j].built) completedProductionsCount++;
       }
-      score += completedProductionsCount * 2;
+      // Find the economy development to get the correct multiplier for this variant
+      let economyDev = null;
+      for (let k = 0; k < DEVELOPMENTS.length; k++) {
+        if (DEVELOPMENTS[k].id === 'economy') {
+          economyDev = DEVELOPMENTS[k];
+          break;
+        }
+      }
+      // Use explicit scoringMultiplier if defined, otherwise default to 2
+      const multiplier = economyDev && economyDev.scoringMultiplier !== undefined
+        ? economyDev.scoringMultiplier
+        : 2;
+      score += completedProductionsCount * multiplier;
     }
   }
 
   // Ancient Empire development bonus (Ancient Empires only)
   if (player.developments.indexOf('ancientEmpire') !== -1) {
     const completedCulturesCount = getCompletedCulturesCount(player, MONUMENTS, variantConfig);
-    score += completedCulturesCount * 9;
+    // Find the ancientEmpire development to get the correct multiplier for this variant
+    let ancientEmpireDev = null;
+    for (let k = 0; k < DEVELOPMENTS.length; k++) {
+      if (DEVELOPMENTS[k].id === 'ancientEmpire') {
+        ancientEmpireDev = DEVELOPMENTS[k];
+        break;
+      }
+    }
+    // Use explicit scoringMultiplier if defined, otherwise default to 9
+    const multiplier = ancientEmpireDev && ancientEmpireDev.scoringMultiplier !== undefined
+      ? ancientEmpireDev.scoringMultiplier
+      : 9;
+    score += completedCulturesCount * multiplier;
   }
 
   // Subtract disasters
@@ -271,7 +297,10 @@ export function calculateScoreBreakdown(player, DEVELOPMENTS, MONUMENTS, variant
         break;
       }
     }
-    const multiplier = architectureDev && architectureDev.cost >= 60 ? 2 : 1;
+    // Use explicit scoringMultiplier if defined, otherwise fallback to heuristic
+    const multiplier = architectureDev && architectureDev.scoringMultiplier !== undefined
+      ? architectureDev.scoringMultiplier
+      : (architectureDev && architectureDev.cost >= 60 ? 2 : 1);
     bonusScore += completedCount * multiplier;
   }
 
@@ -310,14 +339,38 @@ export function calculateScoreBreakdown(player, DEVELOPMENTS, MONUMENTS, variant
       for (let j = 0; j < player.productions.length; j++) {
         if (player.productions[j].built) completedProductionsCount++;
       }
-      bonusScore += completedProductionsCount * 2;
+      // Find the economy development to get the correct multiplier for this variant
+      let economyDev = null;
+      for (let k = 0; k < DEVELOPMENTS.length; k++) {
+        if (DEVELOPMENTS[k].id === 'economy') {
+          economyDev = DEVELOPMENTS[k];
+          break;
+        }
+      }
+      // Use explicit scoringMultiplier if defined, otherwise default to 2
+      const multiplier = economyDev && economyDev.scoringMultiplier !== undefined
+        ? economyDev.scoringMultiplier
+        : 2;
+      bonusScore += completedProductionsCount * multiplier;
     }
   }
 
   // Ancient Empire development bonus (Ancient Empires only)
   if (player.developments.indexOf('ancientEmpire') !== -1) {
     const completedCulturesCount = getCompletedCulturesCount(player, MONUMENTS, variantConfig);
-    bonusScore += completedCulturesCount * 9;
+    // Find the ancientEmpire development to get the correct multiplier for this variant
+    let ancientEmpireDev = null;
+    for (let k = 0; k < DEVELOPMENTS.length; k++) {
+      if (DEVELOPMENTS[k].id === 'ancientEmpire') {
+        ancientEmpireDev = DEVELOPMENTS[k];
+        break;
+      }
+    }
+    // Use explicit scoringMultiplier if defined, otherwise default to 9
+    const multiplier = ancientEmpireDev && ancientEmpireDev.scoringMultiplier !== undefined
+      ? ancientEmpireDev.scoringMultiplier
+      : 9;
+    bonusScore += completedCulturesCount * multiplier;
   }
 
   const total = developmentsScore + monumentsScore + bonusScore - player.disasters;

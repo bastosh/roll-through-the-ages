@@ -60,7 +60,7 @@ export default function PlayerScorePanel({
   onUnbuildProduction = null
 }) {
   const goodsValue = getGoodsValue(player.goodsPositions);
-  const isAncientEmpires = variantId === 'ancient_empires';
+  const isAncientEmpires = variantId === 'ancient_empires' || variantId === 'ancient_empires_original';
 
   return (
     <div className="bg-white dark:bg-dark-surface rounded-lg shadow-lg p-2 sm:px-4 lg:h-full flex flex-col lg:overflow-hidden transition-colors">
@@ -112,7 +112,7 @@ export default function PlayerScorePanel({
                 />
               )}
             </div>
-            {(variantId === 'late_bronze_age' || isAncientEmpires) && (
+            {(variantId === 'late_bronze_age' || variantId === 'ancient_empires') && (
               <BoatDisplay
                 builtBoats={player.builtBoats || 0}
                 pendingBoats={player.pendingBoats || 0}
@@ -135,6 +135,7 @@ export default function PlayerScorePanel({
               pendingWorkers={pendingWorkers}
               productions={variantConfig.productions}
               citiesBuiltCount={3 + player.cities.filter(c => c.built).length}
+              developments={developments}
             />
           )}
 

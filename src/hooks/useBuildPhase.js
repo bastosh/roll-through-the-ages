@@ -131,9 +131,16 @@ export function useBuildPhase() {
     if (production && !production.built && pendingWorkers >= 1) {
       // If this is the first worker, set requiredWorkers based on current city count
       if (production.progress === 0) {
-        const citiesBuilt = 3 + player.cities.filter(c => c.built).length;
-        const cityKey = `${citiesBuilt} cities`;
-        production.requiredWorkers = productionDef.workers[cityKey] || productionDef.workers['3 cities'];
+        // Check if workers is a number (Ancient Empires Original) or an object (Ancient Empires Beri)
+        if (typeof productionDef.workers === 'number') {
+          // Fixed cost (Ancient Empires Original)
+          production.requiredWorkers = productionDef.workers;
+        } else {
+          // Dynamic cost based on city count (Ancient Empires Beri)
+          const citiesBuilt = 3 + player.cities.filter(c => c.built).length;
+          const cityKey = `${citiesBuilt} cities`;
+          production.requiredWorkers = productionDef.workers[cityKey] || productionDef.workers['3 cities'];
+        }
       }
 
       // Add a worker to production building

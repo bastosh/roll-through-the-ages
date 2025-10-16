@@ -1,19 +1,39 @@
 // Helper functions to get translated monument and development data
 import i18n from '../../i18n/config';
 
-export function getTranslatedMonuments(baseMonuments) {
+export function getTranslatedMonuments(baseMonuments, variantId = null) {
   return baseMonuments.map(function(monument) {
+    let effectText = null;
+    if (monument.effect) {
+      // Try to get variant-specific effect first
+      const effectKey = 'monumentEffects.' + monument.id;
+      const effectData = i18n.t(effectKey, { returnObjects: true });
+
+      if (typeof effectData === 'object' && effectData !== null) {
+        // Check if variant-specific effect exists
+        if (variantId && effectData[variantId]) {
+          effectText = effectData[variantId];
+        } else {
+          // Fallback to default
+          effectText = effectData.default || effectData;
+        }
+      } else {
+        // Old string format (backward compatibility)
+        effectText = effectData;
+      }
+    }
+
     return {
       ...monument,
       name: i18n.t('monuments.' + monument.id),
-      effect: monument.effect ? i18n.t('monumentEffects.' + monument.id) : null
+      effect: effectText
     };
   });
 }
 
 export function getTranslatedDevelopments(baseDevelopments) {
   return baseDevelopments.map(function(dev) {
-    // Handle special cases with dynamic values based on cost/points
+    // Handle special cases with dynamic values based on scoringMultiplier or cost/points
     let effect;
 
     if (dev.id === 'granaries') {
@@ -21,9 +41,19 @@ export function getTranslatedDevelopments(baseDevelopments) {
       const coins = dev.cost === 30 && dev.points === 6 ? 6 : 4;
       effect = i18n.t('developmentEffects.granaries', { count: coins });
     } else if (dev.id === 'architecture') {
-      // Detect variant: 60 cost = 2 bonus points, 50 cost = 1 bonus point
-      const bonus = dev.cost === 60 ? 2 : 1;
+      // Use scoringMultiplier if defined, otherwise fallback to heuristic
+      const bonus = dev.scoringMultiplier !== undefined
+        ? dev.scoringMultiplier
+        : (dev.cost === 60 ? 2 : 1);
       effect = i18n.t('developmentEffects.architecture', { count: bonus });
+    } else if (dev.id === 'economy') {
+      // Use scoringMultiplier if defined, otherwise default to 2
+      const bonus = dev.scoringMultiplier !== undefined ? dev.scoringMultiplier : 2;
+      effect = i18n.t('developmentEffects.economy', { count: bonus });
+    } else if (dev.id === 'ancientEmpire') {
+      // Use scoringMultiplier if defined, otherwise default to 9
+      const bonus = dev.scoringMultiplier !== undefined ? dev.scoringMultiplier : 9;
+      effect = i18n.t('developmentEffects.ancientEmpire', { count: bonus });
     } else {
       effect = i18n.t('developmentEffects.' + dev.id);
     }
