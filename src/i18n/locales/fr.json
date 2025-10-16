@@ -101,7 +101,8 @@
     "bronze_age_2024": "The Bronze Age (2024)",
     "late_bronze_age": "The Late Bronze Age",
     "ancient_empires": "Ancient Empires",
-    "ancient_empires_beri": "Ancient Empires (Beri)"
+    "ancient_empires_beri": "Ancient Empires (Beri)",
+    "ancient_empires_beri_revised": "Ancient Empires (Beri révisée)"
   },
 
   "monuments": {
@@ -126,25 +127,35 @@
 
   "monumentEffects": {
     "ishtar_gate": {
+      "ancient_empires_beri": "Vous gagnez 12 pièces à dépenser dans le tour où vous achevez cette merveille",
+      "ancient_empires_beri_revised": "Vous gagnez 12 pièces à dépenser dans le tour où vous achevez cette merveille",
       "default": "À chaque tour, vous avez 1 ouvrier supplémentaire"
     },
     "delphi_oracle": {
       "ancient_empires": "Relancer un dé (comme Leadership)",
       "ancient_empires_beri": "Vous gagnez 12 pièces à dépenser dans le tour où vous achevez cette merveille",
+      "ancient_empires_beri_revised": "Relancer un dé (comme Leadership)",
       "default": "Relancer un dé (comme Leadership)"
     },
     "heavenly_gate": {
+      "ancient_empires_beri": "+5 pièces par dé ouvriers",
+      "ancient_empires_beri_revised": "+5 pièces par dé ouvriers",
       "default": "En phase 1, si vous conservez au moins un dé 1 ressource, vous recevez 1 ressource supplémentaire"
     },
     "great_wall": {
+      "ancient_empires_beri": "Les invasions ne vous affectent plus",
+      "ancient_empires_beri_revised": "Les invasions ne vous affectent plus",
       "default": "Les invasions ne vous affectent plus"
     },
     "sphinx": {
       "ancient_empires": "Conserve 1 ressource lors d'une révolte (5+ crânes)",
       "ancient_empires_beri": "Une fois dans la partie, ignorez la perte de PV due à la famine",
+      "ancient_empires_beri_revised": "Conserve 1 ressource lors d'une révolte (5+ crânes)",
       "default": "Une fois dans la partie, ignorez la perte de PV due à la famine"
     },
     "great_pyramid": {
+      "ancient_empires_beri": "Lorsque vous subissez au moins 1 point de Catastrophe (famine incluse), subissez-en 1 de moins",
+      "ancient_empires_beri_revised": "Lorsque vous subissez au moins 1 point de Catastrophe (famine incluse), subissez-en 1 de moins",
       "default": "Lorsque vous subissez au moins 1 point de Catastrophe (famine incluse), subissez-en 1 de moins"
     }
   },

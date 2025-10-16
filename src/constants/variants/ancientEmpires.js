@@ -72,7 +72,7 @@ const BASE_DEVELOPMENTS = [
   { id: 'ancientEmpire', prerequisite: 'metropolis', cost: 80, points: 10, scoringMultiplier: 10 } // 10 points per culture
 ];
 
-export const ANCIENT_EMPIRES_ORIGINALCONFIG = {
+export const ANCIENT_EMPIRES_CONFIG = {
   id: 'ancient_empires',
   name: 'Ancient Empires',
   displayName: 'Ancient Empires',

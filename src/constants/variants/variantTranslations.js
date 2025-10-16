@@ -45,7 +45,23 @@ export function getTranslatedDevelopments(baseDevelopments, variantId = null) {
       const bonus = dev.scoringMultiplier !== undefined
         ? dev.scoringMultiplier
         : (dev.cost === 60 ? 2 : 1);
-      effect = i18n.t('developmentEffects.architecture', { count: bonus });
+
+      // Variant-specific effect for Architecture
+      const effectKey = 'developmentEffects.architecture';
+      const effectData = i18n.t(effectKey, { returnObjects: true });
+
+      if (typeof effectData === 'object' && effectData !== null && !effectData.hasOwnProperty('count')) {
+        // Check if variant-specific effect exists
+        if (variantId && effectData[variantId]) {
+          effect = i18n.t(effectKey + '.' + variantId, { count: bonus });
+        } else {
+          // Fallback to default
+          effect = i18n.t(effectKey + '.default', { count: bonus });
+        }
+      } else {
+        // Old string format (backward compatibility)
+        effect = i18n.t(effectKey, { count: bonus });
+      }
     } else if (dev.id === 'economy') {
       // Use scoringMultiplier if defined, otherwise default to 2
       const bonus = dev.scoringMultiplier !== undefined ? dev.scoringMultiplier : 2;

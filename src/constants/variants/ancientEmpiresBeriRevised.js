@@ -4,19 +4,19 @@ import { getTranslatedMonuments, getTranslatedDevelopments } from './variantTran
 const METROPOLIS = {name: 'metropolis', workers: 10, points: 4}
 
 const PRODUCTION = [
-  {name: 'market', workers: {'3 cities': 8, '4 cities': 9, '5 cities': 10, '6 cities': 11, '7 cities': 12}, bonus: '1 good'}, 
-  {name: 'mine', workers: {'3 cities': 6, '4 cities': 7, '5 cities': 8}, bonus: '1 coin'}, 
-  {name: 'mine', workers: {'3 cities': 6, '4 cities': 7, '5 cities': 8}, bonus: '1 coin'}, 
-  {name: 'village', workers: {'3 cities': 4, '4 cities': 5, '5 cities': 6}, bonus: '1 food'}, 
-  {name: 'village', workers: {'3 cities': 4, '4 cities': 5, '5 cities': 6}, bonus: '1 food'}, 
-  {name: 'village', workers: {'3 cities': 4, '4 cities': 5, '5 cities': 6}, bonus: '1 food'}, 
+  {name: 'market', workers: {'3 cities': 8, '4 cities': 9, '5 cities': 10, '6 cities': 11, '7 cities': 12}, bonus: '1 good'},
+  {name: 'mine', workers: {'3 cities': 6, '4 cities': 7, '5 cities': 8}, bonus: '1 coin'},
+  {name: 'mine', workers: {'3 cities': 6, '4 cities': 7, '5 cities': 8}, bonus: '1 coin'},
+  {name: 'village', workers: {'3 cities': 4, '4 cities': 5, '5 cities': 6}, bonus: '1 food'},
+  {name: 'village', workers: {'3 cities': 4, '4 cities': 5, '5 cities': 6}, bonus: '1 food'},
+  {name: 'village', workers: {'3 cities': 4, '4 cities': 5, '5 cities': 6}, bonus: '1 food'},
 ]
 
 const CULTURES = [
-  {name: 'celtic', bonusFirst: 8, bonusSecond: 4}, 
-  {name: 'babylonian', bonusFirst: 6, bonusSecond: 3}, 
-  {name: 'greek', bonusFirst: 4, bonusSecond: 2}, 
-  {name: 'chinese', bonusFirst: 4, bonusSecond: 2}, 
+  {name: 'celtic', bonusFirst: 8, bonusSecond: 4},
+  {name: 'babylonian', bonusFirst: 6, bonusSecond: 3},
+  {name: 'greek', bonusFirst: 4, bonusSecond: 2},
+  {name: 'chinese', bonusFirst: 4, bonusSecond: 2},
   {name: 'egyptian', bonusFirst: 2, bonusSecond: 1}
 ];
 
@@ -73,10 +73,10 @@ const BASE_DEVELOPMENTS = [
   { id: 'ancientEmpire', prerequisite: 'metropolis', discount: 'none', cost: 80, points: 10, scoringMultiplier: 9 } // 9 points per culture
 ];
 
-export const ANCIENT_EMPIRES_BERI_CONFIG = {
-  id: 'ancient_empires_beri',
-  name: 'Ancient Empires Beri',
-  displayName: 'Ancient Empires (v. Beri)',
+export const ANCIENT_EMPIRES_BERI_REVISED_CONFIG = {
+  id: 'ancient_empires_beri_revised',
+  name: 'Ancient Empires Beri Revised',
+  displayName: 'Ancient Empires (v. Beri révisée)',
 
   // End game conditions - modified for this variant
   endGameConditions: {
