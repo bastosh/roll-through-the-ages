@@ -206,7 +206,11 @@ export default function ActionButtonsBar({
         )}
         <button
           onClick={onSkipBuy}
-          className="h-12 sm:h-16 w-full sm:w-32 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 cursor-pointer"
+          className={`h-12 sm:h-16 w-full sm:w-32 text-white rounded-lg text-sm sm:text-base font-semibold cursor-pointer ${
+            hasPurchased
+              ? 'bg-green-600 hover:bg-green-700'
+              : 'bg-gray-600 hover:bg-gray-600'
+          }`}
         >
           {hasPurchased ? t('actions.validate') : t('actions.skip')}
         </button>
