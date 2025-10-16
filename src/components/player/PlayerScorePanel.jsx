@@ -60,7 +60,7 @@ export default function PlayerScorePanel({
   onUnbuildProduction = null
 }) {
   const goodsValue = getGoodsValue(player.goodsPositions);
-  const isAncientEmpires = variantId === 'ancient_empires' || variantId === 'ancient_empires_original';
+  const isAncientEmpires = variantId === 'ancient_empires' || variantId === 'ancient_empires_beri';
 
   return (
     <div className="bg-white dark:bg-dark-surface rounded-lg shadow-lg p-2 sm:px-4 lg:h-full flex flex-col lg:overflow-hidden transition-colors">
@@ -112,7 +112,7 @@ export default function PlayerScorePanel({
                 />
               )}
             </div>
-            {(variantId === 'late_bronze_age' || variantId === 'ancient_empires') && (
+            {(variantId === 'late_bronze_age' || variantId === 'ancient_empires' || variantId === 'ancient_empires_beri') && (
               <BoatDisplay
                 builtBoats={player.builtBoats || 0}
                 pendingBoats={player.pendingBoats || 0}

@@ -99,8 +99,8 @@
     "bronze_age": "The Bronze Age",
     "bronze_age_2024": "The Bronze Age (2024)",
     "late_bronze_age": "The Late Bronze Age",
-    "ancient_empires_original": "Ancient Empires",
-    "ancient_empires": "Ancient Empires (Beri)"
+    "ancient_empires": "Ancient Empires",
+    "ancient_empires_beri": "Ancient Empires (Beri)"
   },
 
   "monuments": {
@@ -128,8 +128,8 @@
       "default": "Each turn, you have 1 additional worker"
     },
     "delphi_oracle": {
-      "ancient_empires_original": "Reroll one die (like Leadership)",
-      "ancient_empires": "You gain 12 coins to spend in the turn you complete this wonder",
+      "ancient_empires": "Reroll one die (like Leadership)",
+      "ancient_empires_beri": "You gain 12 coins to spend in the turn you complete this wonder",
       "default": "Reroll one die (like Leadership)"
     },
     "heavenly_gate": {
@@ -139,8 +139,8 @@
       "default": "Invasions no longer affect you"
     },
     "sphinx": {
-      "ancient_empires_original": "Keep 1 resource during revolt (5+ skulls)",
-      "ancient_empires": "Once per game, ignore VP loss from starvation",
+      "ancient_empires": "Keep 1 resource during revolt (5+ skulls)",
+      "ancient_empires_beri": "Once per game, ignore VP loss from starvation",
       "default": "Once per game, ignore VP loss from starvation"
     },
     "great_pyramid": {
@@ -213,8 +213,8 @@
     "commerce": "1 bonus point per good at game end",
     "forestry": "+1 wood if you collect wood",
     "slavery": {
-      "ancient_empires": "+5 coins per Workers die",
-      "ancient_empires_original": "Trade 1 worker for 3 coins",
+      "ancient_empires_beri": "+5 coins per Workers die",
+      "ancient_empires": "Trade 1 worker for 3 coins",
       "default": "+5 coins per Workers die"
     },
     "economy": "{{count}} bonus point(s) per production building",

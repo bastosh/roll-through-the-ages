@@ -100,8 +100,8 @@
     "bronze_age": "The Bronze Age",
     "bronze_age_2024": "The Bronze Age (2024)",
     "late_bronze_age": "The Late Bronze Age",
-    "ancient_empires_original": "Ancient Empires",
-    "ancient_empires": "Ancient Empires (Beri)"
+    "ancient_empires": "Ancient Empires",
+    "ancient_empires_beri": "Ancient Empires (Beri)"
   },
 
   "monuments": {
@@ -129,8 +129,8 @@
       "default": "À chaque tour, vous avez 1 ouvrier supplémentaire"
     },
     "delphi_oracle": {
-      "ancient_empires_original": "Relancer un dé (comme Leadership)",
-      "ancient_empires": "Vous gagnez 12 pièces à dépenser dans le tour où vous achevez cette merveille",
+      "ancient_empires": "Relancer un dé (comme Leadership)",
+      "ancient_empires_beri": "Vous gagnez 12 pièces à dépenser dans le tour où vous achevez cette merveille",
       "default": "Relancer un dé (comme Leadership)"
     },
     "heavenly_gate": {
@@ -140,8 +140,8 @@
       "default": "Les invasions ne vous affectent plus"
     },
     "sphinx": {
-      "ancient_empires_original": "Conserve 1 ressource lors d'une révolte (5+ crânes)",
-      "ancient_empires": "Une fois dans la partie, ignorez la perte de PV due à la famine",
+      "ancient_empires": "Conserve 1 ressource lors d'une révolte (5+ crânes)",
+      "ancient_empires_beri": "Une fois dans la partie, ignorez la perte de PV due à la famine",
       "default": "Une fois dans la partie, ignorez la perte de PV due à la famine"
     },
     "great_pyramid": {
@@ -214,8 +214,8 @@
     "commerce": "1 point de bonus par ressource en fin de partie",
     "forestry": "+1 bois si vous collectez du bois",
     "slavery": {
-      "ancient_empires": "+5 pièces par dé ouvriers",
-      "ancient_empires_original": "Échangez 1 ouvrier contre 3 pièces",
+      "ancient_empires_beri": "+5 pièces par dé ouvriers",
+      "ancient_empires": "Échangez 1 ouvrier contre 3 pièces",
       "default": "+5 pièces par dé ouvriers"
     },
     "economy": "{{count}} point(s) de bonus par bâtiment de production",

@@ -510,7 +510,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     // For Ancient Empires Beri: automatic coins from worker dice (5 coins per die)
     // For Ancient Empires Original: manual trading only (1 worker = 3 coins, handled in buy phase)
     let slaveryBonus = 0;
-    if (currentPlayerState.developments.indexOf('slavery') !== -1 && variantId === 'ancient_empires') {
+    if (currentPlayerState.developments.indexOf('slavery') !== -1 && variantId === 'ancient_empires_beri') {
       slaveryBonus = workerDiceCount * 5;
     }
 
@@ -665,9 +665,9 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     setPendingFoodOrWorkers(0);
     resetStone();
 
-    // If variant is Late Bronze Age or Ancient Empires, player has shipping development and boats, go to trade phase
+    // If variant is Late Bronze Age or Ancient Empires (both variants), player has shipping development and boats, go to trade phase
     const hasShipping = newPlayers[currentPlayerIndex].developments.indexOf('shipping') !== -1;
-    const isTradeVariant = variantId === 'late_bronze_age' || variantId === 'ancient_empires';
+    const isTradeVariant = variantId === 'late_bronze_age' || variantId === 'ancient_empires' || variantId === 'ancient_empires_beri';
     if (isTradeVariant && hasShipping && newPlayers[currentPlayerIndex].builtBoats > 0) {
       initializeTradePhase(newPlayers[currentPlayerIndex]);
       setPhase('trade');

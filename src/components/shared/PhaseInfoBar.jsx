@@ -249,7 +249,7 @@ export default function PhaseInfoBar({
             )}
           </div>
         )}
-        {hasSlavery && variantConfig && variantConfig.id === 'ancient_empires_original' && (
+        {hasSlavery && variantConfig && variantConfig.id === 'ancient_empires' && (
           <div className="flex items-center gap-4 bg-purple-50 dark:bg-purple-900/30 border border-purple-400 dark:border-purple-700 rounded px-5 py-2 transition-colors">
             <div className="text-base font-semibold text-purple-700 dark:text-purple-400">⚒️ {t('developments.slavery')}</div>
             <div className="text-sm text-gray-600 dark:text-dark-text-muted">{t('common.workers')}:</div>
