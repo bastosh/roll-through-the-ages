@@ -213,7 +213,11 @@
     "shipping": "Construisez des navires (1 Bois + 1 Tissu). Échangez des ressources",
     "commerce": "1 point de bonus par ressource en fin de partie",
     "forestry": "+1 bois si vous collectez du bois",
-    "slavery": "+5 pièces par dé ouvriers",
+    "slavery": {
+      "ancient_empires": "+5 pièces par dé ouvriers",
+      "ancient_empires_original": "Échangez 1 ouvrier contre 3 pièces",
+      "default": "+5 pièces par dé ouvriers"
+    },
     "economy": "{{count}} point(s) de bonus par bâtiment de production",
     "kingdom": "1 point de bonus par cité",
     "ancientEmpire": "{{count}} point(s) de bonus par culture complétée"

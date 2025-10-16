@@ -110,6 +110,6 @@ export const ANCIENT_EMPIRES_CONFIG = {
   },
 
   get developments() {
-    return getTranslatedDevelopments(BASE_DEVELOPMENTS);
+    return getTranslatedDevelopments(BASE_DEVELOPMENTS, this.id);
   }
 };

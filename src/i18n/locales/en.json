@@ -212,7 +212,11 @@
     "shipping": "Build boats (1 Wood + 1 Cloth). Trade resources",
     "commerce": "1 bonus point per good at game end",
     "forestry": "+1 wood if you collect wood",
-    "slavery": "+5 coins per Workers die",
+    "slavery": {
+      "ancient_empires": "+5 coins per Workers die",
+      "ancient_empires_original": "Trade 1 worker for 3 coins",
+      "default": "+5 coins per Workers die"
+    },
     "economy": "{{count}} bonus point(s) per production building",
     "kingdom": "1 bonus point per city",
     "ancientEmpire": "{{count}} bonus point(s) per completed culture"

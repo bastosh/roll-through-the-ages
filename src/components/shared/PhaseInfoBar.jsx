@@ -20,6 +20,10 @@ export default function PhaseInfoBar({
   onTradeFood,
   onResetTrade,
   granariesRate,
+  workersToTradeForCoins = 0,
+  onTradeWorkers,
+  onResetWorkersTrade,
+  slaveryRate,
   needsToDiscard,
   hasCaravans,
   foodOrWorkerChoices = [],
@@ -32,8 +36,10 @@ export default function PhaseInfoBar({
   const { t } = useTranslation();
   const hasEngineering = currentPlayer.developments.indexOf('engineering') !== -1;
   const hasGranaries = currentPlayer.developments.indexOf('granaries') !== -1;
+  const hasSlavery = currentPlayer.developments.indexOf('slavery') !== -1;
   const totalStoneAvailable = currentPlayer.goodsPositions.stone + stoneToTradeForWorkers;
   const totalFoodAvailable = currentPlayer.food + foodToTradeForCoins;
+  const totalWorkersAvailable = pendingWorkers + workersToTradeForCoins;
   const foodAvailable = currentPlayer.food;
   const foodNeeded = citiesToFeed;
   const foodShortage = Math.max(0, foodNeeded - foodAvailable);
@@ -236,6 +242,32 @@ export default function PhaseInfoBar({
             {stoneToTradeForWorkers > 0 && (
               <button
                 onClick={onResetStone}
+                className="px-3 py-1 bg-orange-500 dark:bg-orange-600 text-white text-lg rounded hover:bg-orange-600 dark:hover:bg-orange-700 cursor-pointer ml-2 transition-colors"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        )}
+        {hasSlavery && variantConfig && variantConfig.id === 'ancient_empires_original' && (
+          <div className="flex items-center gap-4 bg-purple-50 dark:bg-purple-900/30 border border-purple-400 dark:border-purple-700 rounded px-5 py-2 transition-colors">
+            <div className="text-base font-semibold text-purple-700 dark:text-purple-400">⚒️ {t('developments.slavery')}</div>
+            <div className="text-sm text-gray-600 dark:text-dark-text-muted">{t('common.workers')}:</div>
+            <button
+              onClick={() => onTradeWorkers(Math.max(0, workersToTradeForCoins - 1))}
+              disabled={workersToTradeForCoins <= 0}
+              className="px-3 py-1 bg-purple-300 dark:bg-purple-600 text-white text-lg rounded hover:bg-purple-400 dark:hover:bg-purple-700 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500 transition-colors"
+            >–</button>
+            <span className="w-12 text-center text-lg font-bold dark:text-dark-text">{workersToTradeForCoins}</span>
+            <button
+              onClick={() => onTradeWorkers(Math.min(totalWorkersAvailable, workersToTradeForCoins + 1))}
+              disabled={workersToTradeForCoins >= totalWorkersAvailable}
+              className="px-3 py-1 bg-purple-500 dark:bg-purple-700 text-white text-lg rounded hover:bg-purple-600 dark:hover:bg-purple-800 disabled:bg-gray-200 dark:disabled:bg-gray-700 disabled:text-gray-400 dark:disabled:text-gray-500 transition-colors"
+            >+</button>
+            <div className="text-sm dark:text-dark-text">→ {workersToTradeForCoins * slaveryRate} 💰</div>
+            {workersToTradeForCoins > 0 && (
+              <button
+                onClick={onResetWorkersTrade}
                 className="px-3 py-1 bg-orange-500 dark:bg-orange-600 text-white text-lg rounded hover:bg-orange-600 dark:hover:bg-orange-700 cursor-pointer ml-2 transition-colors"
               >
                 ✕

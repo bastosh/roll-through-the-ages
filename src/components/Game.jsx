@@ -189,6 +189,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     originalGoodsPositions,
     lastPurchasedDevelopment,
     foodToTradeForCoins,
+    workersToTradeForCoins,
     selectDevelopment,
     autoBuyDevelopment,
     toggleGoodForPurchase,
@@ -197,6 +198,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     cancelPurchaseSelection,
     resetBuy: resetBuyPhase,
     tradeFood,
+    tradeWorkers,
     resetTrade,
     resetPhase: resetBuyPhaseState
   } = buyPhaseHook;
@@ -248,6 +250,11 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     // Extract number from effect like "Échangez 1 nourriture contre 4 pièces"
     const match = granariesDev.effect.match(/(\d+)\s+pièces/);
     return match ? parseInt(match[1]) : 4;
+  }
+
+  // Get Slavery exchange rate (3 coins per worker for Ancient Empires)
+  function getSlaveryRate() {
+    return 3; // 1 worker = 3 coins
   }
 
   function handleToggleTestMode() {
@@ -473,9 +480,11 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
       }
     }
 
-    // Add coins bonus from slavery development (+5 per worker die)
+    // Add coins bonus from slavery development (Ancient Empires Beri only)
+    // For Ancient Empires Beri: automatic coins from worker dice (5 coins per die)
+    // For Ancient Empires Original: manual trading only (1 worker = 3 coins, handled in buy phase)
     let slaveryBonus = 0;
-    if (currentPlayerState.developments.indexOf('slavery') !== -1) {
+    if (currentPlayerState.developments.indexOf('slavery') !== -1 && variantId === 'ancient_empires') {
       slaveryBonus = workerDiceCount * 5;
     }
 
@@ -877,6 +886,24 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     }
   }
 
+  function handleTradeWorkers(amount) {
+    const slaveryRate = getSlaveryRate();
+    const result = tradeWorkers(amount, pendingWorkers, slaveryRate);
+    if (result) {
+      setPendingWorkers(result.newPendingWorkers);
+      setPendingCoins(pendingCoins + result.newPendingCoins);
+    }
+  }
+
+  function handleResetWorkersTrade() {
+    if (workersToTradeForCoins > 0) {
+      const slaveryRate = getSlaveryRate();
+      setPendingWorkers(pendingWorkers + workersToTradeForCoins);
+      setPendingCoins(pendingCoins - (workersToTradeForCoins * slaveryRate));
+      resetTrade();
+    }
+  }
+
   function handleDiscardGood(type) {
     discardGood(type);
   }
@@ -1190,6 +1217,10 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
               onTradeFood={handleTradeFood}
               onResetTrade={handleResetTrade}
               granariesRate={getGranariesRate()}
+              workersToTradeForCoins={workersToTradeForCoins}
+              onTradeWorkers={handleTradeWorkers}
+              onResetWorkersTrade={handleResetWorkersTrade}
+              slaveryRate={getSlaveryRate()}
               needsToDiscard={!currentPlayer.developments.includes('caravans') && getTotalGoodsCount(tempGoodsPositions || currentPlayer.goodsPositions) > 6}
               hasCaravans={currentPlayer.developments.indexOf('caravans') !== -1}
               foodOrWorkerChoices={foodOrWorkerChoices}

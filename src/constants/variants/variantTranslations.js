@@ -31,7 +31,7 @@ export function getTranslatedMonuments(baseMonuments, variantId = null) {
   });
 }
 
-export function getTranslatedDevelopments(baseDevelopments) {
+export function getTranslatedDevelopments(baseDevelopments, variantId = null) {
   return baseDevelopments.map(function(dev) {
     // Handle special cases with dynamic values based on scoringMultiplier or cost/points
     let effect;
@@ -54,6 +54,23 @@ export function getTranslatedDevelopments(baseDevelopments) {
       // Use scoringMultiplier if defined, otherwise default to 9
       const bonus = dev.scoringMultiplier !== undefined ? dev.scoringMultiplier : 9;
       effect = i18n.t('developmentEffects.ancientEmpire', { count: bonus });
+    } else if (dev.id === 'slavery') {
+      // Variant-specific effect for Slavery
+      const effectKey = 'developmentEffects.slavery';
+      const effectData = i18n.t(effectKey, { returnObjects: true });
+
+      if (typeof effectData === 'object' && effectData !== null) {
+        // Check if variant-specific effect exists
+        if (variantId && effectData[variantId]) {
+          effect = effectData[variantId];
+        } else {
+          // Fallback to default
+          effect = effectData.default || effectData;
+        }
+      } else {
+        // Old string format (backward compatibility)
+        effect = effectData;
+      }
     } else {
       effect = i18n.t('developmentEffects.' + dev.id);
     }

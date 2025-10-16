@@ -21,6 +21,7 @@ export function useBuyPhase() {
   const [originalDevelopments, setOriginalDevelopments] = useState(null);
   const [lastPurchasedDevelopment, setLastPurchasedDevelopment] = useState(null);
   const [foodToTradeForCoins, setFoodToTradeForCoins] = useState(0);
+  const [workersToTradeForCoins, setWorkersToTradeForCoins] = useState(0);
 
   function selectDevelopment(dev, player, pendingCoins, playerCount = 1) {
     const totalValue = getGoodsValue(player.goodsPositions) + pendingCoins;
@@ -190,8 +191,26 @@ export function useBuyPhase() {
     return null;
   }
 
+  function tradeWorkers(amount, pendingWorkers, slaveryRate) {
+    if (amount < 0) return null;
+
+    const difference = amount - workersToTradeForCoins;
+    const totalWorkersAvailable = pendingWorkers + workersToTradeForCoins;
+
+    if (amount <= totalWorkersAvailable) {
+      const newPendingWorkers = pendingWorkers - difference;
+      const coinsToAdd = difference * slaveryRate;
+      const newPendingCoins = coinsToAdd;
+      setWorkersToTradeForCoins(amount);
+
+      return { newPendingWorkers, newPendingCoins };
+    }
+    return null;
+  }
+
   function resetTrade() {
     setFoodToTradeForCoins(0);
+    setWorkersToTradeForCoins(0);
   }
 
   function resetPhase() {
@@ -212,6 +231,7 @@ export function useBuyPhase() {
     originalGoodsPositions,
     lastPurchasedDevelopment,
     foodToTradeForCoins,
+    workersToTradeForCoins,
     selectDevelopment,
     autoBuyDevelopment,
     toggleGoodForPurchase,
@@ -220,6 +240,7 @@ export function useBuyPhase() {
     cancelPurchaseSelection,
     resetBuy,
     tradeFood,
+    tradeWorkers,
     resetTrade,
     resetPhase
   };
