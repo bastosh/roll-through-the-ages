@@ -413,7 +413,30 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     setPendingWorkers(result.newPendingWorkers);
     setPendingFoodOrWorkers(0);
     resetFoodOrWorkersPhase();
-    setPhase('feed');
+
+    // Directement nourrir les cités au lieu de passer par la phase 'feed'
+    const feedResult = feedCities(player, result.newPendingWorkers, false);
+
+    // If Sphinx can be used, show modal and set phase to 'feed'
+    if (feedResult.canUseSphinx) {
+      setSphinxStarvationPoints(feedResult.starvationPoints);
+      setShowSphinxModal(true);
+      setPhase('feed');
+      return;
+    }
+
+    // Update player with feed results
+    newPlayers[currentPlayerIndex] = feedResult.player;
+    setPlayers(newPlayers);
+
+    // Skip build phase if no workers
+    if (feedResult.shouldSkipBuild) {
+      skipToBuyPhase();
+    } else {
+      // Initialize build phase state before entering build phase
+      initializeBuildPhase(feedResult.player);
+      setPhase('build');
+    }
   }
 
   function handleFeed(useSphinx = false) {
