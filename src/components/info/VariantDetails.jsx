@@ -38,11 +38,11 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
       </div>
 
       {/* Règles spécifiques */}
-      {(playerCount === 1 || variantId === 'late_bronze_age' || variantId === 'ancient_empires' || variantId === 'ancient_empires_original') && (
+      {((playerCount === 1 && variantId === 'bronze_age') || variantId === 'late_bronze_age' || variantId === 'ancient_empires' || variantId === 'ancient_empires_original') && (
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-amber-700 dark:text-amber-500 mb-2">📜 {t('setup.specificRules')}</h3>
           <div className="bg-blue-50 dark:bg-dark-elevated rounded p-3 space-y-2 text-sm dark:text-dark-text">
-            {playerCount === 1 && (
+            {playerCount === 1 && variantId === 'bronze_age' && (
               <p>• ☠️ {variant.soloSkullsLocked ? t('setup.skullsCannotBeRerolled') : t('setup.skullsCanBeRerolled')}</p>
             )}
             {variantId === 'late_bronze_age' && (
@@ -68,8 +68,16 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
                     <p>- <span className="font-semibold">{t('cultures.chinese')}</span> : {t('setup.cultureBonus', { first: 4, second: 2 })}</p>
                     <p>- <span className="font-semibold">{t('cultures.egyptian')}</span> : {t('setup.cultureBonus', { first: 2, second: 1 })}</p>
                   </div>
-                  <p>• <span className="font-semibold">{t('developments.economy')}</span> : {t('developmentEffects.economy')}</p>
-                  <p>• <span className="font-semibold">{t('developments.ancientEmpire')}</span> : {t('developmentEffects.ancientEmpire')}</p>
+                  {(function() {
+                    const economyDev = variant.developments.find(d => d.id === 'economy');
+                    const empireDev = variant.developments.find(d => d.id === 'ancientEmpire');
+                    return (
+                      <>
+                        {economyDev && <p>• <span className="font-semibold">{economyDev.name}</span> : {economyDev.effect}</p>}
+                        {empireDev && <p>• <span className="font-semibold">{empireDev.name}</span> : {empireDev.effect}</p>}
+                      </>
+                    );
+                  })()}
                 </div>
               </>
             )}
