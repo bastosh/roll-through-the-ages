@@ -146,6 +146,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     lockedDice,
     leadershipUsed,
     leadershipMode,
+    isRolling,
     rollDice,
     toggleLock,
     handleReroll,
@@ -1211,6 +1212,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
             leadershipMode={leadershipMode}
             isSoloMode={isSoloMode}
             variantConfig={variantConfig}
+            isRolling={isRolling}
             onToggleLock={toggleLock}
             onToggleFoodOrWorker={handleToggleFoodOrWorkerDie}
             canUsePreservation={

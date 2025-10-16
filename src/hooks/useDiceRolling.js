@@ -7,15 +7,22 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
   const [lockedDice, setLockedDice] = useState(savedState?.lockedDice ?? []);
   const [leadershipUsed, setLeadershipUsed] = useState(savedState?.leadershipUsed ?? false);
   const [leadershipMode, setLeadershipMode] = useState(false);
+  const [isRolling, setIsRolling] = useState(false);
 
   // Ref to store timeout ID for auto-validate
   const autoValidateTimeoutRef = useRef(null);
+
+  // Ref to store timeout ID for rolling animation
+  const rollingAnimationTimeoutRef = useRef(null);
 
   // Clean up timeout on unmount
   useEffect(function() {
     return function() {
       if (autoValidateTimeoutRef.current) {
         clearTimeout(autoValidateTimeoutRef.current);
+      }
+      if (rollingAnimationTimeoutRef.current) {
+        clearTimeout(rollingAnimationTimeoutRef.current);
       }
     };
   }, []);
@@ -26,6 +33,15 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
       clearTimeout(autoValidateTimeoutRef.current);
       autoValidateTimeoutRef.current = null;
     }
+
+    // Clear any existing rolling animation timeout
+    if (rollingAnimationTimeoutRef.current) {
+      clearTimeout(rollingAnimationTimeoutRef.current);
+      rollingAnimationTimeoutRef.current = null;
+    }
+
+    // Start rolling animation
+    setIsRolling(true);
 
     let diceToRoll = [];
 
@@ -48,6 +64,12 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
       newResults[idx] = DICE_FACES[Math.floor(Math.random() * 6)];
     }
     setDiceResults(newResults);
+
+    // Stop rolling animation after 600ms (matching CSS animation duration)
+    rollingAnimationTimeoutRef.current = setTimeout(function() {
+      rollingAnimationTimeoutRef.current = null;
+      setIsRolling(false);
+    }, 600);
 
     // Skulls auto-locked unless in solo mode AND variant allows rerolling skulls
     const shouldLockSkulls = !isSoloMode || variantConfig.soloSkullsLocked;
@@ -169,6 +191,7 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
     setLockedDice([]);
     setLeadershipUsed(false);
     setLeadershipMode(false);
+    setIsRolling(false);
   }
 
   return {
@@ -178,6 +201,7 @@ export function useDiceRolling(numDice, isSoloMode, variantConfig, currentPlayer
     lockedDice,
     leadershipUsed,
     leadershipMode,
+    isRolling,
     // Actions
     rollDice,
     toggleLock,

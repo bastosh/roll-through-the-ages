@@ -28,3 +28,41 @@
   --color-amber-dark-600: #d97706;
   --color-amber-dark-700: #b45309;
 }
+
+/* Animation de lancer de dés - simple shake */
+@keyframes dice-roll {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  10% {
+    transform: rotate(-10deg);
+  }
+  20% {
+    transform: rotate(10deg);
+  }
+  30% {
+    transform: rotate(-10deg);
+  }
+  40% {
+    transform: rotate(10deg);
+  }
+  50% {
+    transform: rotate(-10deg);
+  }
+  60% {
+    transform: rotate(10deg);
+  }
+  70% {
+    transform: rotate(-5deg);
+  }
+  80% {
+    transform: rotate(5deg);
+  }
+  90% {
+    transform: rotate(-2deg);
+  }
+}
+
+.animate-dice-roll {
+  animation: dice-roll 600ms ease-in-out;
+}

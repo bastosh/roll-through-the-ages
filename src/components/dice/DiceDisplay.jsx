@@ -9,6 +9,7 @@ export default function DiceDisplay({
   isClickable,
   foodOrWorkerIndex,
   foodOrWorkerChoice,
+  isRolling,
   onToggleLock,
   onToggleFoodOrWorker,
   leadershipMode
@@ -58,16 +59,21 @@ export default function DiceDisplay({
     ringClass = 'ring-2 sm:ring-4 ' + ringColor;
   }
 
+  // Appliquer l'animation de lancer uniquement aux dés non verrouillés pendant le lancer
+  const shouldAnimate = isRolling && !isLocked;
+  const animationClass = shouldAnimate ? 'animate-dice-roll ' : '';
+
   return (
     <div
       key={index}
-      className={'relative w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0 rounded-lg ' + ringClass}
+      className={'relative w-12 h-12 sm:w-16 sm:h-16 flex-shrink-0 rounded-lg overflow-hidden ' + ringClass}
     >
       <img
         src={imageSrc}
         alt={result.type}
         onClick={handleClick}
         className={'w-12 h-12 sm:w-16 sm:h-16 object-contain transition rounded-lg ' +
+          animationClass +
           (isClickable || canToggle ? 'cursor-pointer hover:opacity-80 active:opacity-60 ' : 'cursor-default ')}
       />
     </div>

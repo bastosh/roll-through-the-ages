@@ -11,6 +11,7 @@ export default function DiceBar({
   leadershipMode,
   isSoloMode,
   variantConfig,
+  isRolling,
   onToggleLock,
   onToggleFoodOrWorker,
   canUsePreservation
@@ -60,6 +61,7 @@ export default function DiceBar({
               isClickable={isClickable}
               foodOrWorkerIndex={foodOrWorkerIndex}
               foodOrWorkerChoice={foodOrWorkerChoice}
+              isRolling={isRolling}
               onToggleLock={onToggleLock}
               onToggleFoodOrWorker={onToggleFoodOrWorker}
               leadershipMode={leadershipMode}
