@@ -21,7 +21,6 @@ import SphinxChoiceModal from './shared/SphinxChoiceModal';
 import DiceBar from './dice/DiceBar';
 import GameHeader from './layout/GameHeader';
 import GameEndScreen from './layout/GameEndScreen';
-import ThemeToggle from './shared/ThemeToggle';
 
 export default function Game({ playerNames, variantId, isSoloMode, bronze2024DevCount = 5, savedGameState }) {
   // Load variant configuration
