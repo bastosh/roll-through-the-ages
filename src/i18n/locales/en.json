@@ -230,7 +230,8 @@
     },
     "economy": "{{count}} bonus point(s) per production building",
     "kingdom": "1 bonus point per city",
-    "ancientEmpire": "{{count}} bonus point(s) per completed culture"
+    "ancientEmpire": "{{count}} bonus point(s) per completed culture",
+    "ancientEmpireBeriRevised": "3 points per completed culture + 3 points per different culture with at least one monument"
   },
 
   "goods": {

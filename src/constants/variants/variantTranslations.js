@@ -67,9 +67,14 @@ export function getTranslatedDevelopments(baseDevelopments, variantId = null) {
       const bonus = dev.scoringMultiplier !== undefined ? dev.scoringMultiplier : 2;
       effect = i18n.t('developmentEffects.economy', { count: bonus });
     } else if (dev.id === 'ancientEmpire') {
-      // Use scoringMultiplier if defined, otherwise default to 9
-      const bonus = dev.scoringMultiplier !== undefined ? dev.scoringMultiplier : 9;
-      effect = i18n.t('developmentEffects.ancientEmpire', { count: bonus });
+      // Special handling for Beri Revised variant (different scoring system)
+      if (variantId === 'ancient_empires_beri_revised') {
+        effect = i18n.t('developmentEffects.ancientEmpireBeriRevised');
+      } else {
+        // Use scoringMultiplier if defined, otherwise default to 9
+        const bonus = dev.scoringMultiplier !== undefined ? dev.scoringMultiplier : 9;
+        effect = i18n.t('developmentEffects.ancientEmpire', { count: bonus });
+      }
     } else if (dev.id === 'slavery') {
       // Variant-specific effect for Slavery
       const effectKey = 'developmentEffects.slavery';

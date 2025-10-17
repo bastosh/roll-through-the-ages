@@ -71,7 +71,7 @@ const BASE_DEVELOPMENTS = [
   { id: 'commerce', prerequisite: 'metropolis', discount: 'market', cost: 40, points: 8 },
   { id: 'architecture', prerequisite: 'metropolis', discount: 'none', cost: 60, points: 8, scoringMultiplier: 1 }, // 1 point per monument
   { id: 'kingdom', prerequisite: 'metropolis', discount: 'none', cost: 70, points: 10 },
-  { id: 'ancientEmpire', prerequisite: 'metropolis', discount: 'none', cost: 80, points: 10, scoringMultiplier: 9 } // 9 points per culture
+  { id: 'ancientEmpire', prerequisite: 'metropolis', discount: 'none', cost: 80, points: 10, scoringMultiplier: 'special' } // Special: 3pts/completed culture + 3pts/different culture
 ];
 
 export const ANCIENT_EMPIRES_BERI_REVISED_CONFIG = {

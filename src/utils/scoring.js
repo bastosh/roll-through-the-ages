@@ -7,6 +7,64 @@ import { getTotalGoodsCount } from './gameUtils';
  * @param {Object} variantConfig - The variant configuration
  * @returns {number} Number of cultures that are fully completed
  */
+/**
+ * Calculate Ancient Empire score for Beri Revised variant
+ * 3 points per completed culture + 3 points per different culture with at least one monument
+ */
+function getAncientEmpireScoreBeriRevised(player, MONUMENTS, variantConfig) {
+  if (!variantConfig || !variantConfig.cultures) {
+    return 0;
+  }
+
+  let score = 0;
+  const completedCulturesCount = getCompletedCulturesCount(player, MONUMENTS, variantConfig);
+  const culturesWithMonuments = getCulturesWithAtLeastOneMonument(player, MONUMENTS, variantConfig);
+
+  // 3 points per completed culture
+  score += completedCulturesCount * 3;
+
+  // 3 points per different culture with at least one monument
+  score += culturesWithMonuments * 3;
+
+  return score;
+}
+
+/**
+ * Count how many different cultures have at least one monument built by the player
+ */
+function getCulturesWithAtLeastOneMonument(player, MONUMENTS, variantConfig) {
+  if (!variantConfig || !variantConfig.cultures) {
+    return 0;
+  }
+
+  let culturesWithMonuments = 0;
+
+  for (let i = 0; i < variantConfig.cultures.length; i++) {
+    const culture = variantConfig.cultures[i];
+    let hasMonument = false;
+
+    // Check if player has at least one completed monument from this culture
+    for (let j = 0; j < player.monuments.length; j++) {
+      if (player.monuments[j].completed) {
+        // Find this monument in MONUMENTS to check its origin
+        for (let k = 0; k < MONUMENTS.length; k++) {
+          if (MONUMENTS[k].id === player.monuments[j].id && MONUMENTS[k].origin === culture.name) {
+            hasMonument = true;
+            break;
+          }
+        }
+        if (hasMonument) break;
+      }
+    }
+
+    if (hasMonument) {
+      culturesWithMonuments++;
+    }
+  }
+
+  return culturesWithMonuments;
+}
+
 function getCompletedCulturesCount(player, MONUMENTS, variantConfig) {
   if (!variantConfig || !variantConfig.cultures) {
     return 0;
@@ -217,20 +275,26 @@ export function calculatePlayerScore(player, DEVELOPMENTS, MONUMENTS, variantCon
 
   // Ancient Empire development bonus (Ancient Empires only)
   if (player.developments.indexOf('ancientEmpire') !== -1) {
-    const completedCulturesCount = getCompletedCulturesCount(player, MONUMENTS, variantConfig);
-    // Find the ancientEmpire development to get the correct multiplier for this variant
-    let ancientEmpireDev = null;
-    for (let k = 0; k < DEVELOPMENTS.length; k++) {
-      if (DEVELOPMENTS[k].id === 'ancientEmpire') {
-        ancientEmpireDev = DEVELOPMENTS[k];
-        break;
+    // Special scoring for Beri Revised: 3pts/completed + 3pts/different culture
+    if (variantConfig && variantConfig.id === 'ancient_empires_beri_revised') {
+      score += getAncientEmpireScoreBeriRevised(player, MONUMENTS, variantConfig);
+    } else {
+      // Standard scoring: multiplier * completed cultures
+      const completedCulturesCount = getCompletedCulturesCount(player, MONUMENTS, variantConfig);
+      // Find the ancientEmpire development to get the correct multiplier for this variant
+      let ancientEmpireDev = null;
+      for (let k = 0; k < DEVELOPMENTS.length; k++) {
+        if (DEVELOPMENTS[k].id === 'ancientEmpire') {
+          ancientEmpireDev = DEVELOPMENTS[k];
+          break;
+        }
       }
+      // Use explicit scoringMultiplier if defined, otherwise default to 9
+      const multiplier = ancientEmpireDev && ancientEmpireDev.scoringMultiplier !== undefined
+        ? ancientEmpireDev.scoringMultiplier
+        : 9;
+      score += completedCulturesCount * multiplier;
     }
-    // Use explicit scoringMultiplier if defined, otherwise default to 9
-    const multiplier = ancientEmpireDev && ancientEmpireDev.scoringMultiplier !== undefined
-      ? ancientEmpireDev.scoringMultiplier
-      : 9;
-    score += completedCulturesCount * multiplier;
   }
 
   // Subtract disasters
@@ -357,20 +421,26 @@ export function calculateScoreBreakdown(player, DEVELOPMENTS, MONUMENTS, variant
 
   // Ancient Empire development bonus (Ancient Empires only)
   if (player.developments.indexOf('ancientEmpire') !== -1) {
-    const completedCulturesCount = getCompletedCulturesCount(player, MONUMENTS, variantConfig);
-    // Find the ancientEmpire development to get the correct multiplier for this variant
-    let ancientEmpireDev = null;
-    for (let k = 0; k < DEVELOPMENTS.length; k++) {
-      if (DEVELOPMENTS[k].id === 'ancientEmpire') {
-        ancientEmpireDev = DEVELOPMENTS[k];
-        break;
+    // Special scoring for Beri Revised: 3pts/completed + 3pts/different culture
+    if (variantConfig && variantConfig.id === 'ancient_empires_beri_revised') {
+      bonusScore += getAncientEmpireScoreBeriRevised(player, MONUMENTS, variantConfig);
+    } else {
+      // Standard scoring: multiplier * completed cultures
+      const completedCulturesCount = getCompletedCulturesCount(player, MONUMENTS, variantConfig);
+      // Find the ancientEmpire development to get the correct multiplier for this variant
+      let ancientEmpireDev = null;
+      for (let k = 0; k < DEVELOPMENTS.length; k++) {
+        if (DEVELOPMENTS[k].id === 'ancientEmpire') {
+          ancientEmpireDev = DEVELOPMENTS[k];
+          break;
+        }
       }
+      // Use explicit scoringMultiplier if defined, otherwise default to 9
+      const multiplier = ancientEmpireDev && ancientEmpireDev.scoringMultiplier !== undefined
+        ? ancientEmpireDev.scoringMultiplier
+        : 9;
+      bonusScore += completedCulturesCount * multiplier;
     }
-    // Use explicit scoringMultiplier if defined, otherwise default to 9
-    const multiplier = ancientEmpireDev && ancientEmpireDev.scoringMultiplier !== undefined
-      ? ancientEmpireDev.scoringMultiplier
-      : 9;
-    bonusScore += completedCulturesCount * multiplier;
   }
 
   const total = developmentsScore + monumentsScore + bonusScore - player.disasters;
