@@ -91,9 +91,9 @@ export function buildMonument(player, monumentId, pendingWorkers, MONUMENTS, all
           oracleBonus = 12;
         }
       } else if (monumentId === 'sphinx' || monumentId === 'great_pyramid') {
-        // Both Sphinx and Great Pyramid can prevent starvation depending on variant
-        // sphinxPowerAvailable is used for both monuments (naming kept for compatibility)
-        player.sphinxPowerAvailable = true;
+        // Both Sphinx and Great Pyramid can have special powers depending on variant
+        // starvationPreventionAvailable is used for both starvation prevention and resource protection
+        player.starvationPreventionAvailable = true;
       }
     }
     newPendingWorkers--;

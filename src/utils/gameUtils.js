@@ -1,4 +1,5 @@
 import { GOODS_TYPES, GOODS_VALUES } from '../constants/gameData';
+import { hasDisasterReductionMonument, hasResourceProtectionMonument } from './monumentEffects';
 
 export function getGoodsValue(goodsPositions) {
   let total = 0;
@@ -66,67 +67,33 @@ export function addGoods(player, count) {
 }
 
 /**
- * Helper function to check if player has completed Great Pyramid
- */
-function hasGreatPyramid(player) {
-  for (let i = 0; i < player.monuments.length; i++) {
-    if (player.monuments[i].id === 'great_pyramid' && player.monuments[i].completed) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
  * Helper function to apply disaster points with monument reduction
- * In Beri Revised: Sphinx gives -1 disaster
- * In other variants: Great Pyramid gives -1 disaster
+ * Uses variant config to determine which monument reduces disasters
  */
-function applyDisasterPoints(player, points, variantId = null) {
+function applyDisasterPoints(player, points, variantConfig = null) {
   if (points <= 0) return;
 
   player.disasters += points;
 
-  // Determine which monument gives -1 disaster based on variant
-  const isBeriRevised = variantId === 'ancient_empires_beri_revised';
-
-  if (isBeriRevised) {
-    // Beri Revised: Sphinx gives -1 disaster point
-    if (hasSphinxCompleted(player) && points >= 1) {
-      player.disasters -= 1;
-    }
-  } else {
-    // Other variants: Great Pyramid gives -1 disaster point
-    if (hasGreatPyramid(player) && points >= 1) {
+  // Apply disaster reduction monument effect (-1 disaster) if available
+  if (variantConfig && points >= 1) {
+    if (hasDisasterReductionMonument(player, variantConfig)) {
       player.disasters -= 1;
     }
   }
 }
 
-/**
- * Helper function to check if player has Sphinx monument completed
- */
-function hasSphinxCompleted(player) {
-  for (let i = 0; i < player.monuments.length; i++) {
-    if (player.monuments[i].id === 'sphinx' && player.monuments[i].completed) {
-      return true;
-    }
-  }
-  return false;
-}
-
-export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend = 0, variantId = null) {
+export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend = 0, variantConfig = null) {
   const player = allPlayers[playerIdx];
-  const isBeriRevised = variantId === 'ancient_empires_beri_revised';
 
   if (skulls === 2) {
     if (player.developments.indexOf('irrigation') === -1) {
-      applyDisasterPoints(player, 2, variantId);
+      applyDisasterPoints(player, 2, variantConfig);
     }
   } else if (skulls === 3) {
     for (let i = 0; i < allPlayers.length; i++) {
       if (i !== playerIdx && allPlayers[i].developments.indexOf('medicine') === -1) {
-        applyDisasterPoints(allPlayers[i], 3, variantId);
+        applyDisasterPoints(allPlayers[i], 3, variantConfig);
       }
     }
   } else if (skulls === 4) {
@@ -149,7 +116,7 @@ export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend
             }
           }
           if (!hasGreatWall) {
-            applyDisasterPoints(allPlayers[i], totalDamage, variantId);
+            applyDisasterPoints(allPlayers[i], totalDamage, variantConfig);
           }
         }
       }
@@ -163,16 +130,15 @@ export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend
         }
       }
       if (!hasGreatWall) {
-        applyDisasterPoints(player, 4, variantId);
+        applyDisasterPoints(player, 4, variantConfig);
       }
     }
   } else if (skulls >= 5) {
     if (player.developments.indexOf('religion') !== -1) {
       for (let i = 0; i < allPlayers.length; i++) {
         if (i !== playerIdx && allPlayers[i].developments.indexOf('religion') === -1) {
-          // Check if target has Sphinx power available (not for Beri Revised)
-          // In Beri Revised, Sphinx gives -1 disaster instead of keeping 1 resource
-          if (!isBeriRevised && allPlayers[i].sphinxPowerAvailable && hasSphinxCompleted(allPlayers[i])) {
+          // Check if target has resource protection monument (varies by variant)
+          if (variantConfig && allPlayers[i].starvationPreventionAvailable && hasResourceProtectionMonument(allPlayers[i], variantConfig)) {
             // Keep the highest value resource (spearheads first, then cloth, pottery, stone, wood)
             const goodsOrder = ['spearheads', 'cloth', 'pottery', 'stone', 'wood'];
             let keptResource = null;
@@ -189,17 +155,16 @@ export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend
             if (keptResource) {
               allPlayers[i].goodsPositions[keptResource.type] = keptResource.position;
             }
-            // Use up the Sphinx power
-            allPlayers[i].sphinxPowerAvailable = false;
+            // Use up the resource protection power (reusing starvationPreventionAvailable for this)
+            allPlayers[i].starvationPreventionAvailable = false;
           } else {
             allPlayers[i].goodsPositions = { wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 };
           }
         }
       }
     } else {
-      // Check if player has Sphinx power available (not for Beri Revised)
-      // In Beri Revised, Sphinx gives -1 disaster instead of keeping 1 resource
-      if (!isBeriRevised && player.sphinxPowerAvailable && hasSphinxCompleted(player)) {
+      // Check if player has resource protection monument (varies by variant)
+      if (variantConfig && player.starvationPreventionAvailable && hasResourceProtectionMonument(player, variantConfig)) {
         // Keep the highest value resource (spearheads first, then cloth, pottery, stone, wood)
         const goodsOrder = ['spearheads', 'cloth', 'pottery', 'stone', 'wood'];
         let keptResource = null;
@@ -216,8 +181,8 @@ export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend
         if (keptResource) {
           player.goodsPositions[keptResource.type] = keptResource.position;
         }
-        // Use up the Sphinx power
-        player.sphinxPowerAvailable = false;
+        // Use up the resource protection power (reusing starvationPreventionAvailable for this)
+        player.starvationPreventionAvailable = false;
       } else {
         player.goodsPositions = { wood: 0, stone: 0, pottery: 0, cloth: 0, spearheads: 0 };
       }

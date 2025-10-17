@@ -443,5 +443,14 @@
     "warning": "(Ce pouvoir ne peut être utilisé qu'une seule fois dans la partie)",
     "use": "Utiliser le Sphinx",
     "decline": "Subir la catastrophe"
+  },
+
+  "starvationPrevention": {
+    "title": "Utiliser le pouvoir de {{monument}} ?",
+    "message": "Vous allez subir {{points}} point(s) de Catastrophe dus à la famine.",
+    "question": "Voulez-vous utiliser le pouvoir de {{monument}} pour les ignorer ?",
+    "warning": "(Ce pouvoir ne peut être utilisé qu'une seule fois dans la partie)",
+    "use": "Utiliser {{monument}}",
+    "decline": "Subir la catastrophe"
   }
 }

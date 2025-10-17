@@ -153,6 +153,7 @@ export default function PlayerScorePanel({
               currentPlayerIndex={currentPlayerIndex}
               monuments={monuments}
               cultures={variantConfig.cultures}
+              variantConfig={variantConfig}
             />
           ) : (
             <MonumentsGrid

@@ -97,6 +97,13 @@ export const ANCIENT_EMPIRES_BERI_REVISED_CONFIG = {
   productions: PRODUCTION,
   cultures: CULTURES,
 
+  // Monument effects configuration (inverted from Beri)
+  monumentEffects: {
+    starvationPrevention: 'great_pyramid', // Great Pyramid prevents starvation once per game
+    disasterReduction: 'sphinx',           // Sphinx gives -1 disaster
+    resourceProtection: null               // No resource protection in Beri Revised
+  },
+
   // Monument restrictions - all monuments available for all player counts
   monumentRestrictions: {
     1: [],

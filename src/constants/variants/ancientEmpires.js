@@ -95,6 +95,13 @@ export const ANCIENT_EMPIRES_CONFIG = {
   productions: PRODUCTION,
   cultures: CULTURES,
 
+  // Monument effects configuration
+  monumentEffects: {
+    starvationPrevention: null,        // No monument prevents starvation in original Ancient Empires
+    disasterReduction: 'great_pyramid', // Great Pyramid gives -1 disaster
+    resourceProtection: 'sphinx'        // Sphinx keeps 1 resource during revolt (5+ skulls)
+  },
+
   // Monument restrictions - all monuments available for all player counts
   monumentRestrictions: {
     1: [],

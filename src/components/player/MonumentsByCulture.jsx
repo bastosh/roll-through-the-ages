@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { getStarvationPreventionMonument, getResourceProtectionMonument } from '../../utils/monumentEffects';
 
 export default function MonumentsByCulture({
   playerMonuments,
@@ -9,7 +10,8 @@ export default function MonumentsByCulture({
   allPlayers,
   currentPlayerIndex,
   monuments,
-  cultures
+  cultures,
+  variantConfig
 }) {
   const { t } = useTranslation();
 
@@ -253,7 +255,14 @@ export default function MonumentsByCulture({
                           {/* Effect description for monuments with special effects */}
                           {monument.effect && (
                             <div className={'text-[10px] text-amber-800 dark:text-amber-300 italic leading-tight ' +
-                              (monument.id === 'sphinx' && playerMonument.completed && !allPlayers[currentPlayerIndex].sphinxPowerAvailable ? 'line-through opacity-50' : '')}>
+                              ((() => {
+                                // Check if this monument's power has been used
+                                const starvationPreventionId = getStarvationPreventionMonument(variantConfig);
+                                const resourceProtectionId = getResourceProtectionMonument(variantConfig);
+                                const hasUsedPower = !allPlayers[currentPlayerIndex].starvationPreventionAvailable;
+                                const isPowerMonument = monument.id === starvationPreventionId || monument.id === resourceProtectionId;
+                                return playerMonument.completed && hasUsedPower && isPowerMonument ? 'line-through opacity-50' : '';
+                              })())}>
                               {monument.effect}
                             </div>
                           )}

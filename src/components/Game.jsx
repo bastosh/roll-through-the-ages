@@ -17,7 +17,7 @@ import PhaseInfoBar from './shared/PhaseInfoBar';
 import ActionButtonsBar from './shared/ActionButtonsBar';
 import DisasterHelp from './shared/DisasterHelp';
 import PlayerTurnModal from './player/PlayerTurnModal';
-import SphinxChoiceModal from './shared/SphinxChoiceModal';
+import StarvationPreventionModal from './shared/StarvationPreventionModal';
 import DiceBar from './dice/DiceBar';
 import GameHeader from './layout/GameHeader';
 import GameEndScreen from './layout/GameEndScreen';
@@ -109,7 +109,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         pendingBoats: 0,
         metropolis: metropolis,
         productions: productions,
-        sphinxPowerAvailable: false,
+        starvationPreventionAvailable: true,
         smithingInvasions: [] // Track Smithing invasions in solo mode: { baseBonus, spearheadsSpent, totalBonus }
       };
     });
@@ -129,8 +129,9 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
   const [showPlayerTurnModal, setShowPlayerTurnModal] = useState(!isSoloMode && playerNames.length > 1 && !savedGameState);
   const [preservationUsed, setPreservationUsed] = useState(savedGameState?.preservationUsed ?? false);
   const [pendingSkulls, setPendingSkulls] = useState(savedGameState?.pendingSkulls ?? 0);
-  const [showSphinxModal, setShowSphinxModal] = useState(false);
-  const [sphinxStarvationPoints, setSphinxStarvationPoints] = useState(0);
+  const [showStarvationPreventionModal, setShowStarvationPreventionModal] = useState(false);
+  const [starvationPreventionPoints, setStarvationPreventionPoints] = useState(0);
+  const [starvationPreventionMonumentId, setStarvationPreventionMonumentId] = useState(null);
 
   const currentPlayer = players[currentPlayerIndex];
   let numDice = 3;
@@ -416,12 +417,13 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     resetFoodOrWorkersPhase();
 
     // Directement nourrir les cités au lieu de passer par la phase 'feed'
-    const feedResult = feedCities(player, result.newPendingWorkers, false, variantId);
+    const feedResult = feedCities(player, result.newPendingWorkers, false, variantConfig);
 
-    // If Sphinx can be used, show modal and set phase to 'feed'
-    if (feedResult.canUseSphinx) {
-      setSphinxStarvationPoints(feedResult.starvationPoints);
-      setShowSphinxModal(true);
+    // If starvation prevention monument can be used, show modal and set phase to 'feed'
+    if (feedResult.canUseStarvationPrevention) {
+      setStarvationPreventionPoints(feedResult.starvationPoints);
+      setStarvationPreventionMonumentId(feedResult.starvationPreventionMonumentId);
+      setShowStarvationPreventionModal(true);
       setPhase('feed');
       return;
     }
@@ -440,15 +442,16 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     }
   }
 
-  function handleFeed(useSphinx = false) {
+  function handleFeed(useStarvationPrevention = false) {
     const newPlayers = [...players];
-    const result = feedCities(newPlayers[currentPlayerIndex], pendingWorkers, useSphinx, variantId);
+    const result = feedCities(newPlayers[currentPlayerIndex], pendingWorkers, useStarvationPrevention, variantConfig);
     newPlayers[currentPlayerIndex] = result.player;
 
-    // If Sphinx can be used, show modal (don't update players yet!)
-    if (result.canUseSphinx && !useSphinx) {
-      setSphinxStarvationPoints(result.starvationPoints);
-      setShowSphinxModal(true);
+    // If starvation prevention monument can be used, show modal (don't update players yet!)
+    if (result.canUseStarvationPrevention && !useStarvationPrevention) {
+      setStarvationPreventionPoints(result.starvationPoints);
+      setStarvationPreventionMonumentId(result.starvationPreventionMonumentId);
+      setShowStarvationPreventionModal(true);
       return; // Don't update players or change phase
     }
 
@@ -465,16 +468,16 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     }
   }
 
-  function handleSphinxUse() {
-    setShowSphinxModal(false);
+  function handleStarvationPreventionUse() {
+    setShowStarvationPreventionModal(false);
     handleFeed(true);
   }
 
-  function handleSphinxDecline() {
-    setShowSphinxModal(false);
-    // Re-run feed without using Sphinx
+  function handleStarvationPreventionDecline() {
+    setShowStarvationPreventionModal(false);
+    // Re-run feed without using starvation prevention monument
     const newPlayers = [...players];
-    const result = feedCities(newPlayers[currentPlayerIndex], pendingWorkers, false, variantId);
+    const result = feedCities(newPlayers[currentPlayerIndex], pendingWorkers, false, variantConfig);
     newPlayers[currentPlayerIndex] = result.player;
     setPlayers(newPlayers);
 
@@ -734,7 +737,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
       });
     } else {
       // En mode multijoueur : appliquer les dégâts aux adversaires
-      handleDisasters(newPlayers, currentPlayerIndex, pendingSkulls, spearheadsToSpend, variantId);
+      handleDisasters(newPlayers, currentPlayerIndex, pendingSkulls, spearheadsToSpend, variantConfig);
     }
 
     setPlayers(newPlayers);
@@ -762,7 +765,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
       });
     } else {
       // En mode multijoueur : appliquer l'invasion sans Lances
-      handleDisasters(newPlayers, currentPlayerIndex, pendingSkulls, 0, variantId);
+      handleDisasters(newPlayers, currentPlayerIndex, pendingSkulls, 0, variantConfig);
     }
 
     setPlayers(newPlayers);
@@ -1202,12 +1205,14 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         onStart={() => setShowPlayerTurnModal(false)}
       />
 
-      {/* Sphinx Choice Modal */}
-      <SphinxChoiceModal
-        show={showSphinxModal}
-        starvationPoints={sphinxStarvationPoints}
-        onUseSphinx={handleSphinxUse}
-        onDecline={handleSphinxDecline}
+      {/* Starvation Prevention Modal */}
+      <StarvationPreventionModal
+        show={showStarvationPreventionModal}
+        starvationPoints={starvationPreventionPoints}
+        monumentId={starvationPreventionMonumentId}
+        monumentName={starvationPreventionMonumentId ? MONUMENTS.find(m => m.id === starvationPreventionMonumentId)?.name : ''}
+        onUseMonument={handleStarvationPreventionUse}
+        onDecline={handleStarvationPreventionDecline}
       />
 
       <div className="lg:h-full flex flex-col">

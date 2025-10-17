@@ -442,5 +442,14 @@
     "warning": "(This power can only be used once per game)",
     "use": "Use Sphinx",
     "decline": "Suffer the disaster"
+  },
+
+  "starvationPrevention": {
+    "title": "Use the {{monument}} Power?",
+    "message": "You will suffer {{points}} Disaster point(s) from starvation.",
+    "question": "Do you want to use the {{monument}} power to ignore them?",
+    "warning": "(This power can only be used once per game)",
+    "use": "Use {{monument}}",
+    "decline": "Suffer the disaster"
   }
 }

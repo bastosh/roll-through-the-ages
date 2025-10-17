@@ -225,8 +225,8 @@ export function useBuildPhase() {
         }
 
         // Apply monument completion effects
-        if (monumentId === 'sphinx') {
-          player.sphinxPowerAvailable = true;
+        if (monumentId === 'sphinx' || monumentId === 'great_pyramid') {
+          player.starvationPreventionAvailable = true;
         }
       }
       newPendingWorkers--;
