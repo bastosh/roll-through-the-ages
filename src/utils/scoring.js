@@ -244,10 +244,22 @@ export function calculatePlayerScore(player, DEVELOPMENTS, MONUMENTS, variantCon
     score += cityCount;
   }
 
-  // Commerce development bonus (Late Bronze Age only)
+  // Commerce development bonus
   if (player.developments.indexOf('commerce') !== -1) {
     const totalGoodsCount = getTotalGoodsCount(player.goodsPositions);
-    score += totalGoodsCount;
+    // Find the commerce development to get the correct multiplier for this variant
+    let commerceDev = null;
+    for (let k = 0; k < DEVELOPMENTS.length; k++) {
+      if (DEVELOPMENTS[k].id === 'commerce') {
+        commerceDev = DEVELOPMENTS[k];
+        break;
+      }
+    }
+    // Use explicit scoringMultiplier if defined, otherwise default to 1
+    const multiplier = commerceDev && commerceDev.scoringMultiplier !== undefined
+      ? commerceDev.scoringMultiplier
+      : 1;
+    score += totalGoodsCount * multiplier;
   }
 
   // Economy development bonus (Ancient Empires only)
@@ -397,10 +409,22 @@ export function calculateScoreBreakdown(player, DEVELOPMENTS, MONUMENTS, variant
     bonusScore += cityCount;
   }
 
-  // Commerce development bonus (Late Bronze Age only)
+  // Commerce development bonus
   if (player.developments.indexOf('commerce') !== -1) {
     const totalGoodsCount = getTotalGoodsCount(player.goodsPositions);
-    bonusScore += totalGoodsCount;
+    // Find the commerce development to get the correct multiplier for this variant
+    let commerceDev = null;
+    for (let k = 0; k < DEVELOPMENTS.length; k++) {
+      if (DEVELOPMENTS[k].id === 'commerce') {
+        commerceDev = DEVELOPMENTS[k];
+        break;
+      }
+    }
+    // Use explicit scoringMultiplier if defined, otherwise default to 1
+    const multiplier = commerceDev && commerceDev.scoringMultiplier !== undefined
+      ? commerceDev.scoringMultiplier
+      : 1;
+    bonusScore += totalGoodsCount * multiplier;
   }
 
   // Economy development bonus (Ancient Empires only)

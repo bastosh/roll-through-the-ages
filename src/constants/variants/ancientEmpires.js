@@ -66,7 +66,7 @@ const BASE_DEVELOPMENTS = [
   { id: 'engineering', prerequisite: null, cost: 40, points: 6 },
   { id: 'economy', prerequisite: null, cost: 40, points: 6, scoringMultiplier: 1 }, // 1 point per production building
 
-  { id: 'commerce', prerequisite: 'metropolis', cost: 40, points: 8 },
+  { id: 'commerce', prerequisite: 'metropolis', cost: 40, points: 8, scoringMultiplier: 1 }, // 1 point per remaining good
   { id: 'architecture', prerequisite: 'metropolis', cost: 60, points: 8, scoringMultiplier: 1 }, // 1 point per monument
   { id: 'kingdom', prerequisite: 'metropolis', cost: 70, points: 10 },
   { id: 'ancientEmpire', prerequisite: 'metropolis', cost: 80, points: 10, scoringMultiplier: 10 } // 10 points per culture
