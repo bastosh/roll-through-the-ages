@@ -17,7 +17,7 @@ export default function ProductionBuildingsList({
   // For Ancient Empires Original: prerequisite system (unlock)
   // For Ancient Empires Beri: discount system (reduction)
   const buildingDevMap = {};
-  const useDiscount = variantConfig && variantConfig.id === 'ancient_empires_beri';
+  const useDiscount = variantConfig && (variantConfig.id === 'ancient_empires_beri' || variantConfig.id === 'ancient_empires_beri_revised');
 
   if (developments && developments.length > 0) {
     for (let i = 0; i < developments.length; i++) {

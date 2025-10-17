@@ -78,16 +78,28 @@ function hasGreatPyramid(player) {
 }
 
 /**
- * Helper function to apply disaster points with Great Pyramid reduction
+ * Helper function to apply disaster points with monument reduction
+ * In Beri Revised: Sphinx gives -1 disaster
+ * In other variants: Great Pyramid gives -1 disaster
  */
-function applyDisasterPoints(player, points) {
+function applyDisasterPoints(player, points, variantId = null) {
   if (points <= 0) return;
 
   player.disasters += points;
 
-  // Apply Great Pyramid effect: -1 disaster point if at least 1 was added
-  if (hasGreatPyramid(player) && points >= 1) {
-    player.disasters -= 1;
+  // Determine which monument gives -1 disaster based on variant
+  const isBeriRevised = variantId === 'ancient_empires_beri_revised';
+
+  if (isBeriRevised) {
+    // Beri Revised: Sphinx gives -1 disaster point
+    if (hasSphinxCompleted(player) && points >= 1) {
+      player.disasters -= 1;
+    }
+  } else {
+    // Other variants: Great Pyramid gives -1 disaster point
+    if (hasGreatPyramid(player) && points >= 1) {
+      player.disasters -= 1;
+    }
   }
 }
 
@@ -103,17 +115,18 @@ function hasSphinxCompleted(player) {
   return false;
 }
 
-export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend = 0) {
+export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend = 0, variantId = null) {
   const player = allPlayers[playerIdx];
+  const isBeriRevised = variantId === 'ancient_empires_beri_revised';
 
   if (skulls === 2) {
     if (player.developments.indexOf('irrigation') === -1) {
-      applyDisasterPoints(player, 2);
+      applyDisasterPoints(player, 2, variantId);
     }
   } else if (skulls === 3) {
     for (let i = 0; i < allPlayers.length; i++) {
       if (i !== playerIdx && allPlayers[i].developments.indexOf('medicine') === -1) {
-        applyDisasterPoints(allPlayers[i], 3);
+        applyDisasterPoints(allPlayers[i], 3, variantId);
       }
     }
   } else if (skulls === 4) {
@@ -136,7 +149,7 @@ export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend
             }
           }
           if (!hasGreatWall) {
-            applyDisasterPoints(allPlayers[i], totalDamage);
+            applyDisasterPoints(allPlayers[i], totalDamage, variantId);
           }
         }
       }
@@ -150,15 +163,16 @@ export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend
         }
       }
       if (!hasGreatWall) {
-        applyDisasterPoints(player, 4);
+        applyDisasterPoints(player, 4, variantId);
       }
     }
   } else if (skulls >= 5) {
     if (player.developments.indexOf('religion') !== -1) {
       for (let i = 0; i < allPlayers.length; i++) {
         if (i !== playerIdx && allPlayers[i].developments.indexOf('religion') === -1) {
-          // Check if target has Sphinx power available (Ancient Empires Original: keep 1 resource)
-          if (allPlayers[i].sphinxPowerAvailable && hasSphinxCompleted(allPlayers[i])) {
+          // Check if target has Sphinx power available (not for Beri Revised)
+          // In Beri Revised, Sphinx gives -1 disaster instead of keeping 1 resource
+          if (!isBeriRevised && allPlayers[i].sphinxPowerAvailable && hasSphinxCompleted(allPlayers[i])) {
             // Keep the highest value resource (spearheads first, then cloth, pottery, stone, wood)
             const goodsOrder = ['spearheads', 'cloth', 'pottery', 'stone', 'wood'];
             let keptResource = null;
@@ -183,8 +197,9 @@ export function handleDisasters(allPlayers, playerIdx, skulls, spearheadsToSpend
         }
       }
     } else {
-      // Check if player has Sphinx power available (Ancient Empires Original: keep 1 resource)
-      if (player.sphinxPowerAvailable && hasSphinxCompleted(player)) {
+      // Check if player has Sphinx power available (not for Beri Revised)
+      // In Beri Revised, Sphinx gives -1 disaster instead of keeping 1 resource
+      if (!isBeriRevised && player.sphinxPowerAvailable && hasSphinxCompleted(player)) {
         // Keep the highest value resource (spearheads first, then cloth, pottery, stone, wood)
         const goodsOrder = ['spearheads', 'cloth', 'pottery', 'stone', 'wood'];
         let keptResource = null;

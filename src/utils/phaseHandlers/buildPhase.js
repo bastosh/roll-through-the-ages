@@ -36,7 +36,7 @@ export function unbuildCity(player, cityIndex, pendingWorkers) {
 /**
  * Build a monument
  */
-export function buildMonument(player, monumentId, pendingWorkers, MONUMENTS, allPlayers, currentPlayerIndex) {
+export function buildMonument(player, monumentId, pendingWorkers, MONUMENTS, allPlayers, currentPlayerIndex, variantId = null) {
   let monument = null;
   for (let i = 0; i < player.monuments.length; i++) {
     if (player.monuments[i].id === monumentId) {
@@ -83,8 +83,16 @@ export function buildMonument(player, monumentId, pendingWorkers, MONUMENTS, all
 
       // Apply monument completion effects
       if (monumentDef.effect === 'delphi_oracle') {
-        oracleBonus = 12;
-      } else if (monumentId === 'sphinx') {
+        // Delphi Oracle gives coins upon completion
+        // Beri Revised: 10 coins, Beri: 12 coins
+        if (variantId === 'ancient_empires_beri_revised') {
+          oracleBonus = 10;
+        } else {
+          oracleBonus = 12;
+        }
+      } else if (monumentId === 'sphinx' || monumentId === 'great_pyramid') {
+        // Both Sphinx and Great Pyramid can prevent starvation depending on variant
+        // sphinxPowerAvailable is used for both monuments (naming kept for compatibility)
         player.sphinxPowerAvailable = true;
       }
     }

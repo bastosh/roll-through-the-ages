@@ -416,7 +416,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     resetFoodOrWorkersPhase();
 
     // Directement nourrir les cités au lieu de passer par la phase 'feed'
-    const feedResult = feedCities(player, result.newPendingWorkers, false);
+    const feedResult = feedCities(player, result.newPendingWorkers, false, variantId);
 
     // If Sphinx can be used, show modal and set phase to 'feed'
     if (feedResult.canUseSphinx) {
@@ -442,7 +442,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
 
   function handleFeed(useSphinx = false) {
     const newPlayers = [...players];
-    const result = feedCities(newPlayers[currentPlayerIndex], pendingWorkers, useSphinx);
+    const result = feedCities(newPlayers[currentPlayerIndex], pendingWorkers, useSphinx, variantId);
     newPlayers[currentPlayerIndex] = result.player;
 
     // If Sphinx can be used, show modal (don't update players yet!)
@@ -474,7 +474,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     setShowSphinxModal(false);
     // Re-run feed without using Sphinx
     const newPlayers = [...players];
-    const result = feedCities(newPlayers[currentPlayerIndex], pendingWorkers, false);
+    const result = feedCities(newPlayers[currentPlayerIndex], pendingWorkers, false, variantId);
     newPlayers[currentPlayerIndex] = result.player;
     setPlayers(newPlayers);
 
@@ -510,7 +510,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     // For Ancient Empires Beri: automatic coins from worker dice (5 coins per die)
     // For Ancient Empires Original: manual trading only (1 worker = 3 coins, handled in buy phase)
     let slaveryBonus = 0;
-    if (currentPlayerState.developments.indexOf('slavery') !== -1 && variantId === 'ancient_empires_beri') {
+    if (currentPlayerState.developments.indexOf('slavery') !== -1 && (variantId === 'ancient_empires_beri' || variantId === 'ancient_empires_beri_revised')) {
       slaveryBonus = workerDiceCount * 5;
     }
 
@@ -610,7 +610,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     const newPlayers = [...players];
     const player = newPlayers[currentPlayerIndex];
 
-    const result = buildMonument(player, monumentId, pendingWorkers, MONUMENTS, newPlayers, currentPlayerIndex);
+    const result = buildMonument(player, monumentId, pendingWorkers, MONUMENTS, newPlayers, currentPlayerIndex, variantId);
     setPendingWorkers(result.newPendingWorkers);
     setPlayers(newPlayers);
 
@@ -667,7 +667,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
 
     // If variant is Late Bronze Age or Ancient Empires (both variants), player has shipping development and boats, go to trade phase
     const hasShipping = newPlayers[currentPlayerIndex].developments.indexOf('shipping') !== -1;
-    const isTradeVariant = variantId === 'late_bronze_age' || variantId === 'ancient_empires' || variantId === 'ancient_empires_beri';
+    const isTradeVariant = variantId === 'late_bronze_age' || variantId === 'ancient_empires' || variantId === 'ancient_empires_beri' || variantId === 'ancient_empires_beri_revised';
     if (isTradeVariant && hasShipping && newPlayers[currentPlayerIndex].builtBoats > 0) {
       initializeTradePhase(newPlayers[currentPlayerIndex]);
       setPhase('trade');
@@ -724,7 +724,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     }
 
     // Appliquer l'invasion avec les Lances dépensées
-    handleDisasters(newPlayers, currentPlayerIndex, pendingSkulls, spearheadsToSpend);
+    handleDisasters(newPlayers, currentPlayerIndex, pendingSkulls, spearheadsToSpend, variantId);
 
     setPlayers(newPlayers);
     resetSmithingPhase();
@@ -741,7 +741,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
     const newPlayers = [...players];
 
     // Appliquer l'invasion sans Lances
-    handleDisasters(newPlayers, currentPlayerIndex, pendingSkulls, 0);
+    handleDisasters(newPlayers, currentPlayerIndex, pendingSkulls, 0, variantId);
 
     setPlayers(newPlayers);
     resetSmithingPhase();

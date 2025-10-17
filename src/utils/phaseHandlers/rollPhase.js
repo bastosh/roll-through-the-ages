@@ -59,14 +59,21 @@ export function processRollResults(results, currentPlayerIndex, allPlayers, vari
   }
 
   // Add Heavenly Gate bonus: +1 resource if at least one 1-resource die (goods with value 1) is kept
-  let hasHeavenlyGate = false;
-  for (let i = 0; i < currentPlayer.monuments.length; i++) {
-    if (currentPlayer.monuments[i].id === 'heavenly_gate' && currentPlayer.monuments[i].completed) {
-      hasHeavenlyGate = true;
-      break;
+  // Only for Beri variants (where heavenly_gate has effect: 'heavenly_gate')
+  let hasHeavenlyGateEffect = false;
+  if (variantConfig && variantConfig.monuments) {
+    for (let i = 0; i < currentPlayer.monuments.length; i++) {
+      if (currentPlayer.monuments[i].id === 'heavenly_gate' && currentPlayer.monuments[i].completed) {
+        // Check if this monument has the effect in the variant config
+        const monumentDef = variantConfig.monuments.find(m => m.id === 'heavenly_gate');
+        if (monumentDef && monumentDef.effect === 'heavenly_gate') {
+          hasHeavenlyGateEffect = true;
+          break;
+        }
+      }
     }
   }
-  if (hasHeavenlyGate) {
+  if (hasHeavenlyGateEffect) {
     let hasOneResourceDie = false;
     for (let i = 0; i < results.length; i++) {
       if (results[i].type === 'goods' && results[i].value === 1) {
@@ -104,16 +111,18 @@ export function processRollResults(results, currentPlayerIndex, allPlayers, vari
     }
   }
 
-  // Add Ishtar Gate bonus: +1 worker permanently each turn
-  let hasIshtarGate = false;
-  for (let i = 0; i < currentPlayer.monuments.length; i++) {
-    if (currentPlayer.monuments[i].id === 'ishtar_gate' && currentPlayer.monuments[i].completed) {
-      hasIshtarGate = true;
-      break;
+  // Add Ishtar Gate bonus: +1 worker permanently each turn (all Ancient Empires variants)
+  if (variantConfig && (variantConfig.id === 'ancient_empires' || variantConfig.id === 'ancient_empires_beri' || variantConfig.id === 'ancient_empires_beri_revised')) {
+    let hasIshtarGate = false;
+    for (let i = 0; i < currentPlayer.monuments.length; i++) {
+      if (currentPlayer.monuments[i].id === 'ishtar_gate' && currentPlayer.monuments[i].completed) {
+        hasIshtarGate = true;
+        break;
+      }
     }
-  }
-  if (hasIshtarGate) {
-    workers += 1;
+    if (hasIshtarGate) {
+      workers += 1;
+    }
   }
 
   // Check if Smithing (Forge) phase is needed (4 skulls + smithing development)
@@ -121,7 +130,8 @@ export function processRollResults(results, currentPlayerIndex, allPlayers, vari
 
   // Apply disasters (but skip invasion if Smithing phase is needed)
   if (!needsSmithingPhase) {
-    handleDisasters(newPlayers, currentPlayerIndex, skulls);
+    const variantId = variantConfig ? variantConfig.id : null;
+    handleDisasters(newPlayers, currentPlayerIndex, skulls, 0, variantId);
   }
 
   // Determine next phase

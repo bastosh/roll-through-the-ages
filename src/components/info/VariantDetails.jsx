@@ -38,7 +38,7 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
       </div>
 
       {/* Règles spécifiques */}
-      {((playerCount === 1 && variantId === 'bronze_age') || variantId === 'late_bronze_age' || variantId === 'ancient_empires' || variantId === 'ancient_empires_beri') && (
+      {((playerCount === 1 && variantId === 'bronze_age') || variantId === 'late_bronze_age' || variantId === 'ancient_empires' || variantId === 'ancient_empires_beri' || variantId === 'ancient_empires_beri_revised') && (
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-amber-700 dark:text-amber-500 mb-2">📜 {t('setup.specificRules')}</h3>
           <div className="bg-blue-50 dark:bg-dark-elevated rounded p-3 space-y-2 text-sm dark:text-dark-text">
@@ -55,7 +55,7 @@ export default function VariantDetails({ variantId, playerCount, isSoloMode }) {
                 </div>
               </>
             )}
-            {(variantId === 'ancient_empires' || variantId === 'ancient_empires_beri') && (
+            {(variantId === 'ancient_empires' || variantId === 'ancient_empires_beri' || variantId === 'ancient_empires_beri_revised') && (
               <>
                 <div className="space-y-1.5">
                   <p>• <span className="font-semibold">{t('setup.metropolis')}</span> : {t('setup.metropolisRule')}</p>
