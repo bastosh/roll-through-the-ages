@@ -52,6 +52,7 @@ export default function PlayerScorePanel({
   onDecrementSpearheads = null,
   onConfirmSmithing = null,
   onSkipSmithing = null,
+  isSoloMode = false,
   // Ancient Empires props
   variantConfig = null,
   onBuildMetropolis = null,
@@ -90,6 +91,7 @@ export default function PlayerScorePanel({
               onDecrementSpearheads={onDecrementSpearheads}
               onConfirm={onConfirmSmithing}
               onSkip={onSkipSmithing}
+              isSoloMode={isSoloMode}
             />
           )}
 
@@ -112,7 +114,7 @@ export default function PlayerScorePanel({
                 />
               )}
             </div>
-            {(variantId === 'late_bronze_age' || variantId === 'ancient_empires' || variantId === 'ancient_empires_beri' || variantId === 'ancient_empires_beri_revised') && (
+            {(variantId === 'late_bronze_age' || variantId === 'ancient_empires_beri' || variantId === 'ancient_empires_beri_revised') && (
               <BoatDisplay
                 builtBoats={player.builtBoats || 0}
                 pendingBoats={player.pendingBoats || 0}

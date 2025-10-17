@@ -110,7 +110,8 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
         pendingBoats: 0,
         metropolis: metropolis,
         productions: productions,
-        sphinxPowerAvailable: false
+        sphinxPowerAvailable: false,
+        smithingInvasions: [] // Track Smithing invasions in solo mode: { baseBonus, spearheadsSpent, totalBonus }
       };
     });
   });
@@ -723,8 +724,19 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
       player.goodsPositions.spearheads -= spearheadsToSpend;
     }
 
-    // Appliquer l'invasion avec les Lances dépensées
-    handleDisasters(newPlayers, currentPlayerIndex, pendingSkulls, spearheadsToSpend, variantId);
+    if (isSoloMode) {
+      // En mode solo : enregistrer l'invasion comme bonus de score
+      const baseBonus = 4;
+      const totalBonus = baseBonus + (spearheadsToSpend * 2);
+      player.smithingInvasions.push({
+        baseBonus: baseBonus,
+        spearheadsSpent: spearheadsToSpend,
+        totalBonus: totalBonus
+      });
+    } else {
+      // En mode multijoueur : appliquer les dégâts aux adversaires
+      handleDisasters(newPlayers, currentPlayerIndex, pendingSkulls, spearheadsToSpend, variantId);
+    }
 
     setPlayers(newPlayers);
     resetSmithingPhase();
@@ -739,9 +751,20 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
 
   function handleSkipSmithing() {
     const newPlayers = [...players];
+    const player = newPlayers[currentPlayerIndex];
 
-    // Appliquer l'invasion sans Lances
-    handleDisasters(newPlayers, currentPlayerIndex, pendingSkulls, 0, variantId);
+    if (isSoloMode) {
+      // En mode solo : enregistrer l'invasion comme bonus de score (sans bonus de lances)
+      const baseBonus = 4;
+      player.smithingInvasions.push({
+        baseBonus: baseBonus,
+        spearheadsSpent: 0,
+        totalBonus: baseBonus
+      });
+    } else {
+      // En mode multijoueur : appliquer l'invasion sans Lances
+      handleDisasters(newPlayers, currentPlayerIndex, pendingSkulls, 0, variantId);
+    }
 
     setPlayers(newPlayers);
     resetSmithingPhase();
@@ -1343,6 +1366,7 @@ export default function Game({ playerNames, variantId, isSoloMode, bronze2024Dev
             onDecrementSpearheads={decrementSpearheads}
             onConfirmSmithing={handleConfirmSmithing}
             onSkipSmithing={handleSkipSmithing}
+            isSoloMode={isSoloMode}
             variantConfig={variantConfig}
           />
         </div>

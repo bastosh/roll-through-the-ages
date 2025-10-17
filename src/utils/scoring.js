@@ -297,6 +297,13 @@ export function calculatePlayerScore(player, DEVELOPMENTS, MONUMENTS, variantCon
     }
   }
 
+  // Smithing invasions bonus (solo mode only)
+  if (player.smithingInvasions && player.smithingInvasions.length > 0) {
+    for (let i = 0; i < player.smithingInvasions.length; i++) {
+      score += player.smithingInvasions[i].totalBonus;
+    }
+  }
+
   // Subtract disasters
   score -= player.disasters;
 
@@ -440,6 +447,13 @@ export function calculateScoreBreakdown(player, DEVELOPMENTS, MONUMENTS, variant
         ? ancientEmpireDev.scoringMultiplier
         : 9;
       bonusScore += completedCulturesCount * multiplier;
+    }
+  }
+
+  // Smithing invasions bonus (solo mode only)
+  if (player.smithingInvasions && player.smithingInvasions.length > 0) {
+    for (let i = 0; i < player.smithingInvasions.length; i++) {
+      bonusScore += player.smithingInvasions[i].totalBonus;
     }
   }
 
