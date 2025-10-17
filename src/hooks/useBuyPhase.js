@@ -53,16 +53,6 @@ export function useBuyPhase() {
   }
 
   function autoBuyDevelopment(dev, player, pendingCoins, playerCount = 1) {
-    // Save original state
-    const savedState = {
-      goodsPositions: { ...player.goodsPositions },
-      coins: pendingCoins,
-      developments: [...player.developments]
-    };
-    setOriginalGoodsPositions(savedState.goodsPositions);
-    setOriginalCoins(savedState.coins);
-    setOriginalDevelopments(savedState.developments);
-
     // Calculate actual cost with discount
     const actualCost = calculateDevelopmentCost(dev, player.productions, player.monuments, playerCount);
 
@@ -86,7 +76,7 @@ export function useBuyPhase() {
     }
 
     player.developments.push(dev.id);
-    setLastPurchasedDevelopment(dev);
+    // Don't save state for auto-buy - it proceeds immediately to next phase
 
     return { player, newCoins };
   }
